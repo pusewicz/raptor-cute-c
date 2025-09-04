@@ -42,6 +42,11 @@ EXPORT bool game_update(GameMemory *memory, GameInput *input) {
   return true;
 }
 
-EXPORT void game_render(GameMemory *memory) { (void)memory; }
+EXPORT void game_render(GameMemory *memory) { (void)memory;
+  float fps = cf_app_get_smoothed_framerate();
+  char fps_text[32];
+  snprintf(fps_text, sizeof(fps_text), "FPS: %.2f", fps);
+  cf_draw_text(fps_text, cf_v2(10, 30), -1);
+}
 
 EXPORT void game_shutdown(GameMemory *memory) { (void)memory; }

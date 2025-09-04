@@ -12,9 +12,9 @@ typedef struct UpdateData {
 } UpdateData;
 
 void update(void *udata) {
-  UpdateData *update_data  = (UpdateData *)udata;
-  GameLibrary game_library = *(GameLibrary *)update_data->game_library;
-  game_library.update(update_data->memory, update_data->input);
+  UpdateData  *update_data  = (UpdateData *)udata;
+  GameLibrary *game_library = update_data->game_library;
+  game_library->update(update_data->memory, update_data->input);
 }
 
 int main(int argc, char *argv[]) {
@@ -31,24 +31,26 @@ int main(int argc, char *argv[]) {
 
   GameLibrary game_library = platform_open_game_library();
 
-  /* UpdateData update_data = { */
-  /*   .game_library = &game_library, */
-  /*   .memory = &memory, */
-  /*   .input = &input, */
-  /* }; */
+  UpdateData update_data = {
+      .game_library = &game_library,
+      .memory       = &memory,
+      .input        = &input,
+  };
 
   game_library.init(&memory);
 
   CF_Color bg = cf_make_color_rgb(100, 149, 237);
   cf_clear_color(bg.r, bg.g, bg.b, bg.a);
-
-  /* cf_set_update_udata(&update_data); */
+  cf_set_target_framerate(60);
+  cf_set_fixed_timestep(60);
+  cf_set_update_udata(&update_data);
 
   while (cf_app_is_running()) {
+    platform_reload_game_library(&game_library);
     platform_begin_frame();
     {
-      cf_app_update(nullptr);
-      /* game_library.update(&memory, &input); */
+      cf_app_update(&update);
+      game_library.render(&memory);
     }
     platform_end_frame();
   }
