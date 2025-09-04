@@ -35,7 +35,11 @@ EXPORT void game_init(Platform *platform) {
   state->scratch_arena   = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
 }
 
-EXPORT bool game_update(void) { return true; }
+EXPORT bool game_update(void) {
+  cf_arena_reset(&state->scratch_arena);
+
+  return true;
+}
 
 EXPORT void game_render(void) {
   float fps = cf_app_get_smoothed_framerate();
@@ -46,6 +50,9 @@ EXPORT void game_render(void) {
 
 EXPORT void game_shutdown(void) {
   Platform *platform = state->platform;
+  cf_destroy_arena(&state->scratch_arena);
+  cf_destroy_arena(&state->stage_arena);
+  cf_destroy_arena(&state->permanent_arena);
   platform->free_memory(state);
 }
 
