@@ -49,8 +49,12 @@ else()
     add_compile_options(
         -Wall
         -Wextra
+        -Wpedantic
+        -Wconversion
         -Wstrict-prototypes
+        -Wmissing-prototypes
         -fPIC
+        $<$<CONFIG:DEBUG>:-fsanitize=undefined>
         $<$<CONFIG:DEBUG>:-g>)
 endif()
 
@@ -91,3 +95,18 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
     COMMENT "Creating symbolic link for the assets folder in ${destination}"
 )
+
+if (UNIX)
+    target_link_options(gamelib PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
+    target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
+endif()
+
+# Copy the generated DLL for SDL to the built binary’s folder
+if (WIN32)
+    add_custom_command(
+        TARGET game POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$" "$"
+        VERBATIM
+        COMMENT "Copying SDL3 DLL file to build folder"
+    )
+endif()
