@@ -44,7 +44,7 @@ void platform_init(const char *argv0) {
 
 void platform_shutdown(void) { cf_destroy_app(); }
 
-void *platform_allocate_memory(int size) { return cf_calloc(size, 1); }
+void *platform_allocate_memory(size_t size) { return cf_calloc(size, 1); }
 void  platform_free_memory(void *p) { cf_free(p); }
 
 void platform_begin_frame(void) {};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 typedef struct GameMemory          GameMemory;
@@ -24,7 +25,7 @@ typedef struct GameLibrary {
 void platform_init(const char *argv0);
 void platform_shutdown(void);
 
-void *platform_allocate_memory(int size);
+void *platform_allocate_memory(size_t size);
 void  platform_free_memory(void *p);
 
 void platform_begin_frame(void);

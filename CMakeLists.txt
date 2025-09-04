@@ -29,8 +29,6 @@ else()
   message(STATUS "Ccache not found")
 endif()
 
-include(cmake/StaticAnalyzers.cmake)
-
 include(FetchContent)
 FetchContent_Declare(
   cute
@@ -55,6 +53,8 @@ else()
         -fPIC
         $<$<CONFIG:DEBUG>:-g>)
 endif()
+
+include(cmake/StaticAnalyzers.cmake)
 
 add_library(
     gamelib SHARED
