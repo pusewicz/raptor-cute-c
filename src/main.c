@@ -1,20 +1,23 @@
-#include "engine/common.h"
-#include "engine/game_input.h"
 #include "engine/game_memory.h"
+#include "engine/game_state.h"
 #include "platform/platform.h"
 
-#include <cute.h>
+#include <cute_app.h>
+#include <cute_color.h>
+#include <cute_draw.h>
+#include <cute_graphics.h>
+#include <cute_time.h>
+#include <stddef.h>
 
 typedef struct UpdateData {
   GameLibrary *game_library;
   GameMemory  *memory;
-  GameInput   *input;
 } UpdateData;
 
-void update(void *udata) {
+static void update(void *udata) {
   UpdateData  *update_data  = (UpdateData *)udata;
   GameLibrary *game_library = update_data->game_library;
-  game_library->update(update_data->memory, update_data->input);
+  game_library->update(update_data->memory);
 }
 
 int main(int argc, char *argv[]) {
@@ -22,19 +25,17 @@ int main(int argc, char *argv[]) {
 
   platform_init(argv[0]);
 
-  const int  size   = MiB(512);
-  GameMemory memory = {
-      .bytes = platform_allocate_memory(size),
-      .size  = size,
+  const size_t size   = sizeof(GameState);
+  GameMemory   memory = {
+        .bytes = platform_allocate_memory(size),
+        .size  = size,
   };
-  GameInput input = {0};
 
   GameLibrary game_library = platform_open_game_library();
 
   UpdateData update_data = {
       .game_library = &game_library,
       .memory       = &memory,
-      .input        = &input,
   };
 
   game_library.init(&memory);

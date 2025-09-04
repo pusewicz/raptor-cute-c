@@ -4,11 +4,10 @@
 #include <stdint.h>
 
 typedef struct GameMemory          GameMemory;
-typedef struct GameInput           GameInput;
 typedef struct RenderCommandBuffer RenderCommandBuffer;
 
 typedef void (*GameInitFunction)(GameMemory *memory);
-typedef bool (*GameUpdateFunction)(GameMemory *memory, GameInput *input);
+typedef bool (*GameUpdateFunction)(GameMemory *memory);
 typedef void *(*GameRenderFunction)(GameMemory *memory);
 typedef void (*GameShutdownFunction)(GameMemory *memory);
 
@@ -27,8 +26,6 @@ void platform_shutdown(void);
 
 void *platform_allocate_memory(int size);
 void  platform_free_memory(void *p);
-
-void platform_update_input(GameInput *input);
 
 void platform_begin_frame(void);
 void platform_end_frame(void);

@@ -39,7 +39,6 @@ endif()
 
 add_library(
     gamelib SHARED
-    src/engine/arena.c
     src/game/game.c
 )
 target_link_libraries(gamelib cute)
