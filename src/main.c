@@ -41,6 +41,7 @@ int main(int argc, char *argv[]) {
   cf_clear_color(bg.r, bg.g, bg.b, bg.a);
   cf_set_target_framerate(60);
   cf_set_fixed_timestep(60);
+  cf_app_set_vsync(true);
   cf_set_update_udata(&update_data);
 
   while (cf_app_is_running()) {
