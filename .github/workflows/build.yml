@@ -58,7 +58,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update
-          sudo apt install libgl1-mesa-dev libglx-dev libwayland-dev
+          sudo apt install libasound2-dev libpulse-dev libaudio-dev libjack-dev libsndio-dev libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libpipewire-0.3-dev libwayland-dev
 
       - name: Set reusable strings
         # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
