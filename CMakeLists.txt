@@ -42,6 +42,14 @@ add_library(
     src/engine/arena.c
     src/game/game.c
 )
+target_link_libraries(gamelib cute)
+target_compile_definitions(
+    gamelib PRIVATE
+    $<$<CONFIG:Debug>:DEBUG>
+    $<$<CONFIG:Release>:RELEASE>
+    GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>"
+)
+target_include_directories(gamelib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 
 add_executable(
   ${PROJECT_NAME}
@@ -49,19 +57,13 @@ add_executable(
   src/platform/platform_cute.c
 )
 
-target_include_directories(gamelib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
-target_link_libraries(gamelib cute)
-target_compile_definitions(
-    gamelib PRIVATE
-    $<$<CONFIG:Debug>:DEBUG>
-    $<$<CONFIG:Release>:RELEASE>
-)
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 target_link_libraries(${PROJECT_NAME} cute)
 target_compile_definitions(
     ${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
     $<$<CONFIG:Release>:RELEASE>
+    GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>"
 )
 
 set(source "${CMAKE_SOURCE_DIR}/assets")

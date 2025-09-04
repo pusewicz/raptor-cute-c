@@ -7,6 +7,10 @@
 
 #define MAX_PATH_LENGTH 1024
 
+#ifndef GAME_LIBRARY_NAME
+  #error "GAME_LIBRARY_NAME must be defined"
+#endif
+
 char         game_library_path[MAX_PATH_LENGTH] = {0};
 SDL_PathInfo path_info;
 
@@ -44,14 +48,10 @@ GameLibrary platform_open_game_library(void) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to get base path: %s\n", SDL_GetError());
     abort();
   }
+  const char *game_library_name = GAME_LIBRARY_NAME;
 #ifdef SDL_PLATFORM_WIN32
-  const char *game_library_name      = "gamelib.dll";
-  const char *game_library_copy_name = "gamelib_copy.dll";
+  const char *game_library_copy_name = "copy_of" GAME_LIBRARY_NAME;
   SDL_snprintf(game_library_copy_path, MAX_PATH_LENGTH, "%s%s", base_path, game_library_copy_name);
-#elif SDL_PLATFORM_LINUX
-  const char *game_library_name = "libgamelib.so";
-#elif SDL_PLATFORM_MACOS
-  const char *game_library_name = "libgamelib.dylib";
 #endif
 
   SDL_snprintf(game_library_path, countof(game_library_path), "%s%s", base_path, game_library_name);
@@ -82,7 +82,7 @@ GameLibrary platform_open_game_library(void) {
   game_library.render   = (GameRenderFunction)cf_load_function(game_library.library, "game_render");
   game_library.shutdown = (GameShutdownFunction)cf_load_function(game_library.library, "game_shutdown");
 
-  SDL_Log("Game library loaded.\n");
+  SDL_Log("Game library loaded from %s.\n", game_library.library_name);
   return game_library;
 }
 
@@ -117,7 +117,7 @@ void platform_reload_game_library(GameLibrary *game_library) {
     game_library->shutdown = (GameShutdownFunction)cf_load_function(game_library->library, "game_shutdown");
 
     path_info = new_path_info;
-    SDL_Log("Game library reloaded.\n");
+    SDL_Log("Game library reloaded from %s.\n", game_library->library_name);
   }
 }
 
