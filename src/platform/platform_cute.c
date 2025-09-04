@@ -1,9 +1,18 @@
 #include "../engine/common.h"
 #include "platform.h"
 
-#include <SDL3/SDL.h>
-#include <cute.h>
+#include <SDL3/SDL_error.h>
+#include <SDL3/SDL_filesystem.h>
+#include <SDL3/SDL_log.h>
+#include <SDL3/SDL_platform_defines.h>
+#include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL_timer.h>
+#include <_abort.h>
+#include <cute_alloc.h>
+#include <cute_app.h>
+#include <cute_result.h>
 #include <cute_symbol.h>
+#include <stdint.h>
 
 #define MAX_PATH_LENGTH 1024
 
