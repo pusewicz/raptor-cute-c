@@ -55,7 +55,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Linux dependencies
-        if: runner.os == 'ubuntu-latest'
+        if: runner.os == 'Linux'
         run: |
           sudo apt update
           sudo apt install libgl1-mesa-dev libglx-dev
