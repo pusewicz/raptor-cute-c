@@ -7,7 +7,6 @@
 #include <SDL3/SDL_platform_defines.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_timer.h>
-#include <_abort.h>
 #include <cute_alloc.h>
 #include <cute_app.h>
 #include <cute_result.h>

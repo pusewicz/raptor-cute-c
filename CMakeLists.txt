@@ -29,6 +29,8 @@ else()
   message(STATUS "Ccache not found")
 endif()
 
+include(cmake/StaticAnalyzers.cmake)
+
 include(FetchContent)
 FetchContent_Declare(
   cute
