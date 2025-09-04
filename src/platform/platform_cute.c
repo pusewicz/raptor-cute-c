@@ -105,11 +105,11 @@ void platform_reload_game_library(GameLibrary *game_library) {
 
   if (new_path_info.modify_time != path_info.modify_time) {
     cf_unload_shared_library(game_library->library);
-    game_library->shutdown = NULL;
-    game_library->render   = NULL;
-    game_library->update   = NULL;
-    game_library->init     = NULL;
-    game_library->library  = NULL;
+    game_library->shutdown = nullptr;
+    game_library->render   = nullptr;
+    game_library->update   = nullptr;
+    game_library->init     = nullptr;
+    game_library->library  = nullptr;
 
     SDL_Delay(50);
 
