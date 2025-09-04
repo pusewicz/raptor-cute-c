@@ -1,5 +1,6 @@
+#include "platform_cute.h"
+
 #include "../engine/common.h"
-#include "platform.h"
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_filesystem.h>
@@ -11,6 +12,7 @@
 #include <cute_app.h>
 #include <cute_result.h>
 #include <cute_symbol.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #define MAX_PATH_LENGTH 1024
@@ -47,10 +49,12 @@ void platform_shutdown(void) { cf_destroy_app(); }
 void *platform_allocate_memory(size_t size) { return cf_calloc(size, 1); }
 void  platform_free_memory(void *p) { cf_free(p); }
 
-void platform_begin_frame(void) {};
+void platform_begin_frame(void) {}
 void platform_end_frame(void) { cf_app_draw_onto_screen(true); }
 
-GameLibrary platform_open_game_library(void) {
+GameLibrary platform_load_game_library(void) {
+  GameLibrary game_library = {0};
+
   const char *base_path = SDL_GetBasePath();
   if (!base_path) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to get base path: %s\n", SDL_GetError());
@@ -76,25 +80,80 @@ GameLibrary platform_open_game_library(void) {
   }
 #endif
 
-  GameLibrary game_library = {0};
-
 #ifdef SDL_PLATFORM_WIN32
-  game_library.library_name = game_library_copy_path;
+  game_library.path = game_library_copy_path;
 #else
-  game_library.library_name = game_library_path;
+  game_library.path = game_library_path;
 #endif
 
-  game_library.library  = cf_load_shared_library(game_library.library_name);
-  game_library.init     = (GameInitFunction)cf_load_function(game_library.library, "game_init");
-  game_library.update   = (GameUpdateFunction)cf_load_function(game_library.library, "game_update");
-  game_library.render   = (GameRenderFunction)cf_load_function(game_library.library, "game_render");
-  game_library.shutdown = (GameShutdownFunction)cf_load_function(game_library.library, "game_shutdown");
+  game_library.library = cf_load_shared_library(game_library.path);
+  if (!game_library.library) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load library: %s\n", SDL_GetError());
+    return game_library;
+  }
 
-  SDL_Log("Game library loaded from %s.\n", game_library.library_name);
+  game_library.init = (GameInitFunction)cf_load_function(game_library.library, "game_init");
+  if (!game_library.init) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    return game_library;
+  }
+
+  game_library.update = (GameUpdateFunction)cf_load_function(game_library.library, "game_update");
+  if (!game_library.update) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    return game_library;
+  }
+
+  game_library.render = (GameRenderFunction)cf_load_function(game_library.library, "game_render");
+  if (!game_library.render) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    return game_library;
+  }
+
+  game_library.shutdown = (GameShutdownFunction)cf_load_function(game_library.library, "game_shutdown");
+  if (!game_library.shutdown) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    return game_library;
+  }
+
+  game_library.state = (GameStateFunction)cf_load_function(game_library.library, "game_state");
+  if (!game_library.state) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    return game_library;
+  }
+
+  game_library.hot_reload = (GameHotReloadFunction)cf_load_function(game_library.library, "game_hot_reload");
+  if (!game_library.hot_reload) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    return game_library;
+  }
+
+  game_library.ok = true;
+  SDL_Log("Game library loaded from %s.\n", game_library.path);
   return game_library;
 }
 
-void platform_close_game_library(GameLibrary *game_library) { cf_unload_shared_library(game_library->library); }
+void platform_unload_game_library(GameLibrary *game_library) {
+  cf_unload_shared_library(game_library->library);
+  game_library->hot_reload = nullptr;
+  game_library->state      = nullptr;
+  game_library->shutdown   = nullptr;
+  game_library->render     = nullptr;
+  game_library->update     = nullptr;
+  game_library->init       = nullptr;
+  game_library->library    = nullptr;
+  game_library->ok         = false;
+}
+
+bool platform_has_to_reload_game_library(GameLibrary *game_library) {
+  SDL_PathInfo new_path_info;
+  if (!SDL_GetPathInfo(game_library->path, &new_path_info)) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to get path info: %s\n", SDL_GetError());
+    return false;
+  }
+
+  return new_path_info.modify_time != path_info.modify_time;
+}
 
 void platform_reload_game_library(GameLibrary *game_library) {
   SDL_PathInfo new_path_info;
@@ -118,14 +177,14 @@ void platform_reload_game_library(GameLibrary *game_library) {
     }
 #endif
 
-    game_library->library  = cf_load_shared_library(game_library->library_name);
+    game_library->library  = cf_load_shared_library(game_library->path);
     game_library->init     = (GameInitFunction)cf_load_function(game_library->library, "game_init");
     game_library->update   = (GameUpdateFunction)cf_load_function(game_library->library, "game_update");
     game_library->render   = (GameRenderFunction)cf_load_function(game_library->library, "game_render");
     game_library->shutdown = (GameShutdownFunction)cf_load_function(game_library->library, "game_shutdown");
 
     path_info = new_path_info;
-    SDL_Log("Game library reloaded from %s.\n", game_library->library_name);
+    SDL_Log("Game library reloaded from %s.\n", game_library->path);
   }
 }
 
