@@ -12,6 +12,14 @@ set(CF_FRAMEWORK_BUILD_SAMPLES OFF)
 set(CF_FRAMEWORK_BUILD_TESTS OFF)
 set(CF_FRAMEWORK_STATIC OFF)
 
+find_program(CCACHE ccache)
+if (CCACHE)
+  message(STATUS "Using ccache")
+  set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
+else ()
+  message(STATUS "Ccache not found")
+endif ()
+
 include(FetchContent)
 FetchContent_Declare(
   cute
