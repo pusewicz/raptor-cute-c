@@ -37,6 +37,19 @@ EXPORT void game_init(Platform *platform) {
   state->scratch_arena   = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
   state->ecs             = ecs_new(1024, nullptr);
 
+  // Initialize component and system IDs to 0
+  state->PosComp = 0;
+  state->VelComp = 0;
+  state->InputComp = 0;
+  state->SpriteComp = 0;
+  state->InputSystem = 0;
+  state->MovementSystem = 0;
+  state->RenderSystem = 0;
+  
+  // Mark that we haven't registered yet
+  state->components_registered = false;
+  state->systems_registered = false;
+
   register_components(state);
   register_systems(state);
 
@@ -69,4 +82,8 @@ EXPORT void game_shutdown(void) {
 
 EXPORT void *game_state(void) { return state; }
 
-EXPORT void game_hot_reload(void *game_state) { state = (GameState *)game_state; }
+EXPORT void game_hot_reload(void *game_state) { 
+  state = (GameState *)game_state;
+  // Update system callbacks to new function addresses
+  update_system_callbacks(state);
+}

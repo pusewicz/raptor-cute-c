@@ -14,6 +14,21 @@ typedef struct GameState {
   CF_Arena  scratch_arena;
   ecs_t    *ecs;
   ecs_id_t  player_entity;
+  
+  // Component IDs - persist across hot reloads
+  ecs_id_t PosComp;
+  ecs_id_t VelComp;
+  ecs_id_t InputComp;
+  ecs_id_t SpriteComp;
+  
+  // System IDs - persist across hot reloads
+  ecs_id_t InputSystem;
+  ecs_id_t MovementSystem;
+  ecs_id_t RenderSystem;
+  
+  // Track if components/systems have been registered
+  bool components_registered;
+  bool systems_registered;
 } GameState;
 
 extern GameState *state;
