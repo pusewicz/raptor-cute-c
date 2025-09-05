@@ -6,7 +6,6 @@ project(Raptor
 )
 
 set(CMAKE_C_STANDARD 23)
-set(CMAKE_C_STANDARD_REQUIRED ON)
 
 set(CF_FRAMEWORK_BUILD_SAMPLES OFF)
 set(CF_FRAMEWORK_BUILD_TESTS OFF)
@@ -87,6 +86,10 @@ target_compile_definitions(
     $<$<CONFIG:Release>:RELEASE>
     GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>"
 )
+if(UNIX)
+    target_link_options(gamelib PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
+    target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
+endif()
 
 set(source "${CMAKE_SOURCE_DIR}/assets")
 set(destination "${CMAKE_BINARY_DIR}/assets")
@@ -96,13 +99,8 @@ add_custom_command(
     COMMENT "Creating symbolic link for the assets folder in ${destination}"
 )
 
-if (UNIX)
-    target_link_options(gamelib PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
-    target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
-endif()
-
 # Copy the generated DLL for SDL to the built binary’s folder
-if (WIN32)
+if(WIN32)
     add_custom_command(
         TARGET game POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$" "$"
