@@ -5,6 +5,7 @@
 #if defined(__GNUC__) || defined(__clang__)
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wsign-conversion"
+  #pragma GCC diagnostic ignored "-Wfloat-conversion"
   #pragma GCC diagnostic ignored "-Wshorten-64-to-32"
 #endif
 
