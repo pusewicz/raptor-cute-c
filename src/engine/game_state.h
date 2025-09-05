@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../game/ecs.h"
+
 #if defined(__GNUC__) || defined(__clang__)
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wsign-conversion"
@@ -9,7 +11,9 @@
 #endif
 
 #include <cute_alloc.h>
+#include <cute_app.h>
 #include <cute_color.h>
+#include <cute_math.h>
 #include <pico_ecs.h>
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -18,27 +22,16 @@
 
 typedef struct Platform Platform;
 
-typedef struct {
-  ecs_id_t position;
-  ecs_id_t velocity;
-  ecs_id_t input;
-  ecs_id_t sprite;
-} Components;
-
-typedef struct {
-  ecs_id_t input;
-  ecs_id_t movement;
-  ecs_id_t render;
-} Systems;
-
 typedef struct GameState {
-  Platform *platform;
-  CF_Color  bg_color;
-  CF_Arena  permanent_arena;
-  CF_Arena  stage_arena;
-  CF_Arena  scratch_arena;
-  ecs_t    *ecs;
-  ecs_id_t  player_entity;
+  Platform    *platform;
+  CF_V2        canvas_size;
+  CF_V2        scale;    // For resolution independence
+  CF_Arena     permanent_arena;
+  CF_Arena     stage_arena;
+  CF_Arena     scratch_arena;
+  ecs_t       *ecs;
+  ecs_id_t     player_entity;
+  CF_DisplayID display_id;
 
   // Component and System IDs - persist across hot reloads
   Components components;
