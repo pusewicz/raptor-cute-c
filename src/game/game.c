@@ -3,6 +3,8 @@
 #include "../engine/common.h"
 #include "../engine/game_state.h"
 #include "../engine/platform.h"
+#include "ecs.h"
+#include "factories.h"
 
 #include <cute_alloc.h>
 #include <cute_app.h>
@@ -33,10 +35,18 @@ EXPORT void game_init(Platform *platform) {
   state->permanent_arena = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, PERMANENT_ARENA_SIZE);
   state->stage_arena     = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, STAGE_ARENA_SIZE);
   state->scratch_arena   = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
+  state->ecs             = ecs_new(1024, nullptr);
+
+  register_components(state);
+  register_systems(state);
+
+  state->player_entity = make_player(state, 0.0f, 0.0f);
 }
 
 EXPORT bool game_update(void) {
   cf_arena_reset(&state->scratch_arena);
+
+  update_systems(state);
 
   return true;
 }
@@ -53,6 +63,7 @@ EXPORT void game_shutdown(void) {
   cf_destroy_arena(&state->scratch_arena);
   cf_destroy_arena(&state->stage_arena);
   cf_destroy_arena(&state->permanent_arena);
+  ecs_free(state->ecs);
   platform->free_memory(state);
 }
 

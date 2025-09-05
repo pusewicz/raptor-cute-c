@@ -10,6 +10,7 @@
 #include <SDL3/SDL_timer.h>
 #include <cute_alloc.h>
 #include <cute_app.h>
+#include <cute_file_system.h>
 #include <cute_result.h>
 #include <cute_symbol.h>
 #include <stddef.h>
@@ -28,6 +29,15 @@ SDL_PathInfo path_info;
 char game_library_copy_path[MAX_PATH_LENGTH] = {0};
 #endif
 
+static void mount_content_directory_as(const char *dir) {
+  const char *path = cf_fs_get_base_directory();
+  cf_path_normalize(path);
+  char full_path[MAX_PATH_LENGTH];
+  SDL_snprintf(full_path, MAX_PATH_LENGTH, "%s%s", path, "assets");
+  SDL_Log("Mounting content directory %s as %s\n", full_path, dir);
+  cf_fs_mount(full_path, dir, true);
+}
+
 void platform_init(const char *argv0) {
 #ifdef DEBUG
   SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
@@ -42,6 +52,8 @@ void platform_init(const char *argv0) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Could not make app: %s", result.details);
     abort();
   }
+
+  mount_content_directory_as("/assets");
 }
 
 void platform_shutdown(void) { cf_destroy_app(); }

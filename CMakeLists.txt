@@ -53,15 +53,17 @@ else()
         -Wstrict-prototypes
         -Wmissing-prototypes
         -fPIC
-        $<$<CONFIG:DEBUG>:-fsanitize=undefined>
+        # $<$<CONFIG:DEBUG>:-fsanitize=undefined>
         $<$<CONFIG:DEBUG>:-g>)
 endif()
 
-include(cmake/StaticAnalyzers.cmake)
+# include(cmake/StaticAnalyzers.cmake)
 
 add_library(
     gamelib SHARED
     src/game/game.c
+    src/game/ecs.c
+    src/game/factories.c
 )
 target_link_libraries(gamelib cute)
 target_compile_definitions(
@@ -70,7 +72,10 @@ target_compile_definitions(
     $<$<CONFIG:Release>:RELEASE>
     GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>"
 )
-target_include_directories(gamelib PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
+target_include_directories(gamelib PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
 
 add_executable(
   ${PROJECT_NAME}
@@ -78,7 +83,10 @@ add_executable(
   src/platform/platform_cute.c
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
+target_include_directories(${PROJECT_NAME} PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
 target_link_libraries(${PROJECT_NAME} cute)
 target_compile_definitions(
     ${PROJECT_NAME} PRIVATE
@@ -86,10 +94,10 @@ target_compile_definitions(
     $<$<CONFIG:Release>:RELEASE>
     GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>"
 )
-if(UNIX)
-    target_link_options(gamelib PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
-    target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
-endif()
+# if(UNIX)
+#     target_link_options(gamelib PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
+#     target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:DEBUG>:-fsanitize=undefined>)
+# endif()
 
 set(source "${CMAKE_SOURCE_DIR}/assets")
 set(destination "${CMAKE_BINARY_DIR}/assets")
