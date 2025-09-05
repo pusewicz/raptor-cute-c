@@ -43,11 +43,11 @@ void platform_init(const char *argv0) {
   SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
 #endif
 
-  const int screen_width  = 1920;
-  const int screen_height = 1080;
-  const int options       = CF_APP_OPTIONS_WINDOW_POS_CENTERED_BIT;
+  const int window_width  = 180;
+  const int window_height = 320;
+  const int options       = CF_APP_OPTIONS_WINDOW_POS_CENTERED_BIT | CF_APP_OPTIONS_RESIZABLE_BIT;
 
-  CF_Result result = cf_make_app("Raptor", 0, 0, 0, screen_width, screen_height, options, argv0);
+  CF_Result result = cf_make_app("Raptor", cf_default_display(), 0, 0, window_width, window_height, options, argv0);
   if (cf_is_error(result)) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Could not make app: %s", result.details);
     abort();
