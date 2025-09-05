@@ -1,2 +1,5 @@
 /build/
 compile_commands.json
+/assets/*/*.png
+/assets/*.png
+!/assets/player.png
