@@ -11,21 +11,21 @@
 ecs_id_t make_player(GameState *state, float x, float y) {
   ecs_id_t id = ecs_create(state->ecs);
 
-  CF_V2 *pos = ecs_add(state->ecs, id, state->PosComp, nullptr);
+  CF_V2 *pos = ecs_add(state->ecs, id, state->components.position, nullptr);
   pos->x     = x;
   pos->y     = y;
 
-  CF_V2 *vel = ecs_add(state->ecs, id, state->VelComp, nullptr);
+  CF_V2 *vel = ecs_add(state->ecs, id, state->components.velocity, nullptr);
   vel->x     = 0.0f;
   vel->y     = 0.0f;
 
-  input_t *input = ecs_add(state->ecs, id, state->InputComp, nullptr);
+  input_t *input = ecs_add(state->ecs, id, state->components.input, nullptr);
   input->up      = false;
   input->down    = false;
   input->left    = false;
   input->right   = false;
 
-  CF_Sprite *sprite = ecs_add(state->ecs, id, state->SpriteComp, nullptr);
+  CF_Sprite *sprite = ecs_add(state->ecs, id, state->components.sprite, nullptr);
   CF_Result  result;
   *sprite = cf_make_easy_sprite_from_png("assets/player.png", &result);
   if (cf_is_error(result)) {

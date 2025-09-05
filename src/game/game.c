@@ -38,13 +38,8 @@ EXPORT void game_init(Platform *platform) {
   state->ecs             = ecs_new(1024, nullptr);
 
   // Initialize component and system IDs to 0
-  state->PosComp = 0;
-  state->VelComp = 0;
-  state->InputComp = 0;
-  state->SpriteComp = 0;
-  state->InputSystem = 0;
-  state->MovementSystem = 0;
-  state->RenderSystem = 0;
+  state->components = (Components){0};
+  state->systems = (Systems){0};
   
   // Mark that we haven't registered yet
   state->components_registered = false;

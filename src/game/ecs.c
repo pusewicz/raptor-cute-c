@@ -27,7 +27,7 @@ static ecs_ret_t s_update_input_system(ecs_t *ecs, ecs_id_t *entities, int entit
   (void)entity_count;
 
   GameState *state = (GameState *)udata;
-  input_t   *input = ecs_get(ecs, state->player_entity, state->InputComp);
+  input_t   *input = ecs_get(ecs, state->player_entity, state->components.input);
 
   input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
   input->down  = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
@@ -44,9 +44,9 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
     (void)dt;
 
     ecs_id_t entity_id = entities[i];
-    CF_V2   *pos       = ecs_get(ecs, entity_id, state->PosComp);
-    CF_V2   *vel       = ecs_get(ecs, entity_id, state->VelComp);
-    input_t *input     = ecs_get(ecs, entity_id, state->InputComp);
+    CF_V2   *pos       = ecs_get(ecs, entity_id, state->components.position);
+    CF_V2   *vel       = ecs_get(ecs, entity_id, state->components.velocity);
+    input_t *input     = ecs_get(ecs, entity_id, state->components.input);
 
     float speed = 3.0f;
     vel->x      = 0.0f;
@@ -71,8 +71,8 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
   GameState *state = (GameState *)udata;
 
   for (int i = 0; i < entity_count; i++) {
-    CF_V2     *pos    = ecs_get(ecs, entities[i], state->PosComp);
-    CF_Sprite *sprite = ecs_get(ecs, entities[i], state->SpriteComp);
+    CF_V2     *pos    = ecs_get(ecs, entities[i], state->components.position);
+    CF_Sprite *sprite = ecs_get(ecs, entities[i], state->components.sprite);
 
     cf_sprite_update(sprite);
     cf_draw_push();
@@ -86,10 +86,10 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
 
 void register_components(GameState *state) {
   if (!state->components_registered) {
-    state->PosComp               = ecs_register_component(state->ecs, sizeof(CF_V2), nullptr, nullptr);
-    state->VelComp               = ecs_register_component(state->ecs, sizeof(CF_V2), nullptr, nullptr);
-    state->InputComp             = ecs_register_component(state->ecs, sizeof(input_t), nullptr, nullptr);
-    state->SpriteComp            = ecs_register_component(state->ecs, sizeof(CF_Sprite), nullptr, nullptr);
+    state->components.position   = ecs_register_component(state->ecs, sizeof(CF_V2), nullptr, nullptr);
+    state->components.velocity   = ecs_register_component(state->ecs, sizeof(CF_V2), nullptr, nullptr);
+    state->components.input      = ecs_register_component(state->ecs, sizeof(input_t), nullptr, nullptr);
+    state->components.sprite     = ecs_register_component(state->ecs, sizeof(CF_Sprite), nullptr, nullptr);
     state->components_registered = true;
   }
 }
@@ -97,22 +97,22 @@ void register_components(GameState *state) {
 void register_systems(GameState *state) {
   if (!state->systems_registered) {
     // First time registration
-    state->InputSystem    = ecs_register_system(state->ecs, s_update_input_system, nullptr, nullptr, state);
-    state->MovementSystem = ecs_register_system(state->ecs, s_update_movement_system, nullptr, nullptr, state);
-    state->RenderSystem   = ecs_register_system(state->ecs, s_update_render_system, nullptr, nullptr, state);
+    state->systems.input    = ecs_register_system(state->ecs, s_update_input_system, nullptr, nullptr, state);
+    state->systems.movement = ecs_register_system(state->ecs, s_update_movement_system, nullptr, nullptr, state);
+    state->systems.render   = ecs_register_system(state->ecs, s_update_render_system, nullptr, nullptr, state);
 
     // Define input system required components
-    ecs_require_component(state->ecs, state->InputSystem, state->InputComp);
-    ecs_require_component(state->ecs, state->InputSystem, state->PosComp);
+    ecs_require_component(state->ecs, state->systems.input, state->components.input);
+    ecs_require_component(state->ecs, state->systems.input, state->components.position);
 
     // Define movement system required components
-    ecs_require_component(state->ecs, state->MovementSystem, state->PosComp);
-    ecs_require_component(state->ecs, state->MovementSystem, state->VelComp);
-    ecs_require_component(state->ecs, state->MovementSystem, state->InputComp);
+    ecs_require_component(state->ecs, state->systems.movement, state->components.position);
+    ecs_require_component(state->ecs, state->systems.movement, state->components.velocity);
+    ecs_require_component(state->ecs, state->systems.movement, state->components.input);
 
     // Define render system required components
-    ecs_require_component(state->ecs, state->RenderSystem, state->PosComp);
-    ecs_require_component(state->ecs, state->RenderSystem, state->SpriteComp);
+    ecs_require_component(state->ecs, state->systems.render, state->components.position);
+    ecs_require_component(state->ecs, state->systems.render, state->components.sprite);
 
     state->systems_registered = true;
   }
@@ -122,9 +122,9 @@ void update_system_callbacks(GameState *state) {
   ecs_t *ecs = state->ecs;
 
   // Update each system's callback to the current function address
-  ecs->systems[state->InputSystem].system_cb    = s_update_input_system;
-  ecs->systems[state->MovementSystem].system_cb = s_update_movement_system;
-  ecs->systems[state->RenderSystem].system_cb   = s_update_render_system;
+  ecs->systems[state->systems.input].system_cb    = s_update_input_system;
+  ecs->systems[state->systems.movement].system_cb = s_update_movement_system;
+  ecs->systems[state->systems.render].system_cb   = s_update_render_system;
 }
 
 void update_systems(GameState *state) { ecs_update_systems(state->ecs, CF_DELTA_TIME); }
