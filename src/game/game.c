@@ -14,7 +14,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
-GameState *state = nullptr;
+GameState *state = NULL;
 
 #ifdef _WIN32
   #define EXPORT __declspec(dllexport)
@@ -48,7 +48,7 @@ EXPORT void game_init(Platform *platform) {
   state->permanent_arena = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, PERMANENT_ARENA_SIZE);
   state->stage_arena     = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, STAGE_ARENA_SIZE);
   state->scratch_arena   = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
-  state->ecs             = ecs_new(1024, nullptr);
+  state->ecs             = ecs_new(1024, NULL);
 
   // Initialize component and system IDs to 0
   state->components = (Components){0};

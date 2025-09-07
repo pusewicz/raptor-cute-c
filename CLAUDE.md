@@ -6,24 +6,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Building the project
 ```bash
-./build.sh
+rake compile
 ```
 This creates a debug build in `build/debug/` using CMake with Ninja generator.
 
 ### Running the project
 ```bash
-./run.sh
+rake run
 ```
 Runs the built executable from the build directory. Will fail if build hasn't been run first.
 
-### Manual CMake commands
+### Auto-compile on file changes
 ```bash
-# Configure
-cmake -S . -B build/debug -DCMAKE_BUILD_TYPE=Debug -G "Ninja"
-
-# Build
-cmake --build build/debug --config Debug --target all -- -j$(nproc)
+rake watch
 ```
+Watches source files for changes and automatically recompiles the project causing the running game process to reload the gamelib.
 
 ## Architecture
 

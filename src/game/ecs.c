@@ -85,7 +85,7 @@ static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int enti
   CF_V2     *pos   = ecs_get(ecs, state->player_entity, state->components.position);
 
   if (input->shoot) {
-    make_bullet(state, pos->x, pos->y, DIRECTION_UP);
+    make_bullet(state, pos->x, pos->y, cf_v2(0, 1));
     input->shoot = false;
   }
 
@@ -117,10 +117,10 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
 
 void register_components(GameState *state) {
   if (!state->components_registered) {
-    state->components.position   = ecs_register_component(state->ecs, sizeof(CF_V2), nullptr, nullptr);
-    state->components.velocity   = ecs_register_component(state->ecs, sizeof(CF_V2), nullptr, nullptr);
-    state->components.input      = ecs_register_component(state->ecs, sizeof(input_t), nullptr, nullptr);
-    state->components.sprite     = ecs_register_component(state->ecs, sizeof(CF_Sprite), nullptr, nullptr);
+    state->components.position   = ecs_register_component(state->ecs, sizeof(CF_V2), NULL, NULL);
+    state->components.velocity   = ecs_register_component(state->ecs, sizeof(CF_V2), NULL, NULL);
+    state->components.input      = ecs_register_component(state->ecs, sizeof(input_t), NULL, NULL);
+    state->components.sprite     = ecs_register_component(state->ecs, sizeof(CF_Sprite), NULL, NULL);
     state->components_registered = true;
   }
 }
@@ -128,10 +128,10 @@ void register_components(GameState *state) {
 void register_systems(GameState *state) {
   if (!state->systems_registered) {
     // First time registration
-    state->systems.input    = ecs_register_system(state->ecs, s_update_input_system, nullptr, nullptr, state);
-    state->systems.movement = ecs_register_system(state->ecs, s_update_movement_system, nullptr, nullptr, state);
-    state->systems.render   = ecs_register_system(state->ecs, s_update_render_system, nullptr, nullptr, state);
-    state->systems.weapon   = ecs_register_system(state->ecs, s_update_weapon_system, nullptr, nullptr, state);
+    state->systems.input    = ecs_register_system(state->ecs, s_update_input_system, NULL, NULL, state);
+    state->systems.movement = ecs_register_system(state->ecs, s_update_movement_system, NULL, NULL, state);
+    state->systems.render   = ecs_register_system(state->ecs, s_update_render_system, NULL, NULL, state);
+    state->systems.weapon   = ecs_register_system(state->ecs, s_update_weapon_system, NULL, NULL, state);
 
     // Define input system required components
     ecs_require_component(state->ecs, state->systems.input, state->components.input);

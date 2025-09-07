@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cute_math.h>
 #include <pico_ecs.h>
 
 typedef struct GameState GameState;
@@ -15,10 +16,13 @@ typedef struct input_t {
   bool shoot;
 } input_t;
 
-typedef enum Direction { DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT } Direction;
+typedef struct weapon_t {
+  float cooldown;           // Time between shots in seconds
+  float time_since_shot;    // Time since last shot in seconds
+} weapon_t;
 
 typedef struct bullet_t {
-  Direction direction;
+  CF_V2 direction;
 } bullet_t;
 
 /*
@@ -30,6 +34,7 @@ typedef struct {
   ecs_id_t input;
   ecs_id_t sprite;
   ecs_id_t bullet;
+  ecs_id_t weapon;
 } Components;
 
 /*
