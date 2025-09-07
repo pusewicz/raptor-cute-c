@@ -39,14 +39,14 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(cute)
 
 if (MSVC)
-    add_compile_options(
+  add_compile_options(
         /W4
         /D_CRT_SECURE_NO_WARNINGS
         /Zc:preprocessor
         $<$<CONFIG:DEBUG>:/RTCcsu>
         $<$<CONFIG:DEBUG>:/Zi>)
 else()
-    add_compile_options(
+  add_compile_options(
         -Wall
         -Wextra
         -Wpedantic
@@ -62,6 +62,7 @@ endif()
 
 add_library(
     gamelib SHARED
+    src/game/state.c
     src/game/game.c
     src/game/ecs.c
     src/game/factories.c
@@ -73,7 +74,7 @@ target_compile_definitions(
     $<$<CONFIG:Release>:RELEASE>
     GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>"
 )
-target_include_directories(gamelib PUBLIC 
+target_include_directories(gamelib PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
@@ -84,7 +85,7 @@ add_executable(
   src/platform/platform_cute.c
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC 
+target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
@@ -110,7 +111,7 @@ add_custom_command(
 
 # Copy the generated DLL for SDL to the built binary’s folder
 if(WIN32)
-    add_custom_command(
+  add_custom_command(
         TARGET game POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$" "$"
         VERBATIM
