@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
 
   game_library.init(&platform);
 
-  CF_Color bg = cf_make_color_rgb(100, 149, 237);
+  CF_Color bg = cf_make_color_rgb(0, 0, 0);
   cf_clear_color(bg.r, bg.g, bg.b, bg.a);
   cf_set_target_framerate(60);
   cf_set_fixed_timestep(60);

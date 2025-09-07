@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rake:*)",
+      "Bash(grep:*)",
+      "Read(//**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

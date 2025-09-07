@@ -1,5 +1,7 @@
 /build/
 compile_commands.json
+imgui.ini
 /assets/*/*.png
 /assets/*.png
 !/assets/player.png
+!/assets/bullet.png

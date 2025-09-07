@@ -43,11 +43,11 @@ void platform_init(const char *argv0) {
   SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
 #endif
 
-  const int screen_width  = 1920;
-  const int screen_height = 1080;
-  const int options       = CF_APP_OPTIONS_WINDOW_POS_CENTERED_BIT;
+  const int window_width  = 180;
+  const int window_height = 320;
+  const int options       = CF_APP_OPTIONS_WINDOW_POS_CENTERED_BIT | CF_APP_OPTIONS_RESIZABLE_BIT;
 
-  CF_Result result = cf_make_app("Raptor", 0, 0, 0, screen_width, screen_height, options, argv0);
+  CF_Result result = cf_make_app("Raptor", cf_default_display(), 0, 0, window_width, window_height, options, argv0);
   if (cf_is_error(result)) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Could not make app: %s", result.details);
     abort();
@@ -147,13 +147,13 @@ GameLibrary platform_load_game_library(void) {
 
 void platform_unload_game_library(GameLibrary *game_library) {
   cf_unload_shared_library(game_library->library);
-  game_library->hot_reload = nullptr;
-  game_library->state      = nullptr;
-  game_library->shutdown   = nullptr;
-  game_library->render     = nullptr;
-  game_library->update     = nullptr;
-  game_library->init       = nullptr;
-  game_library->library    = nullptr;
+  game_library->hot_reload = NULL;
+  game_library->state      = NULL;
+  game_library->shutdown   = NULL;
+  game_library->render     = NULL;
+  game_library->update     = NULL;
+  game_library->init       = NULL;
+  game_library->library    = NULL;
   game_library->ok         = false;
 }
 
@@ -175,11 +175,11 @@ void platform_reload_game_library(GameLibrary *game_library) {
 
   if (new_path_info.modify_time != path_info.modify_time) {
     cf_unload_shared_library(game_library->library);
-    game_library->shutdown = nullptr;
-    game_library->render   = nullptr;
-    game_library->update   = nullptr;
-    game_library->init     = nullptr;
-    game_library->library  = nullptr;
+    game_library->shutdown = NULL;
+    game_library->render   = NULL;
+    game_library->update   = NULL;
+    game_library->init     = NULL;
+    game_library->library  = NULL;
 
     SDL_Delay(50);
 
