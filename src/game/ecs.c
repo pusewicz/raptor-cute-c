@@ -18,6 +18,7 @@
 #include <cute_sprite.h>
 #include <cute_time.h>
 #include <pico_ecs.h>
+#include <stddef.h>
 
 #if defined(__GNUC__) || defined(__clang__)
   #pragma GCC diagnostic pop
@@ -47,17 +48,16 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
   GameState *state = (GameState *)udata;
 
   for (int i = 0; i < entity_count; i++) {
-    SDL_Log("Updating entity %d\n", entities[i]);
     ecs_id_t entity_id = entities[i];
     CF_V2   *pos       = ecs_get(ecs, entity_id, state->components.position);
     CF_V2   *vel       = ecs_get(ecs, entity_id, state->components.velocity);
-    input_t *input     = ecs_get(ecs, entity_id, state->components.input);
 
     // TODO: Special case for player for now
     if (state->player_entity == entity_id) {
-      float speed = 1.0f;
-      vel->x      = 0.0f;
-      vel->y      = 0.0f;
+      input_t *input = ecs_get(ecs, state->player_entity, state->components.input);
+      float    speed = 1.0f;
+      vel->x         = 0.0f;
+      vel->y         = 0.0f;
       if (input->up)
         vel->y += speed;
       if (input->down)
@@ -76,17 +76,22 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
 }
 
 static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
-  (void)dt;
   (void)entities;
   (void)entity_count;
 
-  GameState *state = (GameState *)udata;
-  input_t   *input = ecs_get(ecs, state->player_entity, state->components.input);
-  CF_V2     *pos   = ecs_get(ecs, state->player_entity, state->components.position);
+  GameState *state  = (GameState *)udata;
+  weapon_t  *weapon = ecs_get(ecs, state->player_entity, state->components.weapon);
 
+  if (weapon->time_since_shot < weapon->cooldown) {
+    weapon->time_since_shot += (float)dt;
+    return 0;
+  }
+
+  input_t *input = ecs_get(ecs, state->player_entity, state->components.input);
   if (input->shoot) {
+    weapon->time_since_shot = 0.0f;
+    CF_V2 *pos              = ecs_get(ecs, state->player_entity, state->components.position);
     make_bullet(state, pos->x, pos->y, cf_v2(0, 1));
-    input->shoot = false;
   }
 
   return 0;
@@ -117,10 +122,11 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
 
 void register_components(GameState *state) {
   if (!state->components_registered) {
-    state->components.position   = ecs_register_component(state->ecs, sizeof(CF_V2), NULL, NULL);
-    state->components.velocity   = ecs_register_component(state->ecs, sizeof(CF_V2), NULL, NULL);
     state->components.input      = ecs_register_component(state->ecs, sizeof(input_t), NULL, NULL);
+    state->components.position   = ecs_register_component(state->ecs, sizeof(CF_V2), NULL, NULL);
     state->components.sprite     = ecs_register_component(state->ecs, sizeof(CF_Sprite), NULL, NULL);
+    state->components.velocity   = ecs_register_component(state->ecs, sizeof(CF_V2), NULL, NULL);
+    state->components.weapon     = ecs_register_component(state->ecs, sizeof(weapon_t), NULL, NULL);
     state->components_registered = true;
   }
 }
@@ -130,8 +136,8 @@ void register_systems(GameState *state) {
     // First time registration
     state->systems.input    = ecs_register_system(state->ecs, s_update_input_system, NULL, NULL, state);
     state->systems.movement = ecs_register_system(state->ecs, s_update_movement_system, NULL, NULL, state);
-    state->systems.render   = ecs_register_system(state->ecs, s_update_render_system, NULL, NULL, state);
     state->systems.weapon   = ecs_register_system(state->ecs, s_update_weapon_system, NULL, NULL, state);
+    state->systems.render   = ecs_register_system(state->ecs, s_update_render_system, NULL, NULL, state);
 
     // Define input system required components
     ecs_require_component(state->ecs, state->systems.input, state->components.input);
@@ -140,7 +146,6 @@ void register_systems(GameState *state) {
     // Define movement system required components
     ecs_require_component(state->ecs, state->systems.movement, state->components.position);
     ecs_require_component(state->ecs, state->systems.movement, state->components.velocity);
-    /* ecs_require_component(state->ecs, state->systems.movement, state->components.input); */
 
     // Define render system required components
     ecs_require_component(state->ecs, state->systems.render, state->components.position);
@@ -157,6 +162,7 @@ void update_system_callbacks(GameState *state) {
   ecs->systems[state->systems.input].system_cb    = s_update_input_system;
   ecs->systems[state->systems.movement].system_cb = s_update_movement_system;
   ecs->systems[state->systems.render].system_cb   = s_update_render_system;
+  ecs->systems[state->systems.weapon].system_cb   = s_update_weapon_system;
 }
 
 void update_systems(GameState *state) { ecs_update_systems(state->ecs, CF_DELTA_TIME); }

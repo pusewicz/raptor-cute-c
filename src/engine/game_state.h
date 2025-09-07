@@ -22,6 +22,11 @@
 
 typedef struct Platform Platform;
 
+/*
+ * Game State
+ *
+ * Should be validated with validate_game_state() before use
+ */
 typedef struct GameState {
   Platform    *platform;
   CF_V2        canvas_size;

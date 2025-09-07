@@ -29,11 +29,11 @@ typedef struct bullet_t {
  * Components
  */
 typedef struct {
-  ecs_id_t position;
-  ecs_id_t velocity;
-  ecs_id_t input;
-  ecs_id_t sprite;
   ecs_id_t bullet;
+  ecs_id_t input;
+  ecs_id_t position;
+  ecs_id_t sprite;
+  ecs_id_t velocity;
   ecs_id_t weapon;
 } Components;
 
@@ -42,9 +42,9 @@ typedef struct {
  */
 typedef struct {
   ecs_id_t input;
-  ecs_id_t weapon;
   ecs_id_t movement;
   ecs_id_t render;
+  ecs_id_t weapon;
 } Systems;
 
 void register_components(GameState *state);

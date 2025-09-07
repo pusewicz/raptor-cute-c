@@ -7,6 +7,7 @@
 #include <cute_math.h>
 #include <cute_result.h>
 #include <cute_sprite.h>
+#include <stddef.h>
 
 ecs_id_t make_player(GameState *state, float x, float y) {
   ecs_id_t id = ecs_create(state->ecs);
