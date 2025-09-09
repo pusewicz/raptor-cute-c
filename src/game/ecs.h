@@ -2,6 +2,7 @@
 
 #include <cute_math.h>
 #include <pico_ecs.h>
+#include <stdbool.h>
 
 typedef struct GameState GameState;
 
