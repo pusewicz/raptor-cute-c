@@ -1,9 +1,10 @@
 #include "state.h"
 
 #include "../engine/game_state.h"
-#include "SDL3/SDL_log.h"
-#include "stdbool.h"
-#include "stddef.h"
+
+#include <SDL3/SDL_log.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 bool validate_game_state(GameState *state) {
   if (state == NULL) {

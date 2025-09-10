@@ -2,20 +2,17 @@
 
 #include "../engine/common.h"
 #include "../engine/game_state.h"
-#include "../engine/platform.h"
 #include "ecs.h"
 #include "factories.h"
+#include "pico_ecs.h"
 #include "state.h"
 
 #include <SDL3/SDL_log.h>
 #include <cimgui.h>
 #include <cute_alloc.h>
 #include <cute_app.h>
-#include <cute_color.h>
-#include <cute_draw.h>
 #include <cute_math.h>
 #include <stddef.h>
-#include <stdio.h>
 
 GameState *state = NULL;
 

@@ -1,13 +1,11 @@
 #include "engine/platform.h"
 #include "platform/platform_cute.h"
 
-#include <SDL3/SDL.h>
 #include <cute_app.h>
 #include <cute_color.h>
-#include <cute_draw.h>
 #include <cute_graphics.h>
 #include <cute_time.h>
-#include <stddef.h>
+#include <stdbool.h>
 
 typedef struct UpdateData {
   GameLibrary *game_library;
