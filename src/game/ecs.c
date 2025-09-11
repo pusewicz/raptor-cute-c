@@ -147,6 +147,11 @@ void register_systems(GameState *state) {
     ecs_require_component(state->ecs, state->systems.movement, state->components.position);
     ecs_require_component(state->ecs, state->systems.movement, state->components.velocity);
 
+    // Define weapon system required components
+    ecs_require_component(state->ecs, state->systems.weapon, state->components.weapon);
+    ecs_require_component(state->ecs, state->systems.weapon, state->components.input);
+    ecs_require_component(state->ecs, state->systems.weapon, state->components.position);
+
     // Define render system required components
     ecs_require_component(state->ecs, state->systems.render, state->components.position);
     ecs_require_component(state->ecs, state->systems.render, state->components.sprite);
