@@ -47,7 +47,6 @@ ecs_id_t make_player(GameState *state, float x, float y) {
 }
 
 ecs_id_t make_bullet(GameState *state, float x, float y, CF_V2 direction) {
-  SDL_Log("Making bullet at (%.2f, %.2f) going %s\n", x, y, 1 == direction.y ? "UP" : "DOWN");
   ecs_id_t id = ecs_create(state->ecs);
 
   bullet_t *bullet  = ecs_add(state->ecs, id, state->components.bullet, NULL);
