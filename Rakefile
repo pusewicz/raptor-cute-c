@@ -26,4 +26,4 @@ task :watch do
   sleep
 end
 
-task default: :compile
+task default: :run
