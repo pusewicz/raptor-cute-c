@@ -103,7 +103,7 @@ EXPORT void game_render(void) {
   igText("Input.RIGHT: %d", input->right);
   igText("Input.SHOOT: %d", input->shoot);
 
-  igText("Weapon.Cooldown: %f", weapon->cooldown);
+  igDragFloat("Weapon.Cooldown", &weapon->cooldown, 0.01f, 0.0f, 1.0f, "%.2f", 1.0f);
   igText("Weapon.TimeSinceShot: %f", weapon->time_since_shot);
   igEnd();
 #endif
