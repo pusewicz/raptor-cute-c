@@ -47,27 +47,24 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
 
   GameState *state = (GameState *)udata;
 
+  // TODO: Special case for player for now
+  CF_V2   *vel   = ecs_get(ecs, state->player_entity, state->components.velocity);
+  input_t *input = ecs_get(ecs, state->player_entity, state->components.input);
+  float    speed = 1.0f;
+  vel->x         = 0.0f;
+  vel->y         = 0.0f;
+  if (input->up)
+    vel->y += speed;
+  if (input->down)
+    vel->y -= speed;
+  if (input->left)
+    vel->x -= speed;
+  if (input->right)
+    vel->x += speed;
+
   for (int i = 0; i < entity_count; i++) {
-    ecs_id_t entity_id = entities[i];
-    CF_V2   *pos       = ecs_get(ecs, entity_id, state->components.position);
-    CF_V2   *vel       = ecs_get(ecs, entity_id, state->components.velocity);
-
-    // TODO: Special case for player for now
-    if (state->player_entity == entity_id) {
-      input_t *input = ecs_get(ecs, state->player_entity, state->components.input);
-      float    speed = 1.0f;
-      vel->x         = 0.0f;
-      vel->y         = 0.0f;
-      if (input->up)
-        vel->y += speed;
-      if (input->down)
-        vel->y -= speed;
-      if (input->left)
-        vel->x -= speed;
-      if (input->right)
-        vel->x += speed;
-    }
-
+    CF_V2 *pos = ecs_get(ecs, entities[i], state->components.position);
+    CF_V2 *vel = ecs_get(ecs, entities[i], state->components.velocity);
     pos->x += vel->x;
     pos->y += vel->y;
   }
