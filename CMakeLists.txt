@@ -50,7 +50,6 @@ else()
         -Wall
         -Wextra
         -Wpedantic
-        -Wconversion
         -Wstrict-prototypes
         -Wmissing-prototypes
         -fPIC

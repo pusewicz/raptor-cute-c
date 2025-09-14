@@ -3,13 +3,6 @@
 #include "../engine/game_state.h"
 #include "factories.h"
 
-#if defined(__GNUC__) || defined(__clang__)
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wsign-conversion"
-  #pragma GCC diagnostic ignored "-Wfloat-conversion"
-  #pragma GCC diagnostic ignored "-Wshorten-64-to-32"
-#endif
-
 #define PICO_ECS_IMPLEMENTATION
 #include <SDL3/SDL_log.h>
 #include <cute_draw.h>
@@ -19,10 +12,6 @@
 #include <cute_time.h>
 #include <pico_ecs.h>
 #include <stddef.h>
-
-#if defined(__GNUC__) || defined(__clang__)
-  #pragma GCC diagnostic pop
-#endif
 
 // System implementations
 static ecs_ret_t s_update_input_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
