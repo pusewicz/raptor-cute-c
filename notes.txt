@@ -1,0 +1,23 @@
+- Scene Transitioning
+   - A scene is an integer denoting which scene we are in
+   - State 
+- Level Progression
+  - On load
+      - Clear all previous entities
+      - Set time to 0s
+      - Load background sprites
+      - Load all enemy sprites
+  - On update
+      - Update function increments time by delta time
+      - On some interval spawn an enemy
+      - Update backround position
+
+  - Enemy
+    - Components
+      - Sprite
+      - Position
+      - Health
+      - Weapon
+      - Bounding Box
+      - Path
+      - Script (or logic component with a big switch statement)

@@ -6,6 +6,7 @@
 #include <cute_app.h>
 #include <cute_color.h>
 #include <cute_math.h>
+#include <cute_sprite.h>
 #include <pico_ecs.h>
 
 typedef struct Platform Platform;
@@ -33,6 +34,13 @@ typedef struct GameState {
   // Track if components/systems have been registered
   bool components_registered;
   bool systems_registered;
+
+  // Scene Management
+  SceneType current_scene;
+  SceneType next_scene;
+
+  // Intro Scene
+  CF_Sprite intro_sprite;
 } GameState;
 
 extern GameState *state;
