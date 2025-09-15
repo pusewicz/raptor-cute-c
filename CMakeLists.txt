@@ -14,18 +14,7 @@ include(GNUInstallDirs)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
-set(CF_FRAMEWORK_BUILD_SAMPLES OFF)
-set(CF_FRAMEWORK_BUILD_TESTS OFF)
-set(CF_FRAMEWORK_STATIC OFF)
-
-include(FetchContent)
-FetchContent_Declare(
-  cute
-  GIT_REPOSITORY https://github.com/RandyGaul/cute_framework
-  GIT_TAG master
-  GIT_SHALLOW
-)
-FetchContent_MakeAvailable(cute)
+add_subdirectory(vendor)
 
 if (MSVC)
   add_compile_options(
