@@ -111,7 +111,7 @@ add_custom_command(
 # Copy the generated DLL for SDL to the built binary’s folder
 if(WIN32)
   add_custom_command(
-        TARGET game POST_BUILD
+        TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$" "$"
         VERBATIM
         COMMENT "Copying SDL3 DLL file to build folder"
