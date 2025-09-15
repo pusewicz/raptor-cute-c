@@ -15,7 +15,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define MAX_PATH_LENGTH 1024
+enum {
+MAX_PATH_LENGTH = 1024
+};
 
 #ifndef GAME_LIBRARY_NAME
   #error "GAME_LIBRARY_NAME must be defined"
