@@ -4,7 +4,6 @@
 #include "factories.h"
 
 #define PICO_ECS_IMPLEMENTATION
-#include <SDL3/SDL_log.h>
 #include <cute_draw.h>
 #include <cute_input.h>
 #include <cute_math.h>
