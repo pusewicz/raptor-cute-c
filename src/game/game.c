@@ -120,8 +120,8 @@ EXPORT void game_shutdown(void) {
 
 EXPORT void *game_state(void) { return g_state; }
 
-EXPORT void game_hot_reload(void *game_g_state) {
-  g_state = (GameState *)game_g_state;
+EXPORT void game_hot_reload(void *game_state) {
+  g_state = (GameState *)game_state;
   // Update system callbacks to new function addresses
   update_system_callbacks();
 }
