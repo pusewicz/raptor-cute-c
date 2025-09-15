@@ -20,7 +20,7 @@ static ecs_ret_t s_update_input_system(ecs_t *ecs, ecs_id_t *entities, int entit
   (void)entity_count;
   (void)udata;
 
-  input_t   *input = ecs_get(ecs, state->player_entity, state->components.input);
+  input_t   *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
 
   input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
   input->down  = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
@@ -37,8 +37,8 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
 
   // TODO: Special case for player for now
   {
-    CF_V2   *vel   = ecs_get(ecs, state->player_entity, state->components.velocity);
-    input_t *input = ecs_get(ecs, state->player_entity, state->components.input);
+    CF_V2   *vel   = ecs_get(ecs, g_state->player_entity, g_state->components.velocity);
+    input_t *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
     float    speed = 1.0f;
     vel->x         = 0.0f;
     vel->y         = 0.0f;
@@ -53,8 +53,8 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
   }
 
   for (int i = 0; i < entity_count; i++) {
-    CF_V2 *pos = ecs_get(ecs, entities[i], state->components.position);
-    CF_V2 *vel = ecs_get(ecs, entities[i], state->components.velocity);
+    CF_V2 *pos = ecs_get(ecs, entities[i], g_state->components.position);
+    CF_V2 *vel = ecs_get(ecs, entities[i], g_state->components.velocity);
     pos->x += vel->x;
     pos->y += vel->y;
   }
@@ -67,17 +67,17 @@ static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int enti
   (void)entity_count;
   (void)udata;
 
-  weapon_t  *weapon = ecs_get(ecs, state->player_entity, state->components.weapon);
+  weapon_t  *weapon = ecs_get(ecs, g_state->player_entity, g_state->components.weapon);
 
   if (weapon->time_since_shot < weapon->cooldown) {
     weapon->time_since_shot += (float)dt;
     return 0;
   }
 
-  input_t *input = ecs_get(ecs, state->player_entity, state->components.input);
+  input_t *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
   if (input->shoot) {
     weapon->time_since_shot = 0.0f;
-    CF_V2 *pos              = ecs_get(ecs, state->player_entity, state->components.position);
+    CF_V2 *pos              = ecs_get(ecs, g_state->player_entity, g_state->components.position);
     make_bullet(pos->x, pos->y, cf_v2(0, 1));
   }
 
@@ -89,11 +89,11 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
   (void)udata;
 
   cf_draw_push();
-  cf_draw_scale(state->scale.x, state->scale.y);
+  cf_draw_scale(g_state->scale.x, g_state->scale.y);
 
   for (int i = 0; i < entity_count; i++) {
-    CF_V2     *pos    = ecs_get(ecs, entities[i], state->components.position);
-    CF_Sprite *sprite = ecs_get(ecs, entities[i], state->components.sprite);
+    CF_V2     *pos    = ecs_get(ecs, entities[i], g_state->components.position);
+    CF_Sprite *sprite = ecs_get(ecs, entities[i], g_state->components.sprite);
 
     cf_sprite_update(sprite);
     cf_draw_push();
@@ -108,53 +108,53 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
 }
 
 void register_components(void) {
-  if (!state->components_registered) {
-    state->components.input      = ecs_register_component(state->ecs, sizeof(input_t), NULL, NULL);
-    state->components.position   = ecs_register_component(state->ecs, sizeof(CF_V2), NULL, NULL);
-    state->components.sprite     = ecs_register_component(state->ecs, sizeof(CF_Sprite), NULL, NULL);
-    state->components.velocity   = ecs_register_component(state->ecs, sizeof(CF_V2), NULL, NULL);
-    state->components.weapon     = ecs_register_component(state->ecs, sizeof(weapon_t), NULL, NULL);
-    state->components_registered = true;
+  if (!g_state->components_registered) {
+    g_state->components.input      = ecs_register_component(g_state->ecs, sizeof(input_t), NULL, NULL);
+    g_state->components.position   = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
+    g_state->components.sprite     = ecs_register_component(g_state->ecs, sizeof(CF_Sprite), NULL, NULL);
+    g_state->components.velocity   = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
+    g_state->components.weapon     = ecs_register_component(g_state->ecs, sizeof(weapon_t), NULL, NULL);
+    g_state->components_registered = true;
   }
 }
 
 void register_systems(void) {
-  if (!state->systems_registered) {
+  if (!g_state->systems_registered) {
     // First time registration
-    state->systems.input    = ecs_register_system(state->ecs, s_update_input_system, NULL, NULL, state);
-    state->systems.movement = ecs_register_system(state->ecs, s_update_movement_system, NULL, NULL, state);
-    state->systems.weapon   = ecs_register_system(state->ecs, s_update_weapon_system, NULL, NULL, state);
-    state->systems.render   = ecs_register_system(state->ecs, s_update_render_system, NULL, NULL, state);
+    g_state->systems.input    = ecs_register_system(g_state->ecs, s_update_input_system, NULL, NULL, g_state);
+    g_state->systems.movement = ecs_register_system(g_state->ecs, s_update_movement_system, NULL, NULL, g_state);
+    g_state->systems.weapon   = ecs_register_system(g_state->ecs, s_update_weapon_system, NULL, NULL, g_state);
+    g_state->systems.render   = ecs_register_system(g_state->ecs, s_update_render_system, NULL, NULL, g_state);
 
     // Define input system required components
-    ecs_require_component(state->ecs, state->systems.input, state->components.input);
-    ecs_require_component(state->ecs, state->systems.input, state->components.position);
+    ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.input);
+    ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.position);
 
     // Define movement system required components
-    ecs_require_component(state->ecs, state->systems.movement, state->components.position);
-    ecs_require_component(state->ecs, state->systems.movement, state->components.velocity);
+    ecs_require_component(g_state->ecs, g_state->systems.movement, g_state->components.position);
+    ecs_require_component(g_state->ecs, g_state->systems.movement, g_state->components.velocity);
 
     // Define weapon system required components
-    ecs_require_component(state->ecs, state->systems.weapon, state->components.weapon);
-    ecs_require_component(state->ecs, state->systems.weapon, state->components.input);
-    ecs_require_component(state->ecs, state->systems.weapon, state->components.position);
+    ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.weapon);
+    ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.input);
+    ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.position);
 
     // Define render system required components
-    ecs_require_component(state->ecs, state->systems.render, state->components.position);
-    ecs_require_component(state->ecs, state->systems.render, state->components.sprite);
+    ecs_require_component(g_state->ecs, g_state->systems.render, g_state->components.position);
+    ecs_require_component(g_state->ecs, g_state->systems.render, g_state->components.sprite);
 
-    state->systems_registered = true;
+    g_state->systems_registered = true;
   }
 }
 
 void update_system_callbacks(void) {
-  ecs_t *ecs = state->ecs;
+  ecs_t *ecs = g_state->ecs;
 
   // Update each system's callback to the current function address
-  ecs->systems[state->systems.input].system_cb    = s_update_input_system;
-  ecs->systems[state->systems.movement].system_cb = s_update_movement_system;
-  ecs->systems[state->systems.render].system_cb   = s_update_render_system;
-  ecs->systems[state->systems.weapon].system_cb   = s_update_weapon_system;
+  ecs->systems[g_state->systems.input].system_cb    = s_update_input_system;
+  ecs->systems[g_state->systems.movement].system_cb = s_update_movement_system;
+  ecs->systems[g_state->systems.render].system_cb   = s_update_render_system;
+  ecs->systems[g_state->systems.weapon].system_cb   = s_update_weapon_system;
 }
 
-void update_systems(void) { ecs_update_systems(state->ecs, CF_DELTA_TIME); }
+void update_systems(void) { ecs_update_systems(g_state->ecs, CF_DELTA_TIME); }

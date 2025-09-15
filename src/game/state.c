@@ -7,35 +7,35 @@
 #include <stddef.h>
 
 bool validate_game_state(void) {
-  if (state == NULL) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "state is NULL");
+  if (g_state == NULL) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state is NULL");
     return false;
   }
-  if (state->platform == NULL) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "state->platform is NULL");
+  if (g_state->platform == NULL) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->platform is NULL");
     return false;
   }
-  if (state->canvas_size.x <= 0 || state->canvas_size.y <= 0) {
+  if (g_state->canvas_size.x <= 0 || g_state->canvas_size.y <= 0) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM,
-                 "state->canvas_size is invalid: (%.2f, %.2f)",
-                 state->canvas_size.x,
-                 state->canvas_size.y);
+                 "g_state->canvas_size is invalid: (%.2f, %.2f)",
+                 g_state->canvas_size.x,
+                 g_state->canvas_size.y);
     return false;
   }
-  if (state->scale.x <= 0 || state->scale.y <= 0) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "state->scale is invalid: (%.2f, %.2f)", state->scale.x, state->scale.y);
+  if (g_state->scale.x <= 0 || g_state->scale.y <= 0) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->scale is invalid: (%.2f, %.2f)", g_state->scale.x, g_state->scale.y);
     return false;
   }
-  if (state->ecs == NULL) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "state->ecs is NULL");
+  if (g_state->ecs == NULL) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->ecs is NULL");
     return false;
   }
-  if (!state->components_registered) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "state->components_registered is false");
+  if (!g_state->components_registered) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->components_registered is false");
     return false;
   }
-  if (!state->systems_registered) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "state->systems_registered is false");
+  if (!g_state->systems_registered) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->systems_registered is false");
     return false;
   }
   return true;

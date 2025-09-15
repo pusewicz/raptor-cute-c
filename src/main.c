@@ -46,14 +46,14 @@ int main(int argc, char *argv[]) {
     cf_app_update(&update);
 
     if (platform_has_to_reload_game_library(&game_library)) {
-      void *game_state = game_library.state();
+      void *state = game_library.state();
       platform_unload_game_library(&game_library);
 
       cf_sleep(50);
       GameLibrary new_game_library = platform_load_game_library();
       if (new_game_library.ok) {
         game_library = new_game_library;
-        game_library.hot_reload(game_state);
+        game_library.hot_reload(state);
       }
     }
 

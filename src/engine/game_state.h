@@ -35,4 +35,4 @@ typedef struct GameState {
   bool systems_registered;
 } GameState;
 
-extern GameState *state;
+extern GameState *g_state;
