@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-bool validate_game_state(GameState *state) {
+bool validate_game_state(void) {
   if (state == NULL) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "state is NULL");
     return false;

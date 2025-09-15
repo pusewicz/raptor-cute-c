@@ -58,12 +58,12 @@ EXPORT void game_init(Platform *platform) {
   state->components_registered = false;    // TODO: Do we need this?
   state->systems_registered    = false;    // TODO: Do we need this?
 
-  register_components(state);
-  register_systems(state);
+  register_components();
+  register_systems();
 
-  state->player_entity = make_player(state, 0.0f, 0.0f);
+  state->player_entity = make_player(0.0f, 0.0f);
 
-  if (!validate_game_state(state)) {
+  if (!validate_game_state()) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "GameState validation failed in game_init");
     abort();
   }
@@ -79,7 +79,7 @@ EXPORT void game_init(Platform *platform) {
 EXPORT bool game_update(void) {
   cf_arena_reset(&state->scratch_arena);
 
-  update_systems(state);
+  update_systems();
 
   return true;
 }
@@ -123,5 +123,5 @@ EXPORT void *game_state(void) { return state; }
 EXPORT void game_hot_reload(void *game_state) {
   state = (GameState *)game_state;
   // Update system callbacks to new function addresses
-  update_system_callbacks(state);
+  update_system_callbacks();
 }

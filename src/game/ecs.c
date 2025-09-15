@@ -18,8 +18,8 @@ static ecs_ret_t s_update_input_system(ecs_t *ecs, ecs_id_t *entities, int entit
   (void)dt;
   (void)entities;
   (void)entity_count;
+  (void)udata;
 
-  GameState *state = (GameState *)udata;
   input_t   *input = ecs_get(ecs, state->player_entity, state->components.input);
 
   input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
@@ -33,23 +33,24 @@ static ecs_ret_t s_update_input_system(ecs_t *ecs, ecs_id_t *entities, int entit
 
 static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)dt;
-
-  GameState *state = (GameState *)udata;
+  (void)udata;
 
   // TODO: Special case for player for now
-  CF_V2   *vel   = ecs_get(ecs, state->player_entity, state->components.velocity);
-  input_t *input = ecs_get(ecs, state->player_entity, state->components.input);
-  float    speed = 1.0f;
-  vel->x         = 0.0f;
-  vel->y         = 0.0f;
-  if (input->up)
-    vel->y += speed;
-  if (input->down)
-    vel->y -= speed;
-  if (input->left)
-    vel->x -= speed;
-  if (input->right)
-    vel->x += speed;
+  {
+    CF_V2   *vel   = ecs_get(ecs, state->player_entity, state->components.velocity);
+    input_t *input = ecs_get(ecs, state->player_entity, state->components.input);
+    float    speed = 1.0f;
+    vel->x         = 0.0f;
+    vel->y         = 0.0f;
+    if (input->up)
+      vel->y += speed;
+    if (input->down)
+      vel->y -= speed;
+    if (input->left)
+      vel->x -= speed;
+    if (input->right)
+      vel->x += speed;
+  }
 
   for (int i = 0; i < entity_count; i++) {
     CF_V2 *pos = ecs_get(ecs, entities[i], state->components.position);
@@ -64,8 +65,8 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
 static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)entities;
   (void)entity_count;
+  (void)udata;
 
-  GameState *state  = (GameState *)udata;
   weapon_t  *weapon = ecs_get(ecs, state->player_entity, state->components.weapon);
 
   if (weapon->time_since_shot < weapon->cooldown) {
@@ -77,7 +78,7 @@ static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int enti
   if (input->shoot) {
     weapon->time_since_shot = 0.0f;
     CF_V2 *pos              = ecs_get(ecs, state->player_entity, state->components.position);
-    make_bullet(state, pos->x, pos->y, cf_v2(0, 1));
+    make_bullet(pos->x, pos->y, cf_v2(0, 1));
   }
 
   return 0;
@@ -85,7 +86,7 @@ static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int enti
 
 static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)dt;
-  GameState *state = (GameState *)udata;
+  (void)udata;
 
   cf_draw_push();
   cf_draw_scale(state->scale.x, state->scale.y);
@@ -106,7 +107,7 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
   return 0;
 }
 
-void register_components(GameState *state) {
+void register_components(void) {
   if (!state->components_registered) {
     state->components.input      = ecs_register_component(state->ecs, sizeof(input_t), NULL, NULL);
     state->components.position   = ecs_register_component(state->ecs, sizeof(CF_V2), NULL, NULL);
@@ -117,7 +118,7 @@ void register_components(GameState *state) {
   }
 }
 
-void register_systems(GameState *state) {
+void register_systems(void) {
   if (!state->systems_registered) {
     // First time registration
     state->systems.input    = ecs_register_system(state->ecs, s_update_input_system, NULL, NULL, state);
@@ -146,7 +147,7 @@ void register_systems(GameState *state) {
   }
 }
 
-void update_system_callbacks(GameState *state) {
+void update_system_callbacks(void) {
   ecs_t *ecs = state->ecs;
 
   // Update each system's callback to the current function address
@@ -156,4 +157,4 @@ void update_system_callbacks(GameState *state) {
   ecs->systems[state->systems.weapon].system_cb   = s_update_weapon_system;
 }
 
-void update_systems(GameState *state) { ecs_update_systems(state->ecs, CF_DELTA_TIME); }
+void update_systems(void) { ecs_update_systems(state->ecs, CF_DELTA_TIME); }

@@ -4,8 +4,6 @@
 #include <pico_ecs.h>
 #include <stdbool.h>
 
-typedef struct GameState GameState;
-
 /*
  * Component structures
  */
@@ -48,7 +46,7 @@ typedef struct {
   ecs_id_t weapon;
 } Systems;
 
-void register_components(GameState *state);
-void register_systems(GameState *state);
-void update_system_callbacks(GameState *state);
-void update_systems(GameState *state);
+void register_components(void);
+void register_systems(void);
+void update_system_callbacks(void);
+void update_systems(void);

@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-ecs_id_t make_player(GameState *state, float x, float y) {
+ecs_id_t make_player(float x, float y) {
   ecs_id_t id = ecs_create(state->ecs);
 
   // Add position
@@ -46,7 +46,7 @@ ecs_id_t make_player(GameState *state, float x, float y) {
   return id;
 }
 
-ecs_id_t make_bullet(GameState *state, float x, float y, CF_V2 direction) {
+ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   ecs_id_t id = ecs_create(state->ecs);
 
   bullet_t *bullet  = ecs_add(state->ecs, id, state->components.bullet, NULL);
