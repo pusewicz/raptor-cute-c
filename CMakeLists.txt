@@ -10,32 +10,15 @@ set(PROJECT_COMPANY_NAMESPACE "com.layer22")
 
 include(cmake/StandardProjectSettings.cmake)
 include(GNUInstallDirs)
+# Link this "library" to use the warnings specified in CompilerWarnings.cmake.
+add_library(project_warnings INTERFACE)
+include(cmake/CompilerWarnings.cmake)
+set_project_warnings(project_warnings)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
 add_subdirectory(vendor)
-
-if (MSVC)
-  add_compile_options(
-        /W4
-        /D_CRT_SECURE_NO_WARNINGS
-        /Zc:preprocessor
-        $<$<CONFIG:DEBUG>:/RTCcsu>
-        $<$<CONFIG:DEBUG>:/Zi>)
-else()
-  add_compile_options(
-        -Wall
-        -Wextra
-        -Wpedantic
-        -Wstrict-prototypes
-        -Wmissing-prototypes
-        -fPIC
-        # $<$<CONFIG:DEBUG>:-fsanitize=undefined>
-        $<$<CONFIG:DEBUG>:-g>)
-endif()
-
-# include(cmake/StaticAnalyzers.cmake)
 
 add_library(
     gamelib SHARED
@@ -44,7 +27,9 @@ add_library(
     src/game/ecs.c
     src/game/factories.c
 )
-target_link_libraries(gamelib cute)
+target_link_libraries(gamelib
+  PRIVATE project_warnings
+  PUBLIC cute)
 target_compile_definitions(
     gamelib PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
@@ -66,7 +51,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
-target_link_libraries(${PROJECT_NAME} cute)
+target_link_libraries(${PROJECT_NAME}
+  PRIVATE project_warnings
+  PUBLIC cute)
 target_compile_definitions(
     ${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
