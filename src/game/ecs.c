@@ -149,11 +149,10 @@ void register_systems(void) {
 void update_system_callbacks(void) {
   ecs_t *ecs = g_state->ecs;
 
-  // Update each system's callback to the current function address
-  ecs->systems[g_state->systems.input].system_cb    = s_update_input_system;
-  ecs->systems[g_state->systems.movement].system_cb = s_update_movement_system;
-  ecs->systems[g_state->systems.render].system_cb   = s_update_render_system;
-  ecs->systems[g_state->systems.weapon].system_cb   = s_update_weapon_system;
+  ecs_set_system_callbacks(ecs, g_state->systems.input, s_update_input_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.movement, s_update_movement_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.render, s_update_render_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.weapon, s_update_weapon_system, NULL, NULL);
 }
 
 void update_systems(void) { ecs_update_systems(g_state->ecs, CF_DELTA_TIME); }
