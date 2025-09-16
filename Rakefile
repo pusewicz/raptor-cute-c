@@ -26,4 +26,15 @@ task :watch do
   sleep
 end
 
+namespace :headers do
+  desc "Update header files"
+  task :update do
+    {
+      "include/pico_ecs.h" => "https://raw.githubusercontent.com/empyreanx/pico_headers/refs/heads/main/pico_ecs.h",
+    }.each do |local_path, url|
+      sh "curl -o #{local_path} #{url}"
+    end
+  end
+end
+
 task default: :run

@@ -266,6 +266,39 @@ void ecs_enable_system(ecs_t* ecs, ecs_id_t sys_id);
 void ecs_disable_system(ecs_t* ecs, ecs_id_t sys_id);
 
 /**
+ * @brief Updates the callbacks for an existing system
+ *
+ * @param ecs       The ECS instance
+ * @param sys_id    The system ID
+ * @param system_cb Callback that is fired every update
+ * @param add_cb    Called when an entity is added to the system (can be NULL)
+ * @param remove_cb Called when an entity is removed from the system (can be NULL)
+ */
+void ecs_set_system_callbacks(ecs_t* ecs,
+                              ecs_id_t sys_id,
+                              ecs_system_fn system_cb,
+                              ecs_added_fn add_cb,
+                              ecs_removed_fn remove_cb);
+
+/**
+ * @brief Sets the user data for a system
+ *
+ * @param ecs    The ECS instance
+ * @param sys_id The system ID
+ * @param udata  The user data to set
+ */
+void ecs_set_system_udata(ecs_t* ecs, ecs_id_t sys_id, void* udata);
+
+/**
+ * @brief Gets the user data from a system
+ *
+ * @param ecs    The ECS instance
+ * @param sys_id The system ID
+ * @return       The system's user data
+ */
+void* ecs_get_system_udata(ecs_t* ecs, ecs_id_t sys_id);
+
+/**
  * @brief Creates an entity
  *
  * @param ecs The ECS instance
@@ -780,6 +813,42 @@ void ecs_disable_system(ecs_t* ecs, ecs_id_t sys_id)
     sys->active = false;
 }
 
+void ecs_set_system_callbacks(ecs_t* ecs,
+                            ecs_id_t sys_id,
+                            ecs_system_fn system_cb,
+                            ecs_added_fn add_cb,
+                            ecs_removed_fn remove_cb)
+{
+    ECS_ASSERT(ecs_is_not_null(ecs));
+    ECS_ASSERT(ecs_is_valid_system_id(sys_id));
+    ECS_ASSERT(ecs_is_system_ready(ecs, sys_id));
+    ECS_ASSERT(NULL != system_cb);
+
+    ecs_sys_t* sys = &ecs->systems[sys_id];
+    sys->system_cb = system_cb;
+    sys->add_cb = add_cb;
+    sys->remove_cb = remove_cb;
+}
+
+void ecs_set_system_udata(ecs_t* ecs, ecs_id_t sys_id, void* udata)
+{
+    ECS_ASSERT(ecs_is_not_null(ecs));
+    ECS_ASSERT(ecs_is_valid_system_id(sys_id));
+    ECS_ASSERT(ecs_is_system_ready(ecs, sys_id));
+
+    ecs_sys_t* sys = &ecs->systems[sys_id];
+    sys->udata = udata;
+}
+
+void* ecs_get_system_udata(ecs_t* ecs, ecs_id_t sys_id)
+{
+    ECS_ASSERT(ecs_is_not_null(ecs));
+    ECS_ASSERT(ecs_is_valid_system_id(sys_id));
+    ECS_ASSERT(ecs_is_system_ready(ecs, sys_id));
+
+    return ecs->systems[sys_id].udata;
+}
+
 ecs_id_t ecs_create(ecs_t* ecs)
 {
     ECS_ASSERT(ecs_is_not_null(ecs));
@@ -1114,7 +1183,7 @@ static void ecs_remove_from_systerms(ecs_t* ecs, ecs_id_t entity_id)
             if (sys->remove_cb)
                 sys->remove_cb(ecs, entity_id, sys->udata);
         }
-    } 
+    }
 }
 
 /*=============================================================================
@@ -1346,7 +1415,8 @@ static bool ecs_sparse_set_add(ecs_t* ecs, ecs_sparse_set_t* set, ecs_id_t id)
         // Calculate new capacity
         while (new_capacity <= id)
         {
-            new_capacity += (new_capacity / 2) + 2;
+            new_capacity *= 2;
+            //new_capacity += (new_capacity / 2) + 2;
         }
 
         // Grow dense array
@@ -1463,7 +1533,8 @@ inline static void ecs_stack_push(ecs_t* ecs, ecs_stack_t* stack, ecs_id_t id)
 
     if (stack->size == stack->capacity)
     {
-        stack->capacity += (stack->capacity / 2) + 2;
+        stack->capacity *= 2;
+        //stack->capacity += (stack->capacity / 2) + 2;
 
         stack->array = (ecs_id_t*)ECS_REALLOC(stack->array,
                                               stack->capacity * sizeof(ecs_id_t),
@@ -1520,7 +1591,8 @@ static void ecs_array_resize(ecs_t* ecs, ecs_array_t* array, size_t capacity)
     {
         while (array->capacity <= capacity)
         {
-            array->capacity += (array->capacity / 2) + 2;
+            array->capacity *= 2;
+            //array->capacity += (array->capacity / 2) + 2;
         }
 
         array->data = ECS_REALLOC(array->data,
