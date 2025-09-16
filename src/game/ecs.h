@@ -49,4 +49,3 @@ typedef struct {
 void register_components(void);
 void register_systems(void);
 void update_system_callbacks(void);
-void update_systems(void);

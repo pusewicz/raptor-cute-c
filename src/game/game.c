@@ -2,6 +2,7 @@
 
 #include "../engine/common.h"
 #include "../engine/game_state.h"
+#include "cute_time.h"
 #include "ecs.h"
 #include "factories.h"
 #include "pico_ecs.h"
@@ -79,12 +80,16 @@ EXPORT void game_init(Platform *platform) {
 EXPORT bool game_update(void) {
   cf_arena_reset(&g_state->scratch_arena);
 
-  update_systems();
+  ecs_update_system(g_state->ecs, g_state->systems.input, CF_DELTA_TIME);
+  ecs_update_system(g_state->ecs, g_state->systems.movement, CF_DELTA_TIME);
+  ecs_update_system(g_state->ecs, g_state->systems.weapon, CF_DELTA_TIME);
 
   return true;
 }
 
 EXPORT void game_render(void) {
+  ecs_update_system(g_state->ecs, g_state->systems.render, CF_DELTA_TIME);
+
 #ifdef DEBUG
   input_t  *input  = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.input);
   weapon_t *weapon = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.weapon);

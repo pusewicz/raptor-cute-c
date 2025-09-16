@@ -8,7 +8,6 @@
 #include <cute_input.h>
 #include <cute_math.h>
 #include <cute_sprite.h>
-#include <cute_time.h>
 #include <pico_ecs.h>
 #include <stddef.h>
 
@@ -154,5 +153,3 @@ void update_system_callbacks(void) {
   ecs_set_system_callbacks(ecs, g_state->systems.render, s_update_render_system, NULL, NULL);
   ecs_set_system_callbacks(ecs, g_state->systems.weapon, s_update_weapon_system, NULL, NULL);
 }
-
-void update_systems(void) { ecs_update_systems(g_state->ecs, CF_DELTA_TIME); }
