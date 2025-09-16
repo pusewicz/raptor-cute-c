@@ -9,11 +9,15 @@
 #include "state.h"
 
 #include <SDL3/SDL_log.h>
+#include <_abort.h>
 #include <cimgui.h>
 #include <cute_alloc.h>
 #include <cute_app.h>
 #include <cute_math.h>
+#include <cute_rnd.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <time.h>
 
 GameState *g_state = NULL;
 
@@ -34,22 +38,19 @@ GameState *g_state = NULL;
 EXPORT void game_init(Platform *platform) {
   g_state = platform->allocate_memory(sizeof(GameState));
 
-  g_state->display_id = cf_default_display();
+  const int scale    = 3;
+  const int canvas_w = CANVAS_WIDTH * scale;
+  const int canvas_h = CANVAS_HEIGHT * scale;
 
-  int scale_w = cf_display_width(g_state->display_id) / CANVAS_WIDTH;
-  int scale_h = cf_display_height(g_state->display_id) / CANVAS_HEIGHT;
-  int scale   = cf_min(scale_w, scale_h) - 1;
-
-  int canvas_w = CANVAS_WIDTH * scale;
-  int canvas_h = CANVAS_HEIGHT * scale;
-
+  g_state->display_id      = cf_default_display();
   g_state->platform        = platform;
   g_state->canvas_size     = cf_v2(canvas_w, canvas_h);
-  g_state->scale           = cf_v2(scale - 1, scale - 1);    // Scale up for resolution independence
+  g_state->scale           = cf_v2(scale, scale);
   g_state->permanent_arena = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, PERMANENT_ARENA_SIZE);
   g_state->stage_arena     = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, STAGE_ARENA_SIZE);
   g_state->scratch_arena   = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
   g_state->ecs             = ecs_new(1024, NULL);
+  g_state->rnd             = cf_rnd_seed((uint32_t)time(NULL));
 
   // Initialize component and system IDs to 0
   g_state->components = (Components){0};
@@ -62,7 +63,8 @@ EXPORT void game_init(Platform *platform) {
   register_components();
   register_systems();
 
-  g_state->player_entity = make_player(0.0f, 0.0f);
+  g_state->player_entity        = make_player(0.0f, 0.0f);
+  g_state->enemy_spawner_entity = make_enemy_spawner();
 
   if (!validate_game_state()) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "GameState validation failed in game_init");
@@ -83,19 +85,21 @@ EXPORT bool game_update(void) {
   ecs_update_system(g_state->ecs, g_state->systems.input, CF_DELTA_TIME);
   ecs_update_system(g_state->ecs, g_state->systems.movement, CF_DELTA_TIME);
   ecs_update_system(g_state->ecs, g_state->systems.weapon, CF_DELTA_TIME);
+  ecs_update_system(g_state->ecs, g_state->systems.enemy_spawn, CF_DELTA_TIME);
 
   return true;
 }
 
-EXPORT void game_render(void) {
-  ecs_update_system(g_state->ecs, g_state->systems.render, CF_DELTA_TIME);
-
-#ifdef DEBUG
+static void game_render_debug(void) {
   InputComponent  *input  = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.input);
   WeaponComponent *weapon = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.weapon);
-  CF_V2    *pos    = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.position);
-  CF_V2    *vel    = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.velocity);
-  igBegin("Debug Info", NULL, 0);
+  CF_V2           *pos    = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.position);
+  CF_V2           *vel    = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.velocity);
+
+  /*
+   * Debug info
+   */
+  igBegin("Debug", NULL, 0);
 
   igText("FPS: %.2f", cf_app_get_framerate());
 
@@ -111,6 +115,26 @@ EXPORT void game_render(void) {
   igDragFloat("Weapon.Cooldown", &weapon->cooldown, 0.01f, 0.0f, 1.0f, "%.2f", 1.0f);
   igText("Weapon.TimeSinceShot: %f", weapon->time_since_shot);
   igEnd();
+
+  /*
+   * Window info
+   */
+  igBegin("Window", NULL, 0);
+  int w = cf_app_get_width();
+  int h = cf_app_get_height();
+  igText("Screen: %dx%d", cf_display_width(g_state->display_id), cf_display_height(g_state->display_id));
+  igText("Size: %dx%d", w, h);
+  igText("Canvas: %dx%d", cf_app_get_canvas_width(), cf_app_get_canvas_height());
+  igText("Game Scale: %.2fx%.2f", g_state->scale.x, g_state->scale.y);
+  igText("DPI Scale: %.2f", cf_app_get_dpi_scale());
+  igEnd();
+}
+
+EXPORT void game_render(void) {
+  ecs_update_system(g_state->ecs, g_state->systems.render, CF_DELTA_TIME);
+
+#ifdef DEBUG
+  game_render_debug();
 #endif
 }
 
