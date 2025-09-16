@@ -24,7 +24,7 @@ ecs_id_t make_player(float x, float y) {
   vel->y     = 0.0f;
 
   // Add input controls
-  input_t *input = ecs_add(g_state->ecs, id, g_state->components.input, NULL);
+  InputComponent *input = ecs_add(g_state->ecs, id, g_state->components.input, NULL);
   input->up      = false;
   input->down    = false;
   input->left    = false;
@@ -39,7 +39,7 @@ ecs_id_t make_player(float x, float y) {
   }
 
   // Add weapon
-  weapon_t *weapon        = ecs_add(g_state->ecs, id, g_state->components.weapon, NULL);
+  WeaponComponent *weapon        = ecs_add(g_state->ecs, id, g_state->components.weapon, NULL);
   weapon->cooldown        = 0.5f;    // Half a second between shots
   weapon->time_since_shot = 0.0f;
 
@@ -49,7 +49,7 @@ ecs_id_t make_player(float x, float y) {
 ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   ecs_id_t id = ecs_create(g_state->ecs);
 
-  bullet_t *bullet  = ecs_add(g_state->ecs, id, g_state->components.bullet, NULL);
+  BulletComponent *bullet  = ecs_add(g_state->ecs, id, g_state->components.bullet, NULL);
   bullet->direction = direction;
 
   CF_V2 *pos = ecs_add(g_state->ecs, id, g_state->components.position, NULL);

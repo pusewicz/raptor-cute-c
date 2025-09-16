@@ -91,8 +91,8 @@ EXPORT void game_render(void) {
   ecs_update_system(g_state->ecs, g_state->systems.render, CF_DELTA_TIME);
 
 #ifdef DEBUG
-  input_t  *input  = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.input);
-  weapon_t *weapon = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.weapon);
+  InputComponent  *input  = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.input);
+  WeaponComponent *weapon = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.weapon);
   CF_V2    *pos    = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.position);
   CF_V2    *vel    = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.velocity);
   igBegin("Debug Info", NULL, 0);

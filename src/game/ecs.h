@@ -7,22 +7,22 @@
 /*
  * Component structures
  */
-typedef struct input_t {
+typedef struct InputComponent {
   bool up;
   bool down;
   bool left;
   bool right;
   bool shoot;
-} input_t;
+} InputComponent;
 
-typedef struct weapon_t {
+typedef struct WeaponComponent {
   float cooldown;           // Time between shots in seconds
   float time_since_shot;    // Time since last shot in seconds
-} weapon_t;
+} WeaponComponent;
 
-typedef struct bullet_t {
+typedef struct BulletComponent {
   CF_V2 direction;
-} bullet_t;
+} BulletComponent;
 
 /*
  * Components

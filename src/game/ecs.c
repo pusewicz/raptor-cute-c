@@ -18,7 +18,7 @@ static ecs_ret_t s_update_input_system(ecs_t *ecs, ecs_id_t *entities, int entit
   (void)entity_count;
   (void)udata;
 
-  input_t   *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
+  InputComponent   *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
 
   input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
   input->down  = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
@@ -36,7 +36,7 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
   // TODO: Special case for player for now
   {
     CF_V2   *vel   = ecs_get(ecs, g_state->player_entity, g_state->components.velocity);
-    input_t *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
+    InputComponent *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
     float    speed = 1.0f;
     vel->x         = 0.0f;
     vel->y         = 0.0f;
@@ -65,14 +65,14 @@ static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int enti
   (void)entity_count;
   (void)udata;
 
-  weapon_t  *weapon = ecs_get(ecs, g_state->player_entity, g_state->components.weapon);
+  WeaponComponent  *weapon = ecs_get(ecs, g_state->player_entity, g_state->components.weapon);
 
   if (weapon->time_since_shot < weapon->cooldown) {
     weapon->time_since_shot += (float)dt;
     return 0;
   }
 
-  input_t *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
+  InputComponent *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
   if (input->shoot) {
     weapon->time_since_shot = 0.0f;
     CF_V2 *pos              = ecs_get(ecs, g_state->player_entity, g_state->components.position);
@@ -107,11 +107,11 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
 
 void register_components(void) {
   if (!g_state->components_registered) {
-    g_state->components.input      = ecs_register_component(g_state->ecs, sizeof(input_t), NULL, NULL);
+    g_state->components.input      = ecs_register_component(g_state->ecs, sizeof(InputComponent), NULL, NULL);
     g_state->components.position   = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
     g_state->components.sprite     = ecs_register_component(g_state->ecs, sizeof(CF_Sprite), NULL, NULL);
     g_state->components.velocity   = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
-    g_state->components.weapon     = ecs_register_component(g_state->ecs, sizeof(weapon_t), NULL, NULL);
+    g_state->components.weapon     = ecs_register_component(g_state->ecs, sizeof(WeaponComponent), NULL, NULL);
     g_state->components_registered = true;
   }
 }
