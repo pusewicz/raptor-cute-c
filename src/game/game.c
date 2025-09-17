@@ -56,9 +56,6 @@ EXPORT void game_init(Platform *platform) {
   g_state->components = (Components){0};
   g_state->systems    = (Systems){0};
 
-  // Mark that we haven't registered yet
-  g_state->systems_registered = false;    // TODO: Do we need this?
-
   register_components();
   register_systems();
 

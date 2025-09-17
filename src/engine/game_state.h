@@ -32,9 +32,6 @@ typedef struct GameState {
   // Component and System IDs - persist across hot reloads
   Components components;
   Systems    systems;
-
-  // Track if components/systems have been registered
-  bool systems_registered;
 } GameState;
 
 extern GameState *g_state;

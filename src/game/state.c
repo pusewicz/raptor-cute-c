@@ -31,9 +31,5 @@ bool validate_game_state(void) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->ecs is NULL");
     return false;
   }
-  if (!g_state->systems_registered) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->systems_registered is false");
-    return false;
-  }
   return true;
 }

@@ -141,35 +141,31 @@ void register_components(void) {
 }
 
 void register_systems(void) {
-  if (!g_state->systems_registered) {
-    g_state->systems.enemy_spawn = ecs_register_system(g_state->ecs, s_update_enemy_spawn_system, NULL, NULL, g_state);
-    g_state->systems.input       = ecs_register_system(g_state->ecs, s_update_input_system, NULL, NULL, g_state);
-    g_state->systems.movement    = ecs_register_system(g_state->ecs, s_update_movement_system, NULL, NULL, g_state);
-    g_state->systems.render      = ecs_register_system(g_state->ecs, s_update_render_system, NULL, NULL, g_state);
-    g_state->systems.weapon      = ecs_register_system(g_state->ecs, s_update_weapon_system, NULL, NULL, g_state);
+  g_state->systems.enemy_spawn = ecs_register_system(g_state->ecs, s_update_enemy_spawn_system, NULL, NULL, g_state);
+  g_state->systems.input       = ecs_register_system(g_state->ecs, s_update_input_system, NULL, NULL, g_state);
+  g_state->systems.movement    = ecs_register_system(g_state->ecs, s_update_movement_system, NULL, NULL, g_state);
+  g_state->systems.render      = ecs_register_system(g_state->ecs, s_update_render_system, NULL, NULL, g_state);
+  g_state->systems.weapon      = ecs_register_system(g_state->ecs, s_update_weapon_system, NULL, NULL, g_state);
 
-    // Define input system required components
-    ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.input);
-    ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.position);
+  // Define input system required components
+  ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.input);
+  ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.position);
 
-    // Define movement system required components
-    ecs_require_component(g_state->ecs, g_state->systems.movement, g_state->components.position);
-    ecs_require_component(g_state->ecs, g_state->systems.movement, g_state->components.velocity);
+  // Define movement system required components
+  ecs_require_component(g_state->ecs, g_state->systems.movement, g_state->components.position);
+  ecs_require_component(g_state->ecs, g_state->systems.movement, g_state->components.velocity);
 
-    // Define weapon system required components
-    ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.weapon);
-    ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.input);
-    ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.position);
+  // Define weapon system required components
+  ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.weapon);
+  ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.input);
+  ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.position);
 
-    // Define enemy spawn system required components
-    ecs_require_component(g_state->ecs, g_state->systems.enemy_spawn, g_state->components.enemy_spawn);
+  // Define enemy spawn system required components
+  ecs_require_component(g_state->ecs, g_state->systems.enemy_spawn, g_state->components.enemy_spawn);
 
-    // Define render system required components
-    ecs_require_component(g_state->ecs, g_state->systems.render, g_state->components.position);
-    ecs_require_component(g_state->ecs, g_state->systems.render, g_state->components.sprite);
-
-    g_state->systems_registered = true;
-  }
+  // Define render system required components
+  ecs_require_component(g_state->ecs, g_state->systems.render, g_state->components.position);
+  ecs_require_component(g_state->ecs, g_state->systems.render, g_state->components.sprite);
 }
 
 void update_system_callbacks(void) {
