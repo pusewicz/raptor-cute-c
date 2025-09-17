@@ -4,6 +4,7 @@
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_filesystem.h>
+#include <SDL3/SDL_init.h>
 #include <SDL3/SDL_log.h>
 #include <SDL3/SDL_stdinc.h>
 #include <SDL3/SDL_timer.h>
@@ -15,9 +16,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-enum {
-MAX_PATH_LENGTH = 1024
-};
+enum { MAX_PATH_LENGTH = 1024 };
 
 #ifndef GAME_LIBRARY_NAME
   #error "GAME_LIBRARY_NAME must be defined"
@@ -40,6 +39,9 @@ static void mount_content_directory_as(const char *dir) {
 }
 
 void platform_init(const char *argv0) {
+  SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_NAME_STRING, "Raptor");
+  SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_VERSION_STRING, "0.1.0");
+  SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_TYPE_STRING, "game");
 #ifdef DEBUG
   SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
 #endif

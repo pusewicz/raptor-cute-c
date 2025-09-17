@@ -25,10 +25,10 @@ ecs_id_t make_player(float x, float y) {
 
   // Add input controls
   InputComponent *input = ecs_add(g_state->ecs, id, g_state->components.input, NULL);
-  input->up      = false;
-  input->down    = false;
-  input->left    = false;
-  input->right   = false;
+  input->up             = false;
+  input->down           = false;
+  input->left           = false;
+  input->right          = false;
 
   // Add sprite
   CF_Sprite *sprite = ecs_add(g_state->ecs, id, g_state->components.sprite, NULL);
@@ -39,7 +39,7 @@ ecs_id_t make_player(float x, float y) {
   }
 
   // Add weapon
-  WeaponComponent *weapon        = ecs_add(g_state->ecs, id, g_state->components.weapon, NULL);
+  WeaponComponent *weapon = ecs_add(g_state->ecs, id, g_state->components.weapon, NULL);
   weapon->cooldown        = 0.5f;    // Half a second between shots
   weapon->time_since_shot = 0.0f;
 
@@ -49,8 +49,8 @@ ecs_id_t make_player(float x, float y) {
 ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   ecs_id_t id = ecs_create(g_state->ecs);
 
-  BulletComponent *bullet  = ecs_add(g_state->ecs, id, g_state->components.bullet, NULL);
-  bullet->direction = direction;
+  BulletComponent *bullet = ecs_add(g_state->ecs, id, g_state->components.bullet, NULL);
+  bullet->direction       = direction;
 
   CF_V2 *pos = ecs_add(g_state->ecs, id, g_state->components.position, NULL);
   pos->x     = x;
@@ -66,6 +66,38 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   if (cf_is_error(result)) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load bullet sprite: %s\n", result.details);
   }
+
+  return id;
+}
+
+ecs_id_t make_enemy(float x, float y) {
+  ecs_id_t id = ecs_create(g_state->ecs);
+
+  // Add position
+  CF_V2 *pos = ecs_add(g_state->ecs, id, g_state->components.position, NULL);
+  pos->x     = x;
+  pos->y     = y;
+
+  // Add velocity
+  CF_V2 *vel = ecs_add(g_state->ecs, id, g_state->components.velocity, NULL);
+  vel->x     = 0.0f;
+  vel->y     = -0.1f;
+
+  // Add sprite
+  CF_Sprite *sprite = ecs_add(g_state->ecs, id, g_state->components.sprite, NULL);
+  *sprite           = cf_make_sprite("assets/alan.ase");
+
+  return id;
+}
+
+ecs_id_t make_enemy_spawner(void) {
+  ecs_id_t id = ecs_create(g_state->ecs);
+
+  EnemySpawnComponent *spawn   = ecs_add(g_state->ecs, id, g_state->components.enemy_spawn, NULL);
+  spawn->spawn_interval        = 5.0f;    // Spawn an enemy every 5 seconds
+  spawn->time_since_last_spawn = 0.0f;
+  spawn->max_enemies           = 5;
+  spawn->current_enemy_count   = 0;
 
   return id;
 }

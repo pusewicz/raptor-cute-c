@@ -6,6 +6,7 @@
 #include <cute_app.h>
 #include <cute_color.h>
 #include <cute_math.h>
+#include <cute_rnd.h>
 #include <pico_ecs.h>
 
 typedef struct Platform Platform;
@@ -24,7 +25,9 @@ typedef struct GameState {
   CF_Arena     scratch_arena;
   ecs_t       *ecs;
   ecs_id_t     player_entity;
+  ecs_id_t     enemy_spawner_entity;
   CF_DisplayID display_id;
+  CF_Rnd       rnd;
 
   // Component and System IDs - persist across hot reloads
   Components components;

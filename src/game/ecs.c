@@ -7,18 +7,22 @@
 #include <cute_draw.h>
 #include <cute_input.h>
 #include <cute_math.h>
+#include <cute_rnd.h>
 #include <cute_sprite.h>
 #include <pico_ecs.h>
 #include <stddef.h>
 
-// System implementations
+/*
+ * System update functions
+ */
+
 static ecs_ret_t s_update_input_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)dt;
   (void)entities;
   (void)entity_count;
   (void)udata;
 
-  InputComponent   *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
+  InputComponent *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
 
   input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
   input->down  = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
@@ -35,11 +39,11 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
 
   // TODO: Special case for player for now
   {
-    CF_V2   *vel   = ecs_get(ecs, g_state->player_entity, g_state->components.velocity);
+    CF_V2          *vel   = ecs_get(ecs, g_state->player_entity, g_state->components.velocity);
     InputComponent *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
-    float    speed = 1.0f;
-    vel->x         = 0.0f;
-    vel->y         = 0.0f;
+    float           speed = 1.0f;
+    vel->x                = 0.0f;
+    vel->y                = 0.0f;
     if (input->up)
       vel->y += speed;
     if (input->down)
@@ -60,12 +64,56 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
   return 0;
 }
 
+static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+  (void)dt;
+  (void)udata;
+
+  for (int i = 0; i < entity_count; i++) {
+    CF_V2     *pos    = ecs_get(ecs, entities[i], g_state->components.position);
+    CF_Sprite *sprite = ecs_get(ecs, entities[i], g_state->components.sprite);
+
+    cf_sprite_update(sprite);
+    cf_draw_push();
+    cf_draw_translate_v2(*pos);
+    cf_draw_sprite(sprite);
+    cf_draw_pop();
+  }
+
+  return 0;
+}
+
+// TODO: Replace with a coroutine system so it's easier to design spawn patterns
+static ecs_ret_t
+s_update_enemy_spawn_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+  (void)ecs;
+  (void)entities;
+  (void)entity_count;
+  (void)dt;
+  (void)udata;
+
+  for (int i = 0; i < entity_count; i++) {
+    EnemySpawnComponent *spawn = ecs_get(ecs, entities[i], g_state->components.enemy_spawn);
+
+    spawn->time_since_last_spawn += (float)dt;
+    if (spawn->time_since_last_spawn >= spawn->spawn_interval && spawn->current_enemy_count < spawn->max_enemies) {
+      spawn->time_since_last_spawn = 0.0f;
+      spawn->current_enemy_count++;
+
+      float x = cf_rnd_range_float(&g_state->rnd, -20.0f, 20.0f);
+      float y = g_state->canvas_size.y * 0.1f;
+      make_enemy(x, y);
+    }
+  }
+
+  return 0;
+}
+
 static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)entities;
   (void)entity_count;
   (void)udata;
 
-  WeaponComponent  *weapon = ecs_get(ecs, g_state->player_entity, g_state->components.weapon);
+  WeaponComponent *weapon = ecs_get(ecs, g_state->player_entity, g_state->components.weapon);
 
   if (weapon->time_since_shot < weapon->cooldown) {
     weapon->time_since_shot += (float)dt;
@@ -82,47 +130,27 @@ static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int enti
   return 0;
 }
 
-static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
-  (void)dt;
-  (void)udata;
-
-  cf_draw_push();
-  cf_draw_scale(g_state->scale.x, g_state->scale.y);
-
-  for (int i = 0; i < entity_count; i++) {
-    CF_V2     *pos    = ecs_get(ecs, entities[i], g_state->components.position);
-    CF_Sprite *sprite = ecs_get(ecs, entities[i], g_state->components.sprite);
-
-    cf_sprite_update(sprite);
-    cf_draw_push();
-    cf_draw_translate_v2(*pos);
-    cf_draw_sprite(sprite);
-    cf_draw_pop();
-  }
-
-  cf_draw_pop();
-
-  return 0;
-}
-
 void register_components(void) {
   if (!g_state->components_registered) {
-    g_state->components.input      = ecs_register_component(g_state->ecs, sizeof(InputComponent), NULL, NULL);
-    g_state->components.position   = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
-    g_state->components.sprite     = ecs_register_component(g_state->ecs, sizeof(CF_Sprite), NULL, NULL);
-    g_state->components.velocity   = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
-    g_state->components.weapon     = ecs_register_component(g_state->ecs, sizeof(WeaponComponent), NULL, NULL);
+    g_state->components.bullet      = ecs_register_component(g_state->ecs, sizeof(BulletComponent), NULL, NULL);
+    g_state->components.enemy_spawn = ecs_register_component(g_state->ecs, sizeof(EnemySpawnComponent), NULL, NULL);
+    g_state->components.input       = ecs_register_component(g_state->ecs, sizeof(InputComponent), NULL, NULL);
+    g_state->components.position    = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
+    g_state->components.sprite      = ecs_register_component(g_state->ecs, sizeof(CF_Sprite), NULL, NULL);
+    g_state->components.velocity    = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
+    g_state->components.weapon      = ecs_register_component(g_state->ecs, sizeof(WeaponComponent), NULL, NULL);
+
     g_state->components_registered = true;
   }
 }
 
 void register_systems(void) {
   if (!g_state->systems_registered) {
-    // First time registration
-    g_state->systems.input    = ecs_register_system(g_state->ecs, s_update_input_system, NULL, NULL, g_state);
-    g_state->systems.movement = ecs_register_system(g_state->ecs, s_update_movement_system, NULL, NULL, g_state);
-    g_state->systems.weapon   = ecs_register_system(g_state->ecs, s_update_weapon_system, NULL, NULL, g_state);
-    g_state->systems.render   = ecs_register_system(g_state->ecs, s_update_render_system, NULL, NULL, g_state);
+    g_state->systems.enemy_spawn = ecs_register_system(g_state->ecs, s_update_enemy_spawn_system, NULL, NULL, g_state);
+    g_state->systems.input       = ecs_register_system(g_state->ecs, s_update_input_system, NULL, NULL, g_state);
+    g_state->systems.movement    = ecs_register_system(g_state->ecs, s_update_movement_system, NULL, NULL, g_state);
+    g_state->systems.render      = ecs_register_system(g_state->ecs, s_update_render_system, NULL, NULL, g_state);
+    g_state->systems.weapon      = ecs_register_system(g_state->ecs, s_update_weapon_system, NULL, NULL, g_state);
 
     // Define input system required components
     ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.input);
@@ -136,6 +164,9 @@ void register_systems(void) {
     ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.weapon);
     ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.input);
     ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.position);
+
+    // Define enemy spawn system required components
+    ecs_require_component(g_state->ecs, g_state->systems.enemy_spawn, g_state->components.enemy_spawn);
 
     // Define render system required components
     ecs_require_component(g_state->ecs, g_state->systems.render, g_state->components.position);
@@ -152,4 +183,5 @@ void update_system_callbacks(void) {
   ecs_set_system_callbacks(ecs, g_state->systems.movement, s_update_movement_system, NULL, NULL);
   ecs_set_system_callbacks(ecs, g_state->systems.render, s_update_render_system, NULL, NULL);
   ecs_set_system_callbacks(ecs, g_state->systems.weapon, s_update_weapon_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.enemy_spawn, s_update_enemy_spawn_system, NULL, NULL);
 }
