@@ -34,7 +34,6 @@ typedef struct GameState {
   Systems    systems;
 
   // Track if components/systems have been registered
-  bool components_registered;
   bool systems_registered;
 } GameState;
 

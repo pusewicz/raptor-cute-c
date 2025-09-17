@@ -131,17 +131,13 @@ static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int enti
 }
 
 void register_components(void) {
-  if (!g_state->components_registered) {
-    g_state->components.bullet      = ecs_register_component(g_state->ecs, sizeof(BulletComponent), NULL, NULL);
-    g_state->components.enemy_spawn = ecs_register_component(g_state->ecs, sizeof(EnemySpawnComponent), NULL, NULL);
-    g_state->components.input       = ecs_register_component(g_state->ecs, sizeof(InputComponent), NULL, NULL);
-    g_state->components.position    = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
-    g_state->components.sprite      = ecs_register_component(g_state->ecs, sizeof(CF_Sprite), NULL, NULL);
-    g_state->components.velocity    = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
-    g_state->components.weapon      = ecs_register_component(g_state->ecs, sizeof(WeaponComponent), NULL, NULL);
-
-    g_state->components_registered = true;
-  }
+  g_state->components.bullet      = ecs_register_component(g_state->ecs, sizeof(BulletComponent), NULL, NULL);
+  g_state->components.enemy_spawn = ecs_register_component(g_state->ecs, sizeof(EnemySpawnComponent), NULL, NULL);
+  g_state->components.input       = ecs_register_component(g_state->ecs, sizeof(InputComponent), NULL, NULL);
+  g_state->components.position    = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
+  g_state->components.sprite      = ecs_register_component(g_state->ecs, sizeof(CF_Sprite), NULL, NULL);
+  g_state->components.velocity    = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
+  g_state->components.weapon      = ecs_register_component(g_state->ecs, sizeof(WeaponComponent), NULL, NULL);
 }
 
 void register_systems(void) {

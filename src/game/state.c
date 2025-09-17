@@ -23,15 +23,12 @@ bool validate_game_state(void) {
     return false;
   }
   if (g_state->scale.x <= 0 || g_state->scale.y <= 0) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->scale is invalid: (%.2f, %.2f)", g_state->scale.x, g_state->scale.y);
+    SDL_LogError(
+        SDL_LOG_CATEGORY_CUSTOM, "g_state->scale is invalid: (%.2f, %.2f)", g_state->scale.x, g_state->scale.y);
     return false;
   }
   if (g_state->ecs == NULL) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->ecs is NULL");
-    return false;
-  }
-  if (!g_state->components_registered) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->components_registered is false");
     return false;
   }
   if (!g_state->systems_registered) {
