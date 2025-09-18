@@ -38,8 +38,6 @@ void platform_end_frame(void);
 
 GameLibrary platform_load_game_library(void);
 void        platform_unload_game_library(GameLibrary *game_library);
-void        platform_reload_game_library(GameLibrary *game_library);
-bool        platform_has_to_reload_game_library(GameLibrary *game_library);
 
 uint64_t platform_get_performance_counter(void);
 uint64_t platform_get_performance_frequency(void);

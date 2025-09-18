@@ -1,3 +1,4 @@
+#include "SDL3/SDL_log.h"
 #include "engine/platform.h"
 #include "platform/platform_cute.h"
 
@@ -5,7 +6,16 @@
 #include <cute_color.h>
 #include <cute_graphics.h>
 #include <cute_time.h>
+#include <signal.h>
 #include <stdbool.h>
+#include <sys/signal.h>
+
+volatile sig_atomic_t reload_flag = 0;
+
+static void sighup_handler(int sig) {
+  (void)sig;
+  reload_flag = 1;
+}
 
 typedef struct UpdateData {
   GameLibrary *game_library;
@@ -19,6 +29,8 @@ static void update(void *udata) {
 
 int main(int argc, char *argv[]) {
   (void)argc;
+
+  signal(SIGHUP, sighup_handler);
 
   platform_init(argv[0]);
 
@@ -45,11 +57,14 @@ int main(int argc, char *argv[]) {
   while (cf_app_is_running()) {
     cf_app_update(&update);
 
-    if (platform_has_to_reload_game_library(&game_library)) {
+    if (reload_flag == 1) {
+      reload_flag = 0;
+      SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, "Reloading library %s\n", game_library.path);
+
       void *state = game_library.state();
       platform_unload_game_library(&game_library);
 
-      cf_sleep(50);
+      /* cf_sleep(50); */
       GameLibrary new_game_library = platform_load_game_library();
       if (new_game_library.ok) {
         game_library = new_game_library;

@@ -25,10 +25,6 @@ enum { MAX_PATH_LENGTH = 1024 };
 char         game_library_path[MAX_PATH_LENGTH] = {0};
 SDL_PathInfo path_info;
 
-#ifdef SDL_PLATFORM_WIN32
-char game_library_copy_path[MAX_PATH_LENGTH] = {0};
-#endif
-
 static void mount_content_directory_as(const char *dir) {
   const char *path = cf_fs_get_base_directory();
   cf_path_normalize(path);
@@ -76,10 +72,6 @@ GameLibrary platform_load_game_library(void) {
     abort();
   }
   const char *game_library_name = GAME_LIBRARY_NAME;
-#ifdef SDL_PLATFORM_WIN32
-  const char *game_library_copy_name = "copy_of" GAME_LIBRARY_NAME;
-  SDL_snprintf(game_library_copy_path, MAX_PATH_LENGTH, "%s%s", base_path, game_library_copy_name);
-#endif
 
   SDL_snprintf(game_library_path, countof(game_library_path), "%s%s", base_path, game_library_name);
 
@@ -88,18 +80,7 @@ GameLibrary platform_load_game_library(void) {
     abort();
   }
 
-#ifdef SDL_PLATFORM_WIN32
-  if (!SDL_CopyFile(game_library_path, game_library_copy_path)) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to copy dynamic library: %s\n", SDL_GetError());
-    abort();
-  }
-#endif
-
-#ifdef SDL_PLATFORM_WIN32
-  game_library.path = game_library_copy_path;
-#else
   game_library.path = game_library_path;
-#endif
 
   game_library.library = cf_load_shared_library(game_library.path);
   if (!game_library.library) {
@@ -149,6 +130,7 @@ GameLibrary platform_load_game_library(void) {
 }
 
 void platform_unload_game_library(GameLibrary *game_library) {
+  SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, "Unloading library %s\n", game_library->path);
   cf_unload_shared_library(game_library->library);
   game_library->hot_reload = NULL;
   game_library->state      = NULL;
@@ -158,49 +140,6 @@ void platform_unload_game_library(GameLibrary *game_library) {
   game_library->init       = NULL;
   game_library->library    = NULL;
   game_library->ok         = false;
-}
-
-bool platform_has_to_reload_game_library(GameLibrary *game_library) {
-  SDL_PathInfo new_path_info;
-  if (!SDL_GetPathInfo(game_library->path, &new_path_info)) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to get path info: %s\n", SDL_GetError());
-    return false;
-  }
-
-  return new_path_info.modify_time != path_info.modify_time;
-}
-
-void platform_reload_game_library(GameLibrary *game_library) {
-  SDL_PathInfo new_path_info;
-  if (!SDL_GetPathInfo(game_library_path, &new_path_info)) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to get path info: %s\n", SDL_GetError());
-  }
-
-  if (new_path_info.modify_time != path_info.modify_time) {
-    cf_unload_shared_library(game_library->library);
-    game_library->shutdown = NULL;
-    game_library->render   = NULL;
-    game_library->update   = NULL;
-    game_library->init     = NULL;
-    game_library->library  = NULL;
-
-    SDL_Delay(50);
-
-#ifdef SDL_PLATFORM_WIN32
-    if (!SDL_CopyFile(game_library_path, game_library_copy_path)) {
-      SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to copy dynamic library: %s\n", SDL_GetError());
-    }
-#endif
-
-    game_library->library  = cf_load_shared_library(game_library->path);
-    game_library->init     = (GameInitFunction)cf_load_function(game_library->library, "game_init");
-    game_library->update   = (GameUpdateFunction)cf_load_function(game_library->library, "game_update");
-    game_library->render   = (GameRenderFunction)cf_load_function(game_library->library, "game_render");
-    game_library->shutdown = (GameShutdownFunction)cf_load_function(game_library->library, "game_shutdown");
-
-    path_info = new_path_info;
-    SDL_Log("Game library reloaded from %s.\n", game_library->path);
-  }
 }
 
 uint64_t platform_get_performance_counter(void) { return SDL_GetPerformanceCounter(); }

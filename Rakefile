@@ -1,5 +1,6 @@
 BUILD_DIR = File.join(__dir__, 'build', 'debug')
 PWD = File.expand_path(__dir__)
+PID_FILE = File.join(BUILD_DIR, 'raptor.pid')
 
 directory BUILD_DIR do
   sh "cmake -S #{PWD} -B #{BUILD_DIR} -G Ninja -DCMAKE_BUILD_TYPE=Debug"
@@ -12,7 +13,10 @@ end
 
 desc "Run the project"
 task run: :compile do
-  sh File.join(BUILD_DIR, 'Raptor')
+  pid = Process.spawn(File.join(BUILD_DIR, 'Raptor'), chdir: BUILD_DIR)
+  File.write(PID_FILE, pid)
+  puts "Started process #{pid} with PID file at #{PID_FILE}"
+  Process.wait(pid)
 end
 
 desc "Watch for changes and recompile"
@@ -20,8 +24,16 @@ task :watch do
   require 'listen'
   listener = Listen.to('src', 'include') do |_modified, _added, _removed|
     Rake::Task[:compile].execute
+    if File.exist?(PID_FILE)
+      pid = File.read(PID_FILE).to_i
+      begin
+        Process.kill('SIGHUP', pid)
+      rescue Errno::ESRCH
+        puts "Process #{pid} not found"
+      end
+    end
   end
-  puts "Watching for changes in 'src' and 'include' directories..."
+  puts "Listening for changes..."
   listener.start
   sleep
 end
