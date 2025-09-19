@@ -22,12 +22,19 @@ static ecs_ret_t s_update_collision_system(ecs_t *ecs, ecs_id_t *entities, int e
   (void)dt;
   (void)udata;
 
+  EnemySpawnComponent *spawn = ecs_get(ecs, g_state->enemy_spawner_entity, g_state->components.enemy_spawn);
+  CF_Aabb              canvas_aabb =
+      cf_make_aabb_center_half_extents(cf_v2(0, 0), cf_div_v2_f(g_state->canvas_size, g_state->scale * 2));
   dyna ecs_id_t *entities_to_destroy = NULL;
 
   for (int i = 0; i < entity_count; i++) {
     for (int j = i + 1; j < entity_count; j++) {
       ecs_id_t entity_a = entities[i];
       ecs_id_t entity_b = entities[j];
+
+      if (!ecs_is_entity_ready(ecs, entity_a) || !ecs_is_entity_ready(ecs, entity_b)) {
+        continue;
+      }
 
       CF_V2             *pos_a = ecs_get(ecs, entity_a, g_state->components.position);
       CF_V2             *pos_b = ecs_get(ecs, entity_b, g_state->components.position);
@@ -40,15 +47,25 @@ static ecs_ret_t s_update_collision_system(ecs_t *ecs, ecs_id_t *entities, int e
       if (cf_aabb_to_aabb(aabb_a, aabb_b)) {
         apush(entities_to_destroy, entity_a);
         apush(entities_to_destroy, entity_b);
+      } else if (!cf_aabb_to_aabb(canvas_aabb, aabb_a)) {    // Check if entity is out of bounds
+        apush(entities_to_destroy, entity_a);
       }
     }
   }
 
-  for (int i = 0; i < asize(entities_to_destroy); ++i) {
-    ecs_queue_destroy(ecs, entities_to_destroy[i]);
-  }
+  if (entities_to_destroy) {
+    for (int i = 0; i < asize(entities_to_destroy); ++i) {
+      if (ecs_is_entity_ready(ecs, entities_to_destroy[i])) {
+        TagType *tag = ecs_get(ecs, entities_to_destroy[i], g_state->components.tag);
+        if (*tag == TAG_ENEMY) {
+          --spawn->current_enemy_count;
+        }
+        ecs_queue_destroy(ecs, entities_to_destroy[i]);
+      }
+    }
 
-  afree(entities_to_destroy);
+    afree(entities_to_destroy);
+  }
 
   return 0;
 }
@@ -122,21 +139,21 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
 // TODO: Replace with a coroutine system so it's easier to design spawn patterns
 static ecs_ret_t
 s_update_enemy_spawn_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+  (void)entities;
+  (void)entity_count;
   (void)dt;
   (void)udata;
 
-  for (int i = 0; i < entity_count; i++) {
-    EnemySpawnComponent *spawn = ecs_get(ecs, entities[i], g_state->components.enemy_spawn);
+  EnemySpawnComponent *spawn = ecs_get(ecs, g_state->enemy_spawner_entity, g_state->components.enemy_spawn);
+  spawn->time_since_last_spawn += (float)dt;
 
-    spawn->time_since_last_spawn += (float)dt;
-    if (spawn->time_since_last_spawn >= spawn->spawn_interval && spawn->current_enemy_count < spawn->max_enemies) {
-      spawn->time_since_last_spawn = 0.0f;
-      spawn->current_enemy_count++;
+  if (spawn->time_since_last_spawn >= spawn->spawn_interval && spawn->current_enemy_count < spawn->max_enemies) {
+    spawn->time_since_last_spawn = 0.0f;
+    spawn->current_enemy_count++;
 
-      float x = cf_rnd_range_float(&g_state->rnd, -20.0f, 20.0f);
-      float y = g_state->canvas_size.y * 0.1f;
-      make_enemy(x, y);
-    }
+    float x = cf_rnd_range_float(&g_state->rnd, -20.0f, 20.0f);
+    float y = g_state->canvas_size.y * 0.1f;
+    make_enemy(x, y);
   }
 
   return 0;

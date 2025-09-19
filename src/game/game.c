@@ -93,6 +93,8 @@ static void game_render_debug(void) {
   CF_V2           *pos    = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.position);
   CF_V2           *vel    = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.velocity);
 
+  EnemySpawnComponent *spawn = ecs_get(g_state->ecs, g_state->enemy_spawner_entity, g_state->components.enemy_spawn);
+
   /*
    * Debug info
    */
@@ -102,6 +104,10 @@ static void game_render_debug(void) {
 
   igText("Player Position: (%.2f, %.2f)", pos->x, pos->y);
   igText("Player Velocity: (%.2f, %.2f)", vel->x, vel->y);
+
+  igText("Enemy.Max: %d", spawn->max_enemies);
+  igText("Enemy.Count: %d", spawn->current_enemy_count);
+  igText("Enemy.TimeSinceLastSpawn: %.2f", spawn->time_since_last_spawn);
 
   igText("Input.UP: %d", input->up);
   igText("Input.DOWN: %d", input->down);
