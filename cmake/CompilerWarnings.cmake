@@ -47,6 +47,7 @@ function(set_project_warnings project_name)
     -Wcast-align # warn for potential performance problem casts
     -Wunused # warn on anything being unused
     -Wnull-dereference # warn if a null dereference is detected
+    -fcolor-diagnostics
     )
 
   if (WARNINGS_AS_ERRORS)
@@ -58,6 +59,7 @@ function(set_project_warnings project_name)
   set(GCC_WARNINGS
     ${CLANG_WARNINGS}
     -Wmisleading-indentation # warn if indentation implies blocks where blocks
+    -fdiagnostics-color=always
     )
 
   if (MSVC)
@@ -71,5 +73,4 @@ function(set_project_warnings project_name)
   endif ()
 
   target_compile_options(${project_name} INTERFACE ${PROJECT_WARNINGS})
-
 endfunction()
