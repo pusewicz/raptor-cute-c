@@ -82,6 +82,7 @@ EXPORT bool game_update(void) {
   ecs_update_system(g_state->ecs, g_state->systems.movement, CF_DELTA_TIME);
   ecs_update_system(g_state->ecs, g_state->systems.weapon, CF_DELTA_TIME);
   ecs_update_system(g_state->ecs, g_state->systems.enemy_spawn, CF_DELTA_TIME);
+  ecs_update_system(g_state->ecs, g_state->systems.collision, CF_DELTA_TIME);
 
   return true;
 }
