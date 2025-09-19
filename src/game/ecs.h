@@ -12,6 +12,10 @@ typedef struct BulletComponent {
   CF_V2 direction;
 } BulletComponent;
 
+typedef struct ColliderComponent {
+  CF_V2 half_extents;
+} ColliderComponent;
+
 typedef struct InputComponent {
   bool up;
   bool down;
@@ -37,6 +41,7 @@ typedef struct WeaponComponent {
  */
 typedef struct {
   ecs_id_t bullet;
+  ecs_id_t collider;
   ecs_id_t enemy_spawn;
   ecs_id_t input;
   ecs_id_t position;
@@ -49,6 +54,7 @@ typedef struct {
  * Systems
  */
 typedef struct {
+  ecs_id_t collision;
   ecs_id_t enemy_spawn;
   ecs_id_t input;
   ecs_id_t movement;

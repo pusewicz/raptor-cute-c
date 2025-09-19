@@ -4,6 +4,8 @@
 #include "factories.h"
 
 #define PICO_ECS_IMPLEMENTATION
+#include <SDL3/SDL_log.h>
+#include <cute_array.h>
 #include <cute_draw.h>
 #include <cute_input.h>
 #include <cute_math.h>
@@ -15,6 +17,41 @@
 /*
  * System update functions
  */
+
+static ecs_ret_t s_update_collision_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+  (void)dt;
+  (void)udata;
+
+  dyna ecs_id_t *entities_to_destroy = NULL;
+
+  for (int i = 0; i < entity_count; i++) {
+    for (int j = i + 1; j < entity_count; j++) {
+      ecs_id_t entity_a = entities[i];
+      ecs_id_t entity_b = entities[j];
+
+      CF_V2             *pos_a = ecs_get(ecs, entity_a, g_state->components.position);
+      CF_V2             *pos_b = ecs_get(ecs, entity_b, g_state->components.position);
+      ColliderComponent *col_a = ecs_get(ecs, entity_a, g_state->components.collider);
+      ColliderComponent *col_b = ecs_get(ecs, entity_b, g_state->components.collider);
+
+      CF_Aabb aabb_a = cf_make_aabb_center_half_extents(*pos_a, col_a->half_extents);
+      CF_Aabb aabb_b = cf_make_aabb_center_half_extents(*pos_b, col_b->half_extents);
+
+      if (cf_aabb_to_aabb(aabb_a, aabb_b)) {
+        apush(entities_to_destroy, entity_a);
+        apush(entities_to_destroy, entity_b);
+      }
+    }
+  }
+
+  for (int i = 0; i < asize(entities_to_destroy); ++i) {
+    ecs_queue_destroy(ecs, entities_to_destroy[i]);
+  }
+
+  afree(entities_to_destroy);
+
+  return 0;
+}
 
 static ecs_ret_t s_update_input_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)dt;
@@ -85,9 +122,6 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
 // TODO: Replace with a coroutine system so it's easier to design spawn patterns
 static ecs_ret_t
 s_update_enemy_spawn_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
-  (void)ecs;
-  (void)entities;
-  (void)entity_count;
   (void)dt;
   (void)udata;
 
@@ -132,6 +166,7 @@ static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int enti
 
 void register_components(void) {
   g_state->components.bullet      = ecs_register_component(g_state->ecs, sizeof(BulletComponent), NULL, NULL);
+  g_state->components.collider    = ecs_register_component(g_state->ecs, sizeof(ColliderComponent), NULL, NULL);
   g_state->components.enemy_spawn = ecs_register_component(g_state->ecs, sizeof(EnemySpawnComponent), NULL, NULL);
   g_state->components.input       = ecs_register_component(g_state->ecs, sizeof(InputComponent), NULL, NULL);
   g_state->components.position    = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
@@ -141,11 +176,16 @@ void register_components(void) {
 }
 
 void register_systems(void) {
+  g_state->systems.collision   = ecs_register_system(g_state->ecs, s_update_collision_system, NULL, NULL, g_state);
   g_state->systems.enemy_spawn = ecs_register_system(g_state->ecs, s_update_enemy_spawn_system, NULL, NULL, g_state);
   g_state->systems.input       = ecs_register_system(g_state->ecs, s_update_input_system, NULL, NULL, g_state);
   g_state->systems.movement    = ecs_register_system(g_state->ecs, s_update_movement_system, NULL, NULL, g_state);
   g_state->systems.render      = ecs_register_system(g_state->ecs, s_update_render_system, NULL, NULL, g_state);
   g_state->systems.weapon      = ecs_register_system(g_state->ecs, s_update_weapon_system, NULL, NULL, g_state);
+
+  // Define collision system required components
+  ecs_require_component(g_state->ecs, g_state->systems.collision, g_state->components.collider);
+  ecs_require_component(g_state->ecs, g_state->systems.collision, g_state->components.position);
 
   // Define input system required components
   ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.input);
@@ -171,6 +211,7 @@ void register_systems(void) {
 void update_system_callbacks(void) {
   ecs_t *ecs = g_state->ecs;
 
+  ecs_set_system_callbacks(ecs, g_state->systems.collision, s_update_collision_system, NULL, NULL);
   ecs_set_system_callbacks(ecs, g_state->systems.input, s_update_input_system, NULL, NULL);
   ecs_set_system_callbacks(ecs, g_state->systems.movement, s_update_movement_system, NULL, NULL);
   ecs_set_system_callbacks(ecs, g_state->systems.render, s_update_render_system, NULL, NULL);
