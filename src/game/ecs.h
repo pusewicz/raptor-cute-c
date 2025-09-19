@@ -31,6 +31,12 @@ typedef struct EnemySpawnComponent {
   int   current_enemy_count;      // Current number of enemies spawned
 } EnemySpawnComponent;
 
+typedef enum TagType { TAG_PLAYER, TAG_ENEMY, TAG_BULLET } TagType;
+
+typedef struct TagComponent {
+  TagType tag;
+} TagComponent;
+
 typedef struct WeaponComponent {
   float cooldown;           // Time between shots in seconds
   float time_since_shot;    // Time since last shot in seconds
@@ -48,6 +54,7 @@ typedef struct {
   ecs_id_t sprite;
   ecs_id_t velocity;
   ecs_id_t weapon;
+  ecs_id_t tag;
 } Components;
 
 /*

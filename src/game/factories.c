@@ -43,6 +43,10 @@ ecs_id_t make_player(float x, float y) {
   weapon->cooldown        = 0.5f;    // Half a second between shots
   weapon->time_since_shot = 0.0f;
 
+  // Add tag
+  TagComponent *tag = ecs_add(g_state->ecs, id, g_state->components.tag, NULL);
+  tag->tag          = TAG_PLAYER;
+
   return id;
 }
 
@@ -75,6 +79,10 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   ColliderComponent *collider = ecs_add(g_state->ecs, id, g_state->components.collider, NULL);
   collider->half_extents      = cf_v2(sprite->w / 2.0, sprite->h / 2.0);
 
+  // Add tag
+  TagComponent *tag = ecs_add(g_state->ecs, id, g_state->components.tag, NULL);
+  tag->tag          = TAG_BULLET;
+
   return id;
 }
 
@@ -98,6 +106,10 @@ ecs_id_t make_enemy(float x, float y) {
   // Add collider
   ColliderComponent *collider = ecs_add(g_state->ecs, id, g_state->components.collider, NULL);
   collider->half_extents      = cf_v2(sprite->w / 2.0, sprite->h / 2.0);
+
+  // Add tag
+  TagComponent *tag = ecs_add(g_state->ecs, id, g_state->components.tag, NULL);
+  tag->tag          = TAG_ENEMY;
 
   return id;
 }

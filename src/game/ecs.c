@@ -186,10 +186,12 @@ void register_systems(void) {
   // Define collision system required components
   ecs_require_component(g_state->ecs, g_state->systems.collision, g_state->components.collider);
   ecs_require_component(g_state->ecs, g_state->systems.collision, g_state->components.position);
+  ecs_require_component(g_state->ecs, g_state->systems.collision, g_state->components.tag);
 
   // Define input system required components
   ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.input);
   ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.position);
+  ecs_require_component(g_state->ecs, g_state->systems.collision, g_state->components.tag);
 
   // Define movement system required components
   ecs_require_component(g_state->ecs, g_state->systems.movement, g_state->components.position);
@@ -202,6 +204,7 @@ void register_systems(void) {
 
   // Define enemy spawn system required components
   ecs_require_component(g_state->ecs, g_state->systems.enemy_spawn, g_state->components.enemy_spawn);
+  ecs_require_component(g_state->ecs, g_state->systems.enemy_spawn, g_state->components.tag);
 
   // Define render system required components
   ecs_require_component(g_state->ecs, g_state->systems.render, g_state->components.position);
