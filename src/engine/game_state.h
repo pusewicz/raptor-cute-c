@@ -19,7 +19,7 @@ typedef struct Platform Platform;
 typedef struct GameState {
   Platform    *platform;
   CF_V2        canvas_size;
-  CF_V2        scale;    // For resolution independence
+  float        scale;    // For resolution independence
   CF_Arena     permanent_arena;
   CF_Arena     stage_arena;
   CF_Arena     scratch_arena;

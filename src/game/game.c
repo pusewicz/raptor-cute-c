@@ -45,7 +45,7 @@ EXPORT void game_init(Platform *platform) {
   g_state->display_id      = cf_default_display();
   g_state->platform        = platform;
   g_state->canvas_size     = cf_v2(canvas_w, canvas_h);
-  g_state->scale           = cf_v2(scale, scale);
+  g_state->scale           = scale;
   g_state->permanent_arena = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, PERMANENT_ARENA_SIZE);
   g_state->stage_arena     = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, STAGE_ARENA_SIZE);
   g_state->scratch_arena   = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
@@ -122,7 +122,8 @@ static void game_render_debug(void) {
   igText("Screen: %dx%d", cf_display_width(g_state->display_id), cf_display_height(g_state->display_id));
   igText("Size: %dx%d", w, h);
   igText("Canvas: %dx%d", cf_app_get_canvas_width(), cf_app_get_canvas_height());
-  igText("Game Scale: %.2fx%.2f", g_state->scale.x, g_state->scale.y);
+  igText("Canvas(logical): %dx%d", cf_div_v2_f(g_state->canvas_size, g_state->scale));
+  igText("Game Scale: %.2f", g_state->scale);
   igText("DPI Scale: %.2f", cf_app_get_dpi_scale());
   igEnd();
 }

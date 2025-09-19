@@ -22,9 +22,8 @@ bool validate_game_state(void) {
                  g_state->canvas_size.y);
     return false;
   }
-  if (g_state->scale.x <= 0 || g_state->scale.y <= 0) {
-    SDL_LogError(
-        SDL_LOG_CATEGORY_CUSTOM, "g_state->scale is invalid: (%.2f, %.2f)", g_state->scale.x, g_state->scale.y);
+  if (g_state->scale <= 0) {
+    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "g_state->scale is invalid: (%.2f)", g_state->scale);
     return false;
   }
   if (g_state->ecs == NULL) {
