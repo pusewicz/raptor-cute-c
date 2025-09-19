@@ -173,6 +173,7 @@ void register_components(void) {
   g_state->components.sprite      = ecs_register_component(g_state->ecs, sizeof(CF_Sprite), NULL, NULL);
   g_state->components.velocity    = ecs_register_component(g_state->ecs, sizeof(CF_V2), NULL, NULL);
   g_state->components.weapon      = ecs_register_component(g_state->ecs, sizeof(WeaponComponent), NULL, NULL);
+  g_state->components.tag         = ecs_register_component(g_state->ecs, sizeof(TagType), NULL, NULL);
 }
 
 void register_systems(void) {
