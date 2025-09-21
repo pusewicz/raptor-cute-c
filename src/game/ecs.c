@@ -20,7 +20,7 @@
  * System update functions
  */
 
-static ecs_ret_t s_update_collision_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+static ecs_ret_t collision_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)dt;
   (void)udata;
 
@@ -112,7 +112,7 @@ static ecs_ret_t boundary_system(ecs_t *ecs, ecs_id_t *entities, int entity_coun
 }
 
 static ecs_ret_t
-s_update_debug_bounding_boxes_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+debug_bounding_boxes_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   if (!g_state->debug_bounding_boxes) {
     return 0;
   }
@@ -145,7 +145,7 @@ s_update_debug_bounding_boxes_system(ecs_t *ecs, ecs_id_t *entities, int entity_
   return 0;
 }
 
-static ecs_ret_t s_update_input_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+static ecs_ret_t input_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)dt;
   (void)entities;
   (void)entity_count;
@@ -162,7 +162,7 @@ static ecs_ret_t s_update_input_system(ecs_t *ecs, ecs_id_t *entities, int entit
   return 0;
 }
 
-static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+static ecs_ret_t movement_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)dt;
   (void)udata;
 
@@ -193,7 +193,7 @@ static ecs_ret_t s_update_movement_system(ecs_t *ecs, ecs_id_t *entities, int en
   return 0;
 }
 
-static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+static ecs_ret_t render_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)dt;
   (void)udata;
 
@@ -212,8 +212,7 @@ static ecs_ret_t s_update_render_system(ecs_t *ecs, ecs_id_t *entities, int enti
 }
 
 // TODO: Replace with a coroutine system so it's easier to design spawn patterns
-static ecs_ret_t
-s_update_enemy_spawn_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+static ecs_ret_t enemy_spawn_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)entities;
   (void)entity_count;
   (void)dt;
@@ -234,7 +233,7 @@ s_update_enemy_spawn_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ec
   return 0;
 }
 
-static ecs_ret_t s_update_weapon_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+static ecs_ret_t weapon_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)entities;
   (void)entity_count;
   (void)udata;
@@ -269,12 +268,12 @@ void register_components(void) {
 
 void register_systems(void) {
   g_state->systems.boundary    = ecs_register_system(g_state->ecs, boundary_system, NULL, NULL, NULL);
-  g_state->systems.collision   = ecs_register_system(g_state->ecs, s_update_collision_system, NULL, NULL, NULL);
-  g_state->systems.enemy_spawn = ecs_register_system(g_state->ecs, s_update_enemy_spawn_system, NULL, NULL, NULL);
-  g_state->systems.input       = ecs_register_system(g_state->ecs, s_update_input_system, NULL, NULL, NULL);
-  g_state->systems.movement    = ecs_register_system(g_state->ecs, s_update_movement_system, NULL, NULL, NULL);
-  g_state->systems.render      = ecs_register_system(g_state->ecs, s_update_render_system, NULL, NULL, NULL);
-  g_state->systems.weapon      = ecs_register_system(g_state->ecs, s_update_weapon_system, NULL, NULL, NULL);
+  g_state->systems.collision   = ecs_register_system(g_state->ecs, collision_system, NULL, NULL, NULL);
+  g_state->systems.enemy_spawn = ecs_register_system(g_state->ecs, enemy_spawn_system, NULL, NULL, NULL);
+  g_state->systems.input       = ecs_register_system(g_state->ecs, input_system, NULL, NULL, NULL);
+  g_state->systems.movement    = ecs_register_system(g_state->ecs, movement_system, NULL, NULL, NULL);
+  g_state->systems.render      = ecs_register_system(g_state->ecs, render_system, NULL, NULL, NULL);
+  g_state->systems.weapon      = ecs_register_system(g_state->ecs, weapon_system, NULL, NULL, NULL);
 
   /*
    * Boundary system requires position and tag components.
@@ -333,12 +332,11 @@ void update_system_callbacks(void) {
   ecs_t *ecs = g_state->ecs;
 
   ecs_set_system_callbacks(ecs, g_state->systems.boundary, boundary_system, NULL, NULL);
-  ecs_set_system_callbacks(ecs, g_state->systems.collision, s_update_collision_system, NULL, NULL);
-  ecs_set_system_callbacks(
-      ecs, g_state->systems.debug_bounding_boxes, s_update_debug_bounding_boxes_system, NULL, NULL);
-  ecs_set_system_callbacks(ecs, g_state->systems.input, s_update_input_system, NULL, NULL);
-  ecs_set_system_callbacks(ecs, g_state->systems.movement, s_update_movement_system, NULL, NULL);
-  ecs_set_system_callbacks(ecs, g_state->systems.render, s_update_render_system, NULL, NULL);
-  ecs_set_system_callbacks(ecs, g_state->systems.weapon, s_update_weapon_system, NULL, NULL);
-  ecs_set_system_callbacks(ecs, g_state->systems.enemy_spawn, s_update_enemy_spawn_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.collision, collision_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.debug_bounding_boxes, debug_bounding_boxes_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.input, input_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.movement, movement_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.render, render_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.weapon, weapon_system, NULL, NULL);
+  ecs_set_system_callbacks(ecs, g_state->systems.enemy_spawn, enemy_spawn_system, NULL, NULL);
 }
