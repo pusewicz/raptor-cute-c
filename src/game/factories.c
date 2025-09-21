@@ -38,6 +38,10 @@ ecs_id_t make_player(float x, float y) {
     SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load player sprite: %s\n", result.details);
   }
 
+  // // Add collider
+  // ColliderComponent *collider = ecs_add(g_state->ecs, id, g_state->components.collider, NULL);
+  // collider->half_extents      = cf_v2(sprite->w, sprite->h);
+
   // Add weapon
   WeaponComponent *weapon = ecs_add(g_state->ecs, id, g_state->components.weapon, NULL);
   weapon->cooldown        = 0.5f;    // Half a second between shots
@@ -52,10 +56,6 @@ ecs_id_t make_player(float x, float y) {
 
 ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   ecs_id_t id = ecs_create(g_state->ecs);
-
-  // Add bullet component
-  BulletComponent *bullet = ecs_add(g_state->ecs, id, g_state->components.bullet, NULL);
-  bullet->direction       = direction;
 
   // Add position
   CF_V2 *pos = ecs_add(g_state->ecs, id, g_state->components.position, NULL);
@@ -77,7 +77,7 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
 
   // Add collider
   ColliderComponent *collider = ecs_add(g_state->ecs, id, g_state->components.collider, NULL);
-  collider->half_extents      = cf_v2(sprite->w / 2.0, sprite->h / 2.0);
+  collider->half_extents      = cf_v2(sprite->w / 4.2, sprite->h / 4.2);
 
   // Add tag
   TagComponent *tag = ecs_add(g_state->ecs, id, g_state->components.tag, NULL);

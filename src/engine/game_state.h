@@ -32,6 +32,8 @@ typedef struct GameState {
   // Component and System IDs - persist across hot reloads
   Components components;
   Systems    systems;
+
+  bool debug_bounding_boxes;
 } GameState;
 
 extern GameState *g_state;

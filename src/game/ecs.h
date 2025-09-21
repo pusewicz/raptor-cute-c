@@ -46,7 +46,6 @@ typedef struct WeaponComponent {
  * Components
  */
 typedef struct {
-  ecs_id_t bullet;
   ecs_id_t collider;
   ecs_id_t enemy_spawn;
   ecs_id_t input;
@@ -61,7 +60,9 @@ typedef struct {
  * Systems
  */
 typedef struct {
+  ecs_id_t boundary;
   ecs_id_t collision;
+  ecs_id_t debug_bounding_boxes;
   ecs_id_t enemy_spawn;
   ecs_id_t input;
   ecs_id_t movement;
