@@ -127,12 +127,10 @@ static void game_render_debug(void) {
    * Window info
    */
   igBegin("Window", NULL, 0);
-  int w = cf_app_get_width();
-  int h = cf_app_get_height();
   igText("Screen: %dx%d", cf_display_width(g_state->display_id), cf_display_height(g_state->display_id));
-  igText("Size: %dx%d", w, h);
+  igText("Size: %dx%d", cf_app_get_width(), cf_app_get_height());
   igText("Canvas: %dx%d", cf_app_get_canvas_width(), cf_app_get_canvas_height());
-  igText("Canvas(logical): %dx%d", cf_div_v2_f(g_state->canvas_size, g_state->scale));
+  igText("Canvas(logical): %.0fx%.0f", g_state->canvas_size.x, g_state->canvas_size.y);
   igText("Game Scale: %.2f", g_state->scale);
   igText("DPI Scale: %.2f", cf_app_get_dpi_scale());
   igEnd();
