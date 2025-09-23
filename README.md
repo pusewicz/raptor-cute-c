@@ -13,14 +13,13 @@ Raptor is a small shoot em' up game made with Cute Framework and written in C.
 
 ### Prerequisites
 
-- [Rake](https://github.com/ruby/rake)
 - [CMake](https://cmake.org/)
 
 ### macOS
 
 1. Install dependencies using Homebrew:
    ```sh
-   brew install ruby cmake
+   brew install cmake
    ```
 2. Clone the repository:
    ```sh
@@ -29,5 +28,8 @@ Raptor is a small shoot em' up game made with Cute Framework and written in C.
    ```
 3. Build and run the project:
    ```sh
-   rake
+   cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+   cmake --build build
+   cd build
+   ./Raptor
    ```
