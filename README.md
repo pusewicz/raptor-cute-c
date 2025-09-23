@@ -2,6 +2,8 @@
 
 Raptor is a small shoot em' up game made with Cute Framework and written in C.
 
+<img width="652" height="1104" alt="Screenshot 2025-09-24 at 00 24 52" src="https://github.com/user-attachments/assets/5a00f416-9c09-4ca1-a157-9b59b961545d" />
+
 ## Controls
 
 - Arrow Keys/WASD: Move the ship
