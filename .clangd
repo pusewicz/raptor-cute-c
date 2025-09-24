@@ -4,8 +4,6 @@ CompileFlags:
 Diagnostics:
   MissingIncludes: Strict
   UnusedIncludes: Strict
-  ClangTidy:
-    Add: modernize*
 
 Style:
   QuotedHeaders: "src/.*"
