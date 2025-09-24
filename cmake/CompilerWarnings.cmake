@@ -44,7 +44,7 @@ function(set_project_warnings project_name)
     # parent context
     -Wstrict-prototypes
     -Wmissing-prototypes
-    -Wcast-align # warn for potential performance problem casts
+    # -Wcast-align # warn for potential performance problem casts (disabled because of cf_array_add)
     -Wunused # warn on anything being unused
     -Wnull-dereference # warn if a null dereference is detected
     -fcolor-diagnostics
