@@ -3,7 +3,6 @@
 #include "pico_ecs.h"
 
 #include <cute_math.h>
-#include <stdbool.h>
 
 /*
  * Component structures

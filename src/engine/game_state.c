@@ -2,16 +2,13 @@
 
 #include "log.h"
 
-#include <stdbool.h>
-#include <stddef.h>
-
 bool validate_game_state(void) {
-  if (g_state == NULL) {
-    APP_WARN("g_state is NULL");
+  if (g_state == nullptr) {
+    APP_WARN("g_state is null");
     return false;
   }
-  if (g_state->platform == NULL) {
-    APP_WARN("g_state->platform is NULL");
+  if (g_state->platform == nullptr) {
+    APP_WARN("g_state->platform is null");
     return false;
   }
   if (g_state->canvas_size.x <= 0 || g_state->canvas_size.y <= 0) {
@@ -22,8 +19,8 @@ bool validate_game_state(void) {
     APP_WARN("g_state->scale is invalid: (%.2f)", g_state->scale);
     return false;
   }
-  if (g_state->ecs == NULL) {
-    APP_WARN("g_state->ecs is NULL");
+  if (g_state->ecs == nullptr) {
+    APP_WARN("g_state->ecs is null");
     return false;
   }
   return true;

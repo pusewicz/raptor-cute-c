@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-GameState *g_state = NULL;
+GameState *g_state = nullptr;
 
 #ifdef _WIN32
   #define EXPORT __declspec(dllexport)
@@ -45,8 +45,8 @@ EXPORT void game_init(Platform *platform) {
   g_state->permanent_arena      = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, PERMANENT_ARENA_SIZE);
   g_state->stage_arena          = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, STAGE_ARENA_SIZE);
   g_state->scratch_arena        = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
-  g_state->ecs                  = ecs_new(1024, NULL);
-  g_state->rnd                  = cf_rnd_seed((uint32_t)time(NULL));
+  g_state->ecs                  = ecs_new(1024, nullptr);
+  g_state->rnd                  = cf_rnd_seed((uint32_t)time(nullptr));
   g_state->debug_bounding_boxes = false;
 
   // Initialize component and system IDs to 0
@@ -99,7 +99,7 @@ static void game_render_debug(void) {
   /*
    * Debug info
    */
-  igBegin("Debug", NULL, 0);
+  igBegin("Debug", nullptr, 0);
 
   igText("FPS: %.2f", cf_app_get_framerate());
 
@@ -125,7 +125,7 @@ static void game_render_debug(void) {
   /*
    * Window info
    */
-  igBegin("Window", NULL, 0);
+  igBegin("Window", nullptr, 0);
   igText("Screen: %dx%d", cf_display_width(g_state->display_id), cf_display_height(g_state->display_id));
   igText("Size: %dx%d", cf_app_get_width(), cf_app_get_height());
   igText("Canvas: %dx%d", cf_app_get_canvas_width(), cf_app_get_canvas_height());

@@ -1,3 +1,12 @@
+CompileFlags:
+  Add: [-std=c23]
+
 Diagnostics:
   MissingIncludes: Strict
   UnusedIncludes: Strict
+  ClangTidy:
+    Add: modernize*
+
+Style:
+  QuotedHeaders: "src/.*"
+  AngledHeaders: ["include/.*"]

@@ -10,7 +10,7 @@ add_library(
 target_link_libraries(${NAME}
   PRIVATE project_warnings
   PUBLIC cute)
-target_compile_features(${NAME} PRIVATE c_std_11)
+target_compile_features(${NAME} PRIVATE c_std_23)
 target_compile_definitions(
     ${NAME} PRIVATE
     $<$<CONFIG:Debug>:DEBUG>

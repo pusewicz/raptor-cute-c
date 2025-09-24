@@ -134,13 +134,13 @@ GameLibrary platform_load_game_library(void) {
 void platform_unload_game_library(GameLibrary *game_library) {
   APP_DEBUG("Unloading library %s\n", game_library->path);
   cf_unload_shared_library(game_library->library);
-  game_library->hot_reload = NULL;
-  game_library->state      = NULL;
-  game_library->shutdown   = NULL;
-  game_library->render     = NULL;
-  game_library->update     = NULL;
-  game_library->init       = NULL;
-  game_library->library    = NULL;
+  game_library->hot_reload = nullptr;
+  game_library->state      = nullptr;
+  game_library->shutdown   = nullptr;
+  game_library->render     = nullptr;
+  game_library->update     = nullptr;
+  game_library->init       = nullptr;
+  game_library->library    = nullptr;
   game_library->ok         = false;
 }
 

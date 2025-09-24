@@ -5,7 +5,7 @@ add_subdirectory(game)
 include(${PROJECT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)
 
 add_executable(
-  ${NAME} 
+  ${NAME}
   # WIN32 MACOSX_BUNDLE
   main.c
   platform/platform_cute.c
@@ -14,7 +14,7 @@ add_executable(
 target_include_directories(${NAME} PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
-target_compile_features(${NAME} PRIVATE c_std_11)
+target_compile_features(${NAME} PRIVATE c_std_23)
 target_link_libraries(${NAME}
   PRIVATE project_warnings
   PUBLIC cute)
