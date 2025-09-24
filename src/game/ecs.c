@@ -269,6 +269,7 @@ void register_components(void) {
 void register_systems(void) {
   g_state->systems.boundary    = ecs_register_system(g_state->ecs, boundary_system, nullptr, nullptr, nullptr);
   g_state->systems.collision   = ecs_register_system(g_state->ecs, collision_system, nullptr, nullptr, nullptr);
+  g_state->systems.debug_bounding_boxes   = ecs_register_system(g_state->ecs, debug_bounding_boxes_system, nullptr, nullptr, nullptr);
   g_state->systems.enemy_spawn = ecs_register_system(g_state->ecs, enemy_spawn_system, nullptr, nullptr, nullptr);
   g_state->systems.input       = ecs_register_system(g_state->ecs, input_system, nullptr, nullptr, nullptr);
   g_state->systems.movement    = ecs_register_system(g_state->ecs, movement_system, nullptr, nullptr, nullptr);
