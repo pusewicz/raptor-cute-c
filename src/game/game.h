@@ -2,8 +2,6 @@
 
 #include "../engine/platform.h"
 
-#include <stdbool.h>
-
 #ifdef _WIN32
   #define EXPORT __declspec(dllexport)
 #else

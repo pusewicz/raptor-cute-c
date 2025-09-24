@@ -7,7 +7,6 @@
 #include <cute_graphics.h>
 #include <cute_time.h>
 #include <signal.h>
-#include <stdbool.h>
 #include <sys/signal.h>
 
 volatile sig_atomic_t reload_flag = 0;

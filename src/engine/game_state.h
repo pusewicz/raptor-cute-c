@@ -8,7 +8,6 @@
 #include <cute_color.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
-#include <stdbool.h>
 
 typedef struct Platform Platform;
 

@@ -8,7 +8,6 @@
 #include <cute_result.h>
 #include <cute_sprite.h>
 #include <pico_ecs.h>
-#include <stdbool.h>
 #include <stddef.h>
 
 ecs_id_t make_player(float x, float y) {
