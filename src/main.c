@@ -1,7 +1,7 @@
+#include "engine/log.h"
 #include "engine/platform.h"
 #include "platform/platform_cute.h"
 
-#include <SDL3/SDL_log.h>
 #include <cute_app.h>
 #include <cute_color.h>
 #include <cute_graphics.h>
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     if (reload_flag == 1) {
       reload_flag = 0;
-      SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, "Reloading library %s\n", game_library.path);
+      APP_DEBUG("Reloading library %s\n", game_library.path);
 
       void *state = game_library.state();
       platform_unload_game_library(&game_library);

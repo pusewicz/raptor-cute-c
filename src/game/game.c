@@ -2,10 +2,10 @@
 
 #include "../engine/common.h"
 #include "../engine/game_state.h"
+#include "../engine/log.h"
 #include "ecs.h"
 #include "factories.h"
 
-#include <SDL3/SDL_log.h>
 #include <cimgui.h>
 #include <cute_alloc.h>
 #include <cute_app.h>
@@ -60,8 +60,8 @@ EXPORT void game_init(Platform *platform) {
   g_state->enemy_spawner_entity = make_enemy_spawner();
 
   if (!validate_game_state()) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "GameState validation failed in game_init");
-    abort();
+    APP_FATAL("GameState validation failed in game_init");
+    CF_ASSERT(false);
   }
 
   cf_app_set_canvas_size((int)g_state->canvas_size.x * g_state->scale, (int)g_state->canvas_size.y * g_state->scale);

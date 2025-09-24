@@ -1,9 +1,9 @@
 #include "factories.h"
 
 #include "../engine/game_state.h"
+#include "../engine/log.h"
 #include "ecs.h"
 
-#include <SDL3/SDL_log.h>
 #include <cute_math.h>
 #include <cute_result.h>
 #include <cute_sprite.h>
@@ -36,7 +36,7 @@ ecs_id_t make_player(float x, float y) {
   CF_Result  result;
   *sprite = cf_make_easy_sprite_from_png("assets/player.png", &result);
   if (cf_is_error(result)) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load player sprite: %s\n", result.details);
+    APP_ERROR("Failed to load player sprite: %s\n", result.details);
   }
 
   // // Add collider
@@ -73,7 +73,7 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   CF_Result  result;
   *sprite = cf_make_easy_sprite_from_png("assets/bullet.png", &result);
   if (cf_is_error(result)) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load bullet sprite: %s\n", result.details);
+    APP_ERROR("Failed to load bullet sprite: %s\n", result.details);
   }
 
   // Add collider

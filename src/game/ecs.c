@@ -1,11 +1,11 @@
 #include "ecs.h"
 
 #include "../engine/game_state.h"
+#include "../engine/log.h"
 #include "factories.h"
 
 #define PICO_ECS_IMPLEMENTATION
 
-#include <SDL3/SDL_log.h>
 #include <cute_array.h>
 #include <cute_color.h>
 #include <cute_draw.h>
@@ -89,7 +89,7 @@ static ecs_ret_t boundary_system(ecs_t *ecs, ecs_id_t *entities, int entity_coun
 
     // Check if entity is outside canvas bounds
     if (!cf_aabb_to_aabb(canvas_aabb, entity_aabb)) {
-      SDL_Log("Entity %d is outside canvas bounds", entity_id);
+      APP_DEBUG("Entity %d is outside canvas bounds", entity_id);
       TagComponent *tag = ecs_get(ecs, entity_id, g_state->components.tag);
       switch (tag->tag) {
         case TAG_ENEMY:

@@ -1,6 +1,7 @@
 #include "platform_cute.h"
 
 #include "../engine/common.h"
+#include "../engine/log.h"
 
 #include <SDL3/SDL_error.h>
 #include <SDL3/SDL_filesystem.h>
@@ -10,6 +11,7 @@
 #include <SDL3/SDL_timer.h>
 #include <cute_alloc.h>
 #include <cute_app.h>
+#include <cute_c_runtime.h>
 #include <cute_file_system.h>
 #include <cute_result.h>
 #include <cute_symbol.h>
@@ -30,7 +32,7 @@ static void mount_content_directory_as(const char *dir) {
   cf_path_normalize(path);
   char full_path[MAX_PATH_LENGTH];
   SDL_snprintf(full_path, MAX_PATH_LENGTH, "%s%s", path, "assets");
-  SDL_Log("Mounting content directory %s as %s\n", full_path, dir);
+  APP_INFO("Mounting content directory %s as %s\n", full_path, dir);
   cf_fs_mount(full_path, dir, true);
 }
 
@@ -48,8 +50,8 @@ void platform_init(const char *argv0) {
 
   CF_Result result = cf_make_app("Raptor", cf_default_display(), 0, 0, window_width, window_height, options, argv0);
   if (cf_is_error(result)) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Could not make app: %s", result.details);
-    abort();
+    APP_FATAL("Could not make app: %s", result.details);
+    CF_ASSERT(false);
   }
 
   mount_content_directory_as("/assets");
@@ -68,69 +70,69 @@ GameLibrary platform_load_game_library(void) {
 
   const char *base_path = SDL_GetBasePath();
   if (!base_path) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to get base path: %s\n", SDL_GetError());
-    abort();
+    APP_FATAL("Failed to get base path: %s\n", SDL_GetError());
+    CF_ASSERT(false);
   }
   const char *game_library_name = GAME_LIBRARY_NAME;
 
   SDL_snprintf(game_library_path, countof(game_library_path), "%s%s", base_path, game_library_name);
 
   if (!SDL_GetPathInfo(game_library_path, &path_info)) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to get path info for %s: %s\n", game_library_path, SDL_GetError());
-    abort();
+    APP_FATAL("Failed to get path info for %s: %s\n", game_library_path, SDL_GetError());
+    CF_ASSERT(false);
   }
 
   game_library.path = game_library_path;
 
   game_library.library = cf_load_shared_library(game_library.path);
   if (!game_library.library) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load library: %s\n", SDL_GetError());
+    APP_ERROR("Failed to load library: %s\n", SDL_GetError());
     return game_library;
   }
 
   game_library.init = (GameInitFunction)cf_load_function(game_library.library, "game_init");
   if (!game_library.init) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    APP_WARN("Failed to load function: %s\n", SDL_GetError());
     return game_library;
   }
 
   game_library.update = (GameUpdateFunction)cf_load_function(game_library.library, "game_update");
   if (!game_library.update) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    APP_WARN("Failed to load function: %s\n", SDL_GetError());
     return game_library;
   }
 
   game_library.render = (GameRenderFunction)cf_load_function(game_library.library, "game_render");
   if (!game_library.render) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    APP_WARN("Failed to load function: %s\n", SDL_GetError());
     return game_library;
   }
 
   game_library.shutdown = (GameShutdownFunction)cf_load_function(game_library.library, "game_shutdown");
   if (!game_library.shutdown) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    APP_WARN("Failed to load function: %s\n", SDL_GetError());
     return game_library;
   }
 
   game_library.state = (GameStateFunction)cf_load_function(game_library.library, "game_state");
   if (!game_library.state) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    APP_WARN("Failed to load function: %s\n", SDL_GetError());
     return game_library;
   }
 
   game_library.hot_reload = (GameHotReloadFunction)cf_load_function(game_library.library, "game_hot_reload");
   if (!game_library.hot_reload) {
-    SDL_LogError(SDL_LOG_CATEGORY_CUSTOM, "Failed to load function: %s\n", SDL_GetError());
+    APP_WARN("Failed to load function: %s\n", SDL_GetError());
     return game_library;
   }
 
   game_library.ok = true;
-  SDL_Log("Game library loaded from %s.\n", game_library.path);
+  APP_INFO("Game library loaded from %s.\n", game_library.path);
   return game_library;
 }
 
 void platform_unload_game_library(GameLibrary *game_library) {
-  SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, "Unloading library %s\n", game_library->path);
+  APP_DEBUG("Unloading library %s\n", game_library->path);
   cf_unload_shared_library(game_library->library);
   game_library->hot_reload = NULL;
   game_library->state      = NULL;
