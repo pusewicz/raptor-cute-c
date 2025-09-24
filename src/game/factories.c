@@ -7,6 +7,7 @@
 #include <cute_math.h>
 #include <cute_result.h>
 #include <cute_sprite.h>
+#include <pico_ecs.h>
 #include <stdbool.h>
 #include <stddef.h>
 

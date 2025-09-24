@@ -1,7 +1,7 @@
-#include "SDL3/SDL_log.h"
 #include "engine/platform.h"
 #include "platform/platform_cute.h"
 
+#include <SDL3/SDL_log.h>
 #include <cute_app.h>
 #include <cute_color.h>
 #include <cute_graphics.h>
