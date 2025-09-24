@@ -17,7 +17,7 @@ Language: Cpp
 SpaceInEmptyParentheses: "false"
 SpacesBeforeTrailingComments: "4"
 SpacesInContainerLiterals: "true"
-Standard: Cpp11
+Standard: Cpp23
 TabWidth: "2"
 UseTab: Never
 ColumnLimit: 120
