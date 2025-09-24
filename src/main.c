@@ -38,11 +38,9 @@ int main(int argc, char *argv[]) {
       .allocate_memory = platform_allocate_memory,
       .free_memory     = platform_free_memory,
   };
-
   GameLibrary game_library = platform_load_game_library();
-
-  UpdateData update_data = {
-      .game_library = &game_library,
+  UpdateData  update_data  = {
+        .game_library = &game_library,
   };
 
   game_library.init(&platform);
