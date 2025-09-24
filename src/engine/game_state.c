@@ -1,6 +1,4 @@
-#include "state.h"
-
-#include "../engine/game_state.h"
+#include "game_state.h"
 
 #include <SDL3/SDL_log.h>
 #include <stdbool.h>

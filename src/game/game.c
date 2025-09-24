@@ -6,7 +6,6 @@
 #include "ecs.h"
 #include "factories.h"
 #include "pico_ecs.h"
-#include "state.h"
 
 #include <SDL3/SDL_log.h>
 #include <_abort.h>

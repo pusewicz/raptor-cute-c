@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../game/ecs.h"
+#include "pico_ecs.h"
 
 #include <cute_alloc.h>
 #include <cute_app.h>
 #include <cute_color.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
-#include <pico_ecs.h>
+#include <stdbool.h>
 
 typedef struct Platform Platform;
 
@@ -37,3 +38,5 @@ typedef struct GameState {
 } GameState;
 
 extern GameState *g_state;
+
+bool validate_game_state(void);

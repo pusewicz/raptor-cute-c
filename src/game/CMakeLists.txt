@@ -2,7 +2,7 @@ set(NAME "gamelib")
 
 add_library(
     ${NAME} SHARED
-    state.c
+    ../engine/game_state.c
     game.c
     ecs.c
     factories.c
