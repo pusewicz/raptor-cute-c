@@ -86,6 +86,7 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   return id;
 }
 
+#define ENEMY_DEFAULT_SPEED 3.0f
 ecs_id_t make_enemy(float x, float y) {
   ecs_id_t id = ecs_create(g_state->ecs);
 
@@ -97,7 +98,7 @@ ecs_id_t make_enemy(float x, float y) {
   // Add velocity
   CF_V2 *vel = ecs_add(g_state->ecs, id, g_state->components.velocity, nullptr);
   vel->x     = 0.0f;
-  vel->y     = -0.1f;
+  vel->y     = -ENEMY_DEFAULT_SPEED;
 
   // Add sprite
   CF_Sprite *sprite = ecs_add(g_state->ecs, id, g_state->components.sprite, nullptr);
