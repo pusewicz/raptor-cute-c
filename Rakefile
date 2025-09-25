@@ -13,7 +13,9 @@ end
 
 desc 'Run the project'
 task run: :compile do
-  pid = Process.spawn(File.join(BUILD_DIR, 'Raptor'), chdir: BUILD_DIR)
+  cmd = "lldb #{File.join(BUILD_DIR, 'Raptor')} -o run"
+  puts "Executing: #{cmd}"
+  pid = Process.spawn(cmd, chdir: BUILD_DIR)
   File.write(PID_FILE, pid)
   puts "Started process #{pid} with PID file at #{PID_FILE}"
   Process.wait(pid)
