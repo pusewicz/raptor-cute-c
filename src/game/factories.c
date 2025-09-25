@@ -120,7 +120,7 @@ ecs_id_t make_enemy_spawner(void) {
 
   EnemySpawnComponent *spawn   = ecs_add(g_state->ecs, id, g_state->components.enemy_spawn, nullptr);
   spawn->spawn_interval        = 5.0f;    // Spawn an enemy every 5 seconds
-  spawn->time_since_last_spawn = 0.0f;
+  spawn->time_since_last_spawn = 5.0f;
   spawn->max_enemies           = 5;
   spawn->current_enemy_count   = 0;
 
