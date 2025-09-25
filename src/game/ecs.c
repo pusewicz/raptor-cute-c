@@ -1,7 +1,6 @@
 #include "ecs.h"
 
 #include "../engine/game_state.h"
-#include "../engine/log.h"
 #include "factories.h"
 
 #define PICO_ECS_IMPLEMENTATION
@@ -35,10 +34,10 @@ static ecs_ret_t collision_system(ecs_t *ecs, ecs_id_t *entities, int entity_cou
         continue;
       }
 
-      CF_V2             *pos_a = ecs_get(ecs, entity_a, g_state->components.position);
-      CF_V2             *pos_b = ecs_get(ecs, entity_b, g_state->components.position);
-      ColliderComponent *col_a = ecs_get(ecs, entity_a, g_state->components.collider);
-      ColliderComponent *col_b = ecs_get(ecs, entity_b, g_state->components.collider);
+      PositionComponent *pos_a = ECS_GET(entity_a, PositionComponent);
+      PositionComponent *pos_b = ECS_GET(entity_b, PositionComponent);
+      ColliderComponent *col_a = ECS_GET(entity_a, ColliderComponent);
+      ColliderComponent *col_b = ECS_GET(entity_b, ColliderComponent);
 
       CF_Aabb aabb_a = cf_make_aabb_center_half_extents(*pos_a, col_a->half_extents);
       CF_Aabb aabb_b = cf_make_aabb_center_half_extents(*pos_b, col_b->half_extents);
@@ -53,9 +52,9 @@ static ecs_ret_t collision_system(ecs_t *ecs, ecs_id_t *entities, int entity_cou
   if (entities_to_destroy) {
     for (int i = 0; i < asize(entities_to_destroy); ++i) {
       if (ecs_is_entity_ready(ecs, entities_to_destroy[i])) {
-        TagComponent *tag = ecs_get(ecs, entities_to_destroy[i], g_state->components.tag);
-        if (tag->tag == TAG_ENEMY) {
-          EnemySpawnComponent *spawn = ecs_get(ecs, g_state->enemy_spawner_entity, g_state->components.enemy_spawn);
+        TagComponent *tag = ECS_GET(entities_to_destroy[i], TagComponent);
+        if (*tag == TAG_ENEMY) {
+          EnemySpawnComponent *spawn = ECS_GET(g_state->enemy_spawner_entity, EnemySpawnComponent);
           --spawn->current_enemy_count;
         }
         ecs_queue_destroy(ecs, entities_to_destroy[i]);
@@ -82,20 +81,20 @@ static ecs_ret_t boundary_system(ecs_t *ecs, ecs_id_t *entities, int entity_coun
 
   for (int i = 0; i < entity_count; ++i) {
     ecs_id_t           entity_id = entities[i];
-    ColliderComponent *collider  = ecs_get(ecs, entity_id, g_state->components.collider);
-    CF_V2             *position  = ecs_get(ecs, entity_id, g_state->components.position);
+    ColliderComponent *collider  = ECS_GET(entity_id, ColliderComponent);
+    PositionComponent *position  = ECS_GET(entity_id, PositionComponent);
     CF_Aabb canvas_aabb = cf_make_aabb_center_half_extents(cf_v2(0, 0), cf_div_v2_f(g_state->canvas_size, 2.0f));
     CF_Aabb entity_aabb = cf_make_aabb_center_half_extents(*position, collider->half_extents);
 
     // Check if entity is outside canvas bounds
     if (!cf_aabb_to_aabb(canvas_aabb, entity_aabb)) {
-      TagComponent *tag = ecs_get(ecs, entity_id, g_state->components.tag);
-      switch (tag->tag) {
+      TagComponent *tag = ECS_GET(entity_id, TagComponent);
+      switch (*tag) {
         case TAG_BULLET:
         case TAG_ENEMY:
           // TODO: Add add/remove callbacks to the spawn system to always keep track of the number of enemies
-          if (tag->tag == TAG_ENEMY) {
-            EnemySpawnComponent *spawn = ecs_get(ecs, g_state->enemy_spawner_entity, g_state->components.enemy_spawn);
+          if (*tag == TAG_ENEMY) {
+            EnemySpawnComponent *spawn = ECS_GET(g_state->enemy_spawner_entity, EnemySpawnComponent);
             --spawn->current_enemy_count;
           }
           ecs_queue_destroy(ecs, entity_id);
@@ -115,17 +114,18 @@ debug_bounding_boxes_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ec
     return 0;
   }
 
+  (void)ecs;
   (void)dt;
   (void)udata;
 
   for (int i = 0; i < entity_count; ++i) {
     ecs_id_t entity_id = entities[i];
 
-    CF_Sprite         *sprite      = ecs_get(ecs, entity_id, g_state->components.sprite);
-    CF_V2             *pos         = ecs_get(ecs, entity_id, g_state->components.position);
-    ColliderComponent *col         = ecs_get(ecs, entity_id, g_state->components.collider);
-    CF_Aabb            aabb_sprite = cf_make_aabb_center_half_extents(*pos, cf_v2(sprite->w / 2.0f, sprite->h / 2.0f));
-    CF_Aabb            aabb_collider = cf_make_aabb_center_half_extents(*pos, col->half_extents);
+    SpriteComponent   *sprite   = ECS_GET(entity_id, SpriteComponent);
+    PositionComponent *position = ECS_GET(entity_id, PositionComponent);
+    ColliderComponent *collider = ECS_GET(entity_id, ColliderComponent);
+    CF_Aabb aabb_sprite   = cf_make_aabb_center_half_extents(*position, cf_v2(sprite->w / 2.0f, sprite->h / 2.0f));
+    CF_Aabb aabb_collider = cf_make_aabb_center_half_extents(*position, collider->half_extents);
 
     cf_draw_push();
     // Draw sprite box in red
@@ -144,12 +144,13 @@ debug_bounding_boxes_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ec
 }
 
 static ecs_ret_t input_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+  (void)ecs;
   (void)dt;
   (void)entities;
   (void)entity_count;
   (void)udata;
 
-  InputComponent *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
+  InputComponent *input = ECS_GET(g_state->player_entity, InputComponent);
 
   input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
   input->down  = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
@@ -161,29 +162,34 @@ static ecs_ret_t input_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, 
 }
 
 static ecs_ret_t movement_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+  (void)ecs;
   (void)dt;
   (void)udata;
 
   // TODO: Special case for player for now
   {
-    CF_V2          *vel   = ecs_get(ecs, g_state->player_entity, g_state->components.velocity);
-    InputComponent *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
-    float           speed = 1.0f;
-    vel->x                = 0.0f;
-    vel->y                = 0.0f;
-    if (input->up)
+    VelocityComponent *vel   = ECS_GET(g_state->player_entity, VelocityComponent);
+    InputComponent    *input = ECS_GET(g_state->player_entity, InputComponent);
+    float              speed = 1.0f;
+    vel->x                   = 0.0f;
+    vel->y                   = 0.0f;
+    if (input->up) {
       vel->y += speed;
-    if (input->down)
+    }
+    if (input->down) {
       vel->y -= speed;
-    if (input->left)
+    }
+    if (input->left) {
       vel->x -= speed;
-    if (input->right)
+    }
+    if (input->right) {
       vel->x += speed;
+    }
   }
 
   for (int i = 0; i < entity_count; i++) {
-    CF_V2 *pos = ecs_get(ecs, entities[i], g_state->components.position);
-    CF_V2 *vel = ecs_get(ecs, entities[i], g_state->components.velocity);
+    PositionComponent *pos = ECS_GET(entities[i], PositionComponent);
+    VelocityComponent *vel = ECS_GET(entities[i], VelocityComponent);
     pos->x += vel->x;
     pos->y += vel->y;
   }
@@ -192,12 +198,13 @@ static ecs_ret_t movement_system(ecs_t *ecs, ecs_id_t *entities, int entity_coun
 }
 
 static ecs_ret_t render_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+  (void)ecs;
   (void)dt;
   (void)udata;
 
   for (int i = 0; i < entity_count; i++) {
-    CF_V2     *pos    = ecs_get(ecs, entities[i], g_state->components.position);
-    CF_Sprite *sprite = ecs_get(ecs, entities[i], g_state->components.sprite);
+    PositionComponent *pos    = ECS_GET(entities[i], PositionComponent);
+    SpriteComponent   *sprite = ECS_GET(entities[i], SpriteComponent);
 
     cf_sprite_update(sprite);
     cf_draw_push();
@@ -211,12 +218,13 @@ static ecs_ret_t render_system(ecs_t *ecs, ecs_id_t *entities, int entity_count,
 
 // TODO: Replace with a coroutine system so it's easier to design spawn patterns
 static ecs_ret_t enemy_spawn_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+  (void)ecs;
   (void)entities;
   (void)entity_count;
   (void)dt;
   (void)udata;
 
-  EnemySpawnComponent *spawn = ecs_get(ecs, g_state->enemy_spawner_entity, g_state->components.enemy_spawn);
+  EnemySpawnComponent *spawn = ECS_GET(g_state->enemy_spawner_entity, EnemySpawnComponent);
   spawn->time_since_last_spawn += (float)dt;
 
   if (spawn->time_since_last_spawn >= spawn->spawn_interval && spawn->current_enemy_count < spawn->max_enemies) {
@@ -232,21 +240,22 @@ static ecs_ret_t enemy_spawn_system(ecs_t *ecs, ecs_id_t *entities, int entity_c
 }
 
 static ecs_ret_t weapon_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+  (void)ecs;
   (void)entities;
   (void)entity_count;
   (void)udata;
 
-  WeaponComponent *weapon = ecs_get(ecs, g_state->player_entity, g_state->components.weapon);
+  WeaponComponent *weapon = ECS_GET(g_state->player_entity, WeaponComponent);
 
   if (weapon->time_since_shot < weapon->cooldown) {
     weapon->time_since_shot += (float)dt;
     return 0;
   }
 
-  InputComponent *input = ecs_get(ecs, g_state->player_entity, g_state->components.input);
+  InputComponent *input = ECS_GET(g_state->player_entity, InputComponent);
   if (input->shoot) {
     weapon->time_since_shot = 0.0f;
-    CF_V2 *pos              = ecs_get(ecs, g_state->player_entity, g_state->components.position);
+    PositionComponent *pos  = ECS_GET(g_state->player_entity, PositionComponent);
     make_bullet(pos->x, pos->y, cf_v2(0, 1));
   }
 
@@ -254,89 +263,43 @@ static ecs_ret_t weapon_system(ecs_t *ecs, ecs_id_t *entities, int entity_count,
 }
 
 void register_components(void) {
-  g_state->components.collider    = ecs_register_component(g_state->ecs, sizeof(ColliderComponent), nullptr, nullptr);
-  g_state->components.enemy_spawn = ecs_register_component(g_state->ecs, sizeof(EnemySpawnComponent), nullptr, nullptr);
-  g_state->components.input       = ecs_register_component(g_state->ecs, sizeof(InputComponent), nullptr, nullptr);
-  g_state->components.position    = ecs_register_component(g_state->ecs, sizeof(CF_V2), nullptr, nullptr);
-  g_state->components.sprite      = ecs_register_component(g_state->ecs, sizeof(CF_Sprite), nullptr, nullptr);
-  g_state->components.velocity    = ecs_register_component(g_state->ecs, sizeof(CF_V2), nullptr, nullptr);
-  g_state->components.weapon      = ecs_register_component(g_state->ecs, sizeof(WeaponComponent), nullptr, nullptr);
-  g_state->components.tag         = ecs_register_component(g_state->ecs, sizeof(TagComponent), nullptr, nullptr);
+  ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
+  ECS_REGISTER_COMPONENT(EnemySpawnComponent, nullptr, nullptr);
+  ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
+  ECS_REGISTER_COMPONENT(PositionComponent, nullptr, nullptr);
+  ECS_REGISTER_COMPONENT(SpriteComponent, nullptr, nullptr);
+  ECS_REGISTER_COMPONENT(VelocityComponent, nullptr, nullptr);
+  ECS_REGISTER_COMPONENT(WeaponComponent, nullptr, nullptr);
+  ECS_REGISTER_COMPONENT(TagComponent, nullptr, nullptr);
 }
 
 void register_systems(void) {
-  g_state->systems.boundary  = ecs_register_system(g_state->ecs, boundary_system, nullptr, nullptr, nullptr);
-  g_state->systems.collision = ecs_register_system(g_state->ecs, collision_system, nullptr, nullptr, nullptr);
-  g_state->systems.debug_bounding_boxes =
-      ecs_register_system(g_state->ecs, debug_bounding_boxes_system, nullptr, nullptr, nullptr);
-  g_state->systems.enemy_spawn = ecs_register_system(g_state->ecs, enemy_spawn_system, nullptr, nullptr, nullptr);
-  g_state->systems.input       = ecs_register_system(g_state->ecs, input_system, nullptr, nullptr, nullptr);
-  g_state->systems.movement    = ecs_register_system(g_state->ecs, movement_system, nullptr, nullptr, nullptr);
-  g_state->systems.render      = ecs_register_system(g_state->ecs, render_system, nullptr, nullptr, nullptr);
-  g_state->systems.weapon      = ecs_register_system(g_state->ecs, weapon_system, nullptr, nullptr, nullptr);
+  ECS_REGISTER_SYSTEM(boundary, nullptr, nullptr, nullptr);
+  ECS_REGISTER_SYSTEM(collision, nullptr, nullptr, nullptr);
+  ECS_REGISTER_SYSTEM(debug_bounding_boxes, nullptr, nullptr, nullptr);
+  ECS_REGISTER_SYSTEM(enemy_spawn, nullptr, nullptr, nullptr);
+  ECS_REGISTER_SYSTEM(input, nullptr, nullptr, nullptr);
+  ECS_REGISTER_SYSTEM(movement, nullptr, nullptr, nullptr);
+  ECS_REGISTER_SYSTEM(render, nullptr, nullptr, nullptr);
+  ECS_REGISTER_SYSTEM(weapon, nullptr, nullptr, nullptr);
 
-  /*
-   * Boundary system requires position and tag components.
-   */
-  ecs_require_component(g_state->ecs, g_state->systems.boundary, g_state->components.position);
-  ecs_require_component(g_state->ecs, g_state->systems.boundary, g_state->components.tag);
-
-  /*
-   * Collision system requires collider, position, and tag components.
-   */
-  ecs_require_component(g_state->ecs, g_state->systems.collision, g_state->components.collider);
-  ecs_require_component(g_state->ecs, g_state->systems.collision, g_state->components.position);
-  ecs_require_component(g_state->ecs, g_state->systems.collision, g_state->components.tag);
-
-  /*
-   * Input system requires input, position, and tag components.
-   */
-  ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.input);
-  ecs_require_component(g_state->ecs, g_state->systems.input, g_state->components.position);
-  ecs_require_component(g_state->ecs, g_state->systems.collision, g_state->components.tag);
-
-  /*
-   * Movement system requires position and velocity components.
-   */
-  ecs_require_component(g_state->ecs, g_state->systems.movement, g_state->components.position);
-  ecs_require_component(g_state->ecs, g_state->systems.movement, g_state->components.velocity);
-
-  /*
-   * Weapon system requires weapon, input, and position components.
-   */
-  ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.weapon);
-  ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.input);
-  ecs_require_component(g_state->ecs, g_state->systems.weapon, g_state->components.position);
-
-  /*
-   * Enemy spawn system requires enemy spawn and tag components.
-   */
-  ecs_require_component(g_state->ecs, g_state->systems.enemy_spawn, g_state->components.enemy_spawn);
-  ecs_require_component(g_state->ecs, g_state->systems.enemy_spawn, g_state->components.tag);
-
-  /*
-   * Render system requires position and sprite components.
-   */
-  ecs_require_component(g_state->ecs, g_state->systems.render, g_state->components.position);
-  ecs_require_component(g_state->ecs, g_state->systems.render, g_state->components.sprite);
-
-  /*
-   * Debug system requires position, collider, and sprite components.
-   */
-  ecs_require_component(g_state->ecs, g_state->systems.debug_bounding_boxes, g_state->components.position);
-  ecs_require_component(g_state->ecs, g_state->systems.debug_bounding_boxes, g_state->components.collider);
-  ecs_require_component(g_state->ecs, g_state->systems.debug_bounding_boxes, g_state->components.sprite);
+  ECS_REQUIRE_COMPONENT(boundary, PositionComponent, TagComponent);
+  ECS_REQUIRE_COMPONENT(collision, ColliderComponent, PositionComponent, TagComponent);
+  ECS_REQUIRE_COMPONENT(input, InputComponent, PositionComponent, TagComponent);
+  ECS_REQUIRE_COMPONENT(movement, PositionComponent, VelocityComponent);
+  ECS_REQUIRE_COMPONENT(weapon, WeaponComponent, InputComponent, PositionComponent);
+  ECS_REQUIRE_COMPONENT(enemy_spawn, EnemySpawnComponent, TagComponent);
+  ECS_REQUIRE_COMPONENT(render, PositionComponent, SpriteComponent);
+  ECS_REQUIRE_COMPONENT(debug_bounding_boxes, PositionComponent, ColliderComponent, SpriteComponent);
 }
 
 void update_system_callbacks(void) {
-  ecs_t *ecs = g_state->ecs;
-
-  ecs_set_system_callbacks(ecs, g_state->systems.boundary, boundary_system, nullptr, nullptr);
-  ecs_set_system_callbacks(ecs, g_state->systems.collision, collision_system, nullptr, nullptr);
-  ecs_set_system_callbacks(ecs, g_state->systems.debug_bounding_boxes, debug_bounding_boxes_system, nullptr, nullptr);
-  ecs_set_system_callbacks(ecs, g_state->systems.input, input_system, nullptr, nullptr);
-  ecs_set_system_callbacks(ecs, g_state->systems.movement, movement_system, nullptr, nullptr);
-  ecs_set_system_callbacks(ecs, g_state->systems.render, render_system, nullptr, nullptr);
-  ecs_set_system_callbacks(ecs, g_state->systems.weapon, weapon_system, nullptr, nullptr);
-  ecs_set_system_callbacks(ecs, g_state->systems.enemy_spawn, enemy_spawn_system, nullptr, nullptr);
+  ECS_SET_SYSTEM_CALLBACKS(boundary);
+  ECS_SET_SYSTEM_CALLBACKS(collision);
+  ECS_SET_SYSTEM_CALLBACKS(debug_bounding_boxes);
+  ECS_SET_SYSTEM_CALLBACKS(enemy_spawn);
+  ECS_SET_SYSTEM_CALLBACKS(input);
+  ECS_SET_SYSTEM_CALLBACKS(movement);
+  ECS_SET_SYSTEM_CALLBACKS(render);
+  ECS_SET_SYSTEM_CALLBACKS(weapon);
 }

@@ -49,7 +49,7 @@ ecs_id_t make_player(float x, float y) {
 
   // Add tag
   TagComponent *tag = ecs_add(g_state->ecs, id, g_state->components.tag, nullptr);
-  tag->tag          = TAG_PLAYER;
+  *tag              = TAG_PLAYER;
 
   return id;
 }
@@ -81,7 +81,7 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
 
   // Add tag
   TagComponent *tag = ecs_add(g_state->ecs, id, g_state->components.tag, nullptr);
-  tag->tag          = TAG_BULLET;
+  *tag              = TAG_BULLET;
 
   return id;
 }
@@ -110,7 +110,7 @@ ecs_id_t make_enemy(float x, float y) {
 
   // Add tag
   TagComponent *tag = ecs_add(g_state->ecs, id, g_state->components.tag, nullptr);
-  tag->tag          = TAG_ENEMY;
+  *tag              = TAG_ENEMY;
 
   return id;
 }
