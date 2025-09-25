@@ -13,11 +13,11 @@ IndentCaseLabels: "true"
 IndentPPDirectives: BeforeHash
 IndentWidth: "2"
 KeepEmptyLinesAtTheStartOfBlocks: "false"
-Language: Cpp
+Language: C
 SpaceInEmptyParentheses: "false"
 SpacesBeforeTrailingComments: "4"
 SpacesInContainerLiterals: "true"
-Standard: Cpp23
+Standard: Latest
 TabWidth: "2"
 UseTab: Never
 ColumnLimit: 120
