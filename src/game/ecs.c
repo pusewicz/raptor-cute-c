@@ -53,8 +53,8 @@ static ecs_ret_t collision_system(ecs_t *ecs, ecs_id_t *entities, int entity_cou
   if (entities_to_destroy) {
     for (int i = 0; i < asize(entities_to_destroy); ++i) {
       if (ecs_is_entity_ready(ecs, entities_to_destroy[i])) {
-        TagType *tag = ecs_get(ecs, entities_to_destroy[i], g_state->components.tag);
-        if (*tag == TAG_ENEMY) {
+        TagComponent *tag = ecs_get(ecs, entities_to_destroy[i], g_state->components.tag);
+        if (tag->tag == TAG_ENEMY) {
           EnemySpawnComponent *spawn = ecs_get(ecs, g_state->enemy_spawner_entity, g_state->components.enemy_spawn);
           --spawn->current_enemy_count;
         }
@@ -89,19 +89,17 @@ static ecs_ret_t boundary_system(ecs_t *ecs, ecs_id_t *entities, int entity_coun
 
     // Check if entity is outside canvas bounds
     if (!cf_aabb_to_aabb(canvas_aabb, entity_aabb)) {
-      APP_DEBUG("Entity %d is outside canvas bounds", entity_id);
       TagComponent *tag = ecs_get(ecs, entity_id, g_state->components.tag);
       switch (tag->tag) {
+        case TAG_BULLET:
         case TAG_ENEMY:
-        case TAG_BULLET: {
           // TODO: Add add/remove callbacks to the spawn system to always keep track of the number of enemies
           if (tag->tag == TAG_ENEMY) {
-            EnemySpawnComponent *spawn = ecs_get(ecs, g_state->systems.enemy_spawn, g_state->components.enemy_spawn);
+            EnemySpawnComponent *spawn = ecs_get(ecs, g_state->enemy_spawner_entity, g_state->components.enemy_spawn);
             --spawn->current_enemy_count;
           }
           ecs_queue_destroy(ecs, entity_id);
           break;
-        }
         default:
           break;
       }
@@ -263,13 +261,14 @@ void register_components(void) {
   g_state->components.sprite      = ecs_register_component(g_state->ecs, sizeof(CF_Sprite), nullptr, nullptr);
   g_state->components.velocity    = ecs_register_component(g_state->ecs, sizeof(CF_V2), nullptr, nullptr);
   g_state->components.weapon      = ecs_register_component(g_state->ecs, sizeof(WeaponComponent), nullptr, nullptr);
-  g_state->components.tag         = ecs_register_component(g_state->ecs, sizeof(TagType), nullptr, nullptr);
+  g_state->components.tag         = ecs_register_component(g_state->ecs, sizeof(TagComponent), nullptr, nullptr);
 }
 
 void register_systems(void) {
-  g_state->systems.boundary    = ecs_register_system(g_state->ecs, boundary_system, nullptr, nullptr, nullptr);
-  g_state->systems.collision   = ecs_register_system(g_state->ecs, collision_system, nullptr, nullptr, nullptr);
-  g_state->systems.debug_bounding_boxes   = ecs_register_system(g_state->ecs, debug_bounding_boxes_system, nullptr, nullptr, nullptr);
+  g_state->systems.boundary  = ecs_register_system(g_state->ecs, boundary_system, nullptr, nullptr, nullptr);
+  g_state->systems.collision = ecs_register_system(g_state->ecs, collision_system, nullptr, nullptr, nullptr);
+  g_state->systems.debug_bounding_boxes =
+      ecs_register_system(g_state->ecs, debug_bounding_boxes_system, nullptr, nullptr, nullptr);
   g_state->systems.enemy_spawn = ecs_register_system(g_state->ecs, enemy_spawn_system, nullptr, nullptr, nullptr);
   g_state->systems.input       = ecs_register_system(g_state->ecs, input_system, nullptr, nullptr, nullptr);
   g_state->systems.movement    = ecs_register_system(g_state->ecs, movement_system, nullptr, nullptr, nullptr);
