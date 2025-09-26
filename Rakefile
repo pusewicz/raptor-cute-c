@@ -64,4 +64,4 @@ namespace :headers do
   end
 end
 
-task default: :run
+task default: :compile
