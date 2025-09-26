@@ -72,28 +72,28 @@ EXPORT void game_init(Platform *platform) {
 }
 
 EXPORT bool game_update(void) {
-  cf_arena_reset(&g_state->scratch_arena);
-
-  ecs_update_system(g_state->ecs, g_state->systems.input, CF_DELTA_TIME);
-  ecs_update_system(g_state->ecs, g_state->systems.movement, CF_DELTA_TIME);
-  ecs_update_system(g_state->ecs, g_state->systems.weapon, CF_DELTA_TIME);
-  ecs_update_system(g_state->ecs, g_state->systems.enemy_spawn, CF_DELTA_TIME);
-  ecs_update_system(g_state->ecs, g_state->systems.collision, CF_DELTA_TIME);
-  ecs_update_system(g_state->ecs, g_state->systems.boundary, CF_DELTA_TIME);
+  ECS_UPDATE_SYSTEM(input);
+  ECS_UPDATE_SYSTEM(movement);
+  ECS_UPDATE_SYSTEM(weapon);
+  ECS_UPDATE_SYSTEM(enemy_spawn);
+  ECS_UPDATE_SYSTEM(collision);
+  ECS_UPDATE_SYSTEM(boundary);
 #ifdef DEBUG
-  ecs_update_system(g_state->ecs, g_state->systems.debug_bounding_boxes, CF_DELTA_TIME);
+  ECS_UPDATE_SYSTEM(debug_bounding_boxes);
 #endif
+  ECS_UPDATE_SYSTEM(render);
+
+  cf_arena_reset(&g_state->scratch_arena);
 
   return true;
 }
 
 static void game_render_debug(void) {
-  InputComponent  *input  = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.input);
-  WeaponComponent *weapon = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.weapon);
-  CF_V2           *pos    = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.position);
-  CF_V2           *vel    = ecs_get(g_state->ecs, g_state->player_entity, g_state->components.velocity);
-
-  EnemySpawnComponent *spawn = ecs_get(g_state->ecs, g_state->enemy_spawner_entity, g_state->components.enemy_spawn);
+  InputComponent      *input  = ECS_GET(g_state->player_entity, InputComponent);
+  WeaponComponent     *weapon = ECS_GET(g_state->player_entity, WeaponComponent);
+  PositionComponent   *pos    = ECS_GET(g_state->player_entity, PositionComponent);
+  VelocityComponent   *vel    = ECS_GET(g_state->player_entity, VelocityComponent);
+  EnemySpawnComponent *spawn  = ECS_GET(g_state->enemy_spawner_entity, EnemySpawnComponent);
 
   /*
    * Debug info
@@ -135,7 +135,7 @@ static void game_render_debug(void) {
 }
 
 EXPORT void game_render(void) {
-  ecs_update_system(g_state->ecs, g_state->systems.render, CF_DELTA_TIME);
+  ECS_UPDATE_SYSTEM(render);
 
 #ifdef DEBUG
   game_render_debug();
@@ -154,7 +154,9 @@ EXPORT void game_shutdown(void) {
 EXPORT void *game_state(void) { return g_state; }
 
 EXPORT void game_hot_reload(void *game_state) {
+  // Update global game state pointer
   g_state = (GameState *)game_state;
+
   // Update system callbacks to new function addresses
-  update_system_callbacks();
+  update_ecs_system_callbacks();
 }

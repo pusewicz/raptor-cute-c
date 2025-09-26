@@ -262,6 +262,10 @@ static ecs_ret_t weapon_system(ecs_t *ecs, ecs_id_t *entities, int entity_count,
   return 0;
 }
 
+void *add_component_impl(ecs_id_t entity_id, ecs_id_t component_id, void *args) {
+  return ecs_add(g_state->ecs, entity_id, component_id, args);
+}
+
 void init_ecs(void) {
   ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
   ECS_REGISTER_COMPONENT(EnemySpawnComponent, nullptr, nullptr);
@@ -295,7 +299,7 @@ void init_ecs(void) {
 // Set the update functions for each system
 //
 // This function should be called on hot-reload to ensure the latest code is used.
-void update_system_callbacks(void) {
+void update_ecs_system_callbacks(void) {
   ECS_SET_SYSTEM_CALLBACKS(boundary);
   ECS_SET_SYSTEM_CALLBACKS(collision);
   ECS_SET_SYSTEM_CALLBACKS(debug_bounding_boxes);

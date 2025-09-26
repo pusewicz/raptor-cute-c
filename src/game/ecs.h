@@ -5,7 +5,13 @@
 #include <cute_math.h>
 #include <cute_sprite.h>
 
+/*
+ * Convenience macros for ECS operations
+ */
+
+// Get a component of type T from an entity
 #define ECS_GET(entity, T) (T *)ecs_get(g_state->ecs, entity, g_state->components.COMPONENT_TO_UNDERSCORE(T))
+
 #define ECS_REGISTER_COMPONENT(T, ...) \
   g_state->components.COMPONENT_TO_UNDERSCORE(T) = ecs_register_component(g_state->ecs, sizeof(T), __VA_ARGS__)
 #define ECS_REGISTER_SYSTEM(name, ...) \
@@ -27,8 +33,15 @@
                                   ECS_REQUIRE_COMPONENT_3, \
                                   ECS_REQUIRE_COMPONENT_2, \
                                   ECS_REQUIRE_COMPONENT_1)(system, __VA_ARGS__)
+#define ECS_UPDATE_SYSTEM(name) ecs_update_system(g_state->ecs, g_state->systems.name, CF_DELTA_TIME)
 #define ECS_SET_SYSTEM_CALLBACKS(name) \
   ecs_set_system_callbacks(g_state->ecs, g_state->systems.name, name##_system, nullptr, nullptr)
+
+// Add a component to an entity
+#define ECS_ADD_COMPONENT(entity, T) \
+  ((T *)add_component_impl(entity, g_state->components.COMPONENT_TO_UNDERSCORE(T), nullptr))
+
+// Helper macros to convert CamelCase to snake_case for component names
 #define COMPONENT_TO_UNDERSCORE(T)     UNDERSCORE_##T
 #define UNDERSCORE_BulletComponent     bullet
 #define UNDERSCORE_ColliderComponent   collider
@@ -39,6 +52,9 @@
 #define UNDERSCORE_TagComponent        tag
 #define UNDERSCORE_VelocityComponent   velocity
 #define UNDERSCORE_WeaponComponent     weapon
+
+// Convenience macro to create a new entity
+#define make_entity() ecs_create(g_state->ecs)
 
 /*
  * Component structures
@@ -107,5 +123,6 @@ typedef struct {
   ecs_id_t weapon;
 } Systems;
 
-void init_ecs(void);
-void update_system_callbacks(void);
+void  init_ecs(void);
+void  update_ecs_system_callbacks(void);
+void *add_component_impl(ecs_id_t entity, ecs_id_t component_id, void *args);
