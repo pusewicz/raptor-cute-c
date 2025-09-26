@@ -19,6 +19,7 @@ def run(cmd)
   puts "Started process #{pid} with PID file at #{PID_FILE}"
 ensure
   Process.wait(pid)
+  File.delete(PID_FILE) if File.exist?(PID_FILE)
 end
 
 desc 'Run the project'
