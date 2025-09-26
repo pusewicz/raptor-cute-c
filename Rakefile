@@ -1,6 +1,7 @@
 BUILD_DIR = File.join(__dir__, 'build', 'debug')
 PWD = File.expand_path(__dir__)
 PID_FILE = File.join(BUILD_DIR, 'raptor.pid')
+EXE_FILE = File.join(BUILD_DIR, 'Raptor')
 
 directory BUILD_DIR do
   sh "cmake -S #{PWD} -B #{BUILD_DIR} -G Ninja -DCMAKE_BUILD_TYPE=Debug"
@@ -11,14 +12,25 @@ task compile: BUILD_DIR do
   sh "cmake --build #{BUILD_DIR} --parallel"
 end
 
-desc 'Run the project'
-task run: :compile do
-  cmd = "lldb #{File.join(BUILD_DIR, 'Raptor')} -o run"
+def run(cmd)
   puts "Executing: #{cmd}"
   pid = Process.spawn(cmd, chdir: BUILD_DIR)
   File.write(PID_FILE, pid)
   puts "Started process #{pid} with PID file at #{PID_FILE}"
+ensure
   Process.wait(pid)
+end
+
+desc 'Run the project'
+task run: :compile do
+  run EXE_FILE
+end
+
+namespace :run do
+  desc 'Run the project with debugger attached'
+  task :debugger do
+    run "lldb #{EXE_FILE} -o run"
+  end
 end
 
 desc 'Watch for changes and recompile'
