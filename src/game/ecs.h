@@ -9,7 +9,7 @@
 #define ECS_REGISTER_COMPONENT(T, ...) \
   g_state->components.COMPONENT_TO_UNDERSCORE(T) = ecs_register_component(g_state->ecs, sizeof(T), __VA_ARGS__)
 #define ECS_REGISTER_SYSTEM(name, ...) \
-  g_state->systems.name = ecs_register_system(g_state->ecs, CONCATENATE(name, _system), __VA_ARGS__)
+  g_state->systems.name = ecs_register_system(g_state->ecs, name##_system, __VA_ARGS__)
 #define ECS_REQUIRE_COMPONENT_EACH(system, T) \
   ecs_require_component(g_state->ecs, g_state->systems.system, g_state->components.COMPONENT_TO_UNDERSCORE(T));
 #define ECS_REQUIRE_COMPONENT_1(system, T) ECS_REQUIRE_COMPONENT_EACH(system, T)
@@ -28,8 +28,7 @@
                                   ECS_REQUIRE_COMPONENT_2, \
                                   ECS_REQUIRE_COMPONENT_1)(system, __VA_ARGS__)
 #define ECS_SET_SYSTEM_CALLBACKS(name) \
-  ecs_set_system_callbacks(g_state->ecs, g_state->systems.name, CONCATENATE(name, _system), nullptr, nullptr)
-#define CONCATENATE(A, B)              A##B
+  ecs_set_system_callbacks(g_state->ecs, g_state->systems.name, name##_system, nullptr, nullptr)
 #define COMPONENT_TO_UNDERSCORE(T)     UNDERSCORE_##T
 #define UNDERSCORE_BulletComponent     bullet
 #define UNDERSCORE_ColliderComponent   collider
