@@ -114,10 +114,12 @@ static void game_render_debug(void) {
   igText("Input.RIGHT: %d", input->right);
   igText("Input.SHOOT: %d", input->shoot);
 
-  igDragFloat("Weapon.Cooldown", &weapon->cooldown, 0.01f, 0.0f, 1.0f, "%.2f", 1.0f);
-  igText("Weapon.TimeSinceShot: %f", weapon->time_since_shot);
-
   igCheckbox("Draw Bounding Boxes", &g_state->debug_bounding_boxes);
+  igEnd();
+
+  igBegin("Weapon", nullptr, 0);
+  igDragFloat("Cooldown", &weapon->cooldown, 0.01f, 0.0f, 1.0f, "%.2f", 1.0f);
+  igText("Time Since Last Shot: %.2f", weapon->time_since_shot);
   igEnd();
 
   /*
