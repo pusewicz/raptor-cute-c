@@ -38,11 +38,13 @@ desc 'Watch for changes and recompile'
 task :watch do
   require 'listen'
   listener = Listen.to('src', 'include') do |_modified, _added, _removed|
-    Rake::Task[:compile].execute
     if File.exist?(PID_FILE)
       pid = File.read(PID_FILE).to_i
-      puts "Sending SIGHUP to process #{pid}"
+
       begin
+        Process.kill(0, pid)
+        Rake::Task[:compile].execute
+        puts "Sending SIGHUP to process #{pid}"
         Process.kill('SIGHUP', pid)
       rescue Errno::ESRCH
         warn "Process #{pid} not found"
