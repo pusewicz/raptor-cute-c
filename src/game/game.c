@@ -72,6 +72,8 @@ EXPORT void game_init(Platform *platform) {
 }
 
 EXPORT bool game_update(void) {
+  cf_arena_reset(&g_state->scratch_arena);
+
   ECS_UPDATE_SYSTEM(input);
   ECS_UPDATE_SYSTEM(movement);
   ECS_UPDATE_SYSTEM(weapon);
@@ -81,9 +83,6 @@ EXPORT bool game_update(void) {
 #ifdef DEBUG
   ECS_UPDATE_SYSTEM(debug_bounding_boxes);
 #endif
-  ECS_UPDATE_SYSTEM(render);
-
-  cf_arena_reset(&g_state->scratch_arena);
 
   return true;
 }
