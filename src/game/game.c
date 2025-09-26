@@ -53,8 +53,7 @@ EXPORT void game_init(Platform *platform) {
   g_state->components = (Components){0};
   g_state->systems    = (Systems){0};
 
-  register_components();
-  register_systems();
+  init_ecs();
 
   g_state->player_entity        = make_player(0.0f, 0.0f);
   g_state->enemy_spawner_entity = make_enemy_spawner();

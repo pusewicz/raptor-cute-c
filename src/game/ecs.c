@@ -262,7 +262,7 @@ static ecs_ret_t weapon_system(ecs_t *ecs, ecs_id_t *entities, int entity_count,
   return 0;
 }
 
-void register_components(void) {
+void init_ecs(void) {
   ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
   ECS_REGISTER_COMPONENT(EnemySpawnComponent, nullptr, nullptr);
   ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
@@ -271,9 +271,7 @@ void register_components(void) {
   ECS_REGISTER_COMPONENT(VelocityComponent, nullptr, nullptr);
   ECS_REGISTER_COMPONENT(WeaponComponent, nullptr, nullptr);
   ECS_REGISTER_COMPONENT(TagComponent, nullptr, nullptr);
-}
 
-void register_systems(void) {
   ECS_REGISTER_SYSTEM(boundary, nullptr, nullptr, nullptr);
   ECS_REGISTER_SYSTEM(collision, nullptr, nullptr, nullptr);
   ECS_REGISTER_SYSTEM(debug_bounding_boxes, nullptr, nullptr, nullptr);
@@ -283,6 +281,7 @@ void register_systems(void) {
   ECS_REGISTER_SYSTEM(render, nullptr, nullptr, nullptr);
   ECS_REGISTER_SYSTEM(weapon, nullptr, nullptr, nullptr);
 
+  // Define which components each system operates on
   ECS_REQUIRE_COMPONENT(boundary, PositionComponent, TagComponent);
   ECS_REQUIRE_COMPONENT(collision, ColliderComponent, PositionComponent, TagComponent);
   ECS_REQUIRE_COMPONENT(input, InputComponent, PositionComponent, TagComponent);
@@ -293,6 +292,9 @@ void register_systems(void) {
   ECS_REQUIRE_COMPONENT(debug_bounding_boxes, PositionComponent, ColliderComponent, SpriteComponent);
 }
 
+// Set the update functions for each system
+//
+// This function should be called on hot-reload to ensure the latest code is used.
 void update_system_callbacks(void) {
   ECS_SET_SYSTEM_CALLBACKS(boundary);
   ECS_SET_SYSTEM_CALLBACKS(collision);

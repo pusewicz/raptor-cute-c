@@ -107,6 +107,5 @@ typedef struct {
   ecs_id_t weapon;
 } Systems;
 
-void register_components(void);
-void register_systems(void);
+void init_ecs(void);
 void update_system_callbacks(void);
