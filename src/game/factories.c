@@ -10,6 +10,7 @@
 #include <pico_ecs.h>
 #include <stddef.h>
 
+#define WEAPON_DEFAULT_COOLDOWN 0.15f    // Half a second between shots
 ecs_id_t make_player(float x, float y) {
   ecs_id_t id = make_entity();
 
@@ -40,7 +41,7 @@ ecs_id_t make_player(float x, float y) {
 
   // Add weapon
   WeaponComponent *weapon = ECS_ADD_COMPONENT(id, WeaponComponent);
-  weapon->cooldown        = 0.5f;    // Half a second between shots
+  weapon->cooldown        = WEAPON_DEFAULT_COOLDOWN;
   weapon->time_since_shot = 0.0f;
 
   // Add tag
@@ -50,6 +51,7 @@ ecs_id_t make_player(float x, float y) {
   return id;
 }
 
+#define BULLET_DEFAULT_SPEED 3.0f
 ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   ecs_id_t id = make_entity();
 
@@ -61,7 +63,7 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   // Add velocity
   VelocityComponent *vel = ECS_ADD_COMPONENT(id, VelocityComponent);
   vel->x                 = 0.0f;
-  vel->y                 = 1 == direction.y ? 2.0f : -2.0f;
+  vel->y                 = BULLET_DEFAULT_SPEED * direction.y;
 
   // Add sprite
   SpriteComponent *sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
@@ -82,7 +84,7 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   return id;
 }
 
-#define ENEMY_DEFAULT_SPEED 1.0f
+#define ENEMY_DEFAULT_SPEED 0.5f
 ecs_id_t make_enemy(float x, float y) {
   ecs_id_t id = make_entity();
 
@@ -114,11 +116,11 @@ ecs_id_t make_enemy(float x, float y) {
 ecs_id_t make_enemy_spawner(void) {
   ecs_id_t id = make_entity();
 
-  EnemySpawnComponent *spawn   = ECS_ADD_COMPONENT(id, EnemySpawnComponent);
-  spawn->spawn_interval        = 5.0f;    // Spawn an enemy every 5 seconds
-  spawn->time_since_last_spawn = 5.0f;
-  spawn->max_enemies           = 5;
-  spawn->current_enemy_count   = 0;
+  EnemySpawnComponent *spawn = ECS_ADD_COMPONENT(id, EnemySpawnComponent);
+  // Spawn an enemy every 2 seconds
+  spawn->spawn_interval = spawn->time_since_last_spawn = 2.0f;
+  spawn->max_enemies                                   = 5;
+  spawn->current_enemy_count                           = 0;
 
   return id;
 }
