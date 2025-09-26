@@ -45,8 +45,10 @@ task :watch do
       begin
         Process.kill('SIGHUP', pid)
       rescue Errno::ESRCH
-        puts "Process #{pid} not found"
+        warn "Process #{pid} not found"
       end
+    else
+      warn "No PID file found at #{PID_FILE}, not sending SIGHUP"
     end
   end
   puts 'Listening for changes...'
