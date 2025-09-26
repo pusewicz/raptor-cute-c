@@ -42,16 +42,17 @@
   ((T *)add_component_impl(entity, g_state->components.COMPONENT_TO_UNDERSCORE(T), nullptr))
 
 // Helper macros to convert CamelCase to snake_case for component names
-#define COMPONENT_TO_UNDERSCORE(T)     UNDERSCORE_##T
-#define UNDERSCORE_BulletComponent     bullet
-#define UNDERSCORE_ColliderComponent   collider
-#define UNDERSCORE_EnemySpawnComponent enemy_spawn
-#define UNDERSCORE_InputComponent      input
-#define UNDERSCORE_PositionComponent   position
-#define UNDERSCORE_SpriteComponent     sprite
-#define UNDERSCORE_TagComponent        tag
-#define UNDERSCORE_VelocityComponent   velocity
-#define UNDERSCORE_WeaponComponent     weapon
+#define COMPONENT_TO_UNDERSCORE(T)           UNDERSCORE_##T
+#define UNDERSCORE_BulletComponent           bullet
+#define UNDERSCORE_BackgroundScrollComponent background_scroll
+#define UNDERSCORE_ColliderComponent         collider
+#define UNDERSCORE_EnemySpawnComponent       enemy_spawn
+#define UNDERSCORE_InputComponent            input
+#define UNDERSCORE_PositionComponent         position
+#define UNDERSCORE_SpriteComponent           sprite
+#define UNDERSCORE_TagComponent              tag
+#define UNDERSCORE_VelocityComponent         velocity
+#define UNDERSCORE_WeaponComponent           weapon
 
 // Convenience macro to create a new entity
 #define make_entity() ecs_create(g_state->ecs)
@@ -59,6 +60,13 @@
 /*
  * Component structures
  */
+
+#define BACKGROUND_SCROLL_SPRITE_COUNT 6 * 3
+typedef struct BackgroundScrollComponent {
+  CF_Sprite sprites[BACKGROUND_SCROLL_SPRITE_COUNT];    // Background sprite
+  float     y_offset;                                   // Vertical offset for scrolling
+  float     max_y_offset;                               // Maximum offset before resetting
+} BackgroundScrollComponent;
 
 typedef struct BulletComponent {
   CF_V2 direction;
@@ -99,6 +107,7 @@ typedef struct WeaponComponent {
  * Components
  */
 typedef struct {
+  ecs_id_t background_scroll;
   ecs_id_t collider;
   ecs_id_t enemy_spawn;
   ecs_id_t input;
@@ -113,6 +122,7 @@ typedef struct {
  * Systems
  */
 typedef struct {
+  ecs_id_t background_scroll;
   ecs_id_t boundary;
   ecs_id_t collision;
   ecs_id_t debug_bounding_boxes;
