@@ -19,6 +19,40 @@
  * System update functions
  */
 
+static ecs_ret_t background_scroll_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
+  (void)ecs;
+  (void)entities;
+  (void)entity_count;
+  (void)dt;
+  (void)udata;
+
+  BackgroundScrollComponent *bg_scroll = ECS_GET(g_state->background_scroll, BackgroundScrollComponent);
+  bg_scroll->y_offset += 0.1f;
+  if (bg_scroll->y_offset >= bg_scroll->max_y_offset) {
+    bg_scroll->y_offset = 0;
+  }
+
+  {
+    cf_draw_push();
+    cf_draw_translate(0, g_state->canvas_size.y / 2.0f - bg_scroll->y_offset + bg_scroll->max_y_offset * 0.5f);
+    int i = 0;
+    for (int y = 0; y < (BACKGROUND_SCROLL_SPRITE_COUNT / 3); ++y) {
+      for (int x = -1; x <= 1; ++x) {
+        CF_Sprite *sprite = &bg_scroll->sprites[i];
+        cf_draw_push();
+        cf_draw_translate(x * sprite->w, -y * sprite->h);
+        cf_sprite_update(sprite);
+        cf_sprite_draw(sprite);
+        cf_draw_pop();
+        ++i;
+      }
+    }
+    cf_draw_pop();
+  }
+
+  return 0;
+}
+
 static ecs_ret_t collision_system(ecs_t *ecs, ecs_id_t *entities, int entity_count, ecs_dt_t dt, void *udata) {
   (void)dt;
   (void)udata;
@@ -246,7 +280,6 @@ static ecs_ret_t weapon_system(ecs_t *ecs, ecs_id_t *entities, int entity_count,
   (void)udata;
 
   WeaponComponent *weapon = ECS_GET(g_state->player_entity, WeaponComponent);
-
   if (weapon->time_since_shot < weapon->cooldown) {
     weapon->time_since_shot += (float)dt;
     return 0;
@@ -266,7 +299,23 @@ void *add_component_impl(ecs_id_t entity_id, ecs_id_t component_id, void *args) 
   return ecs_add(g_state->ecs, entity_id, component_id, args);
 }
 
+static void init_background_scroll(ecs_t *ecs, ecs_id_t entity_id, void *ptr, void *args) {
+  (void)ecs;
+  (void)entity_id;
+  (void)args;
+
+  BackgroundScrollComponent *comp = (BackgroundScrollComponent *)ptr;
+  for (int i = 0; i < BACKGROUND_SCROLL_SPRITE_COUNT; ++i) {
+    comp->sprites[i] = cf_make_sprite("assets/background.ase");
+
+    // Set the initial frame to 0 or 1 based on the index to create a checkerboard pattern
+    cf_sprite_set_frame(&comp->sprites[i], i % 2);
+  }
+  comp->max_y_offset = comp->sprites[0].h;
+}
+
 void init_ecs(void) {
+  ECS_REGISTER_COMPONENT(BackgroundScrollComponent, init_background_scroll, nullptr);
   ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
   ECS_REGISTER_COMPONENT(EnemySpawnComponent, nullptr, nullptr);
   ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
@@ -276,24 +325,32 @@ void init_ecs(void) {
   ECS_REGISTER_COMPONENT(WeaponComponent, nullptr, nullptr);
   ECS_REGISTER_COMPONENT(TagComponent, nullptr, nullptr);
 
-  ECS_REGISTER_SYSTEM(boundary, nullptr, nullptr, nullptr);
-  ECS_REGISTER_SYSTEM(collision, nullptr, nullptr, nullptr);
-  ECS_REGISTER_SYSTEM(debug_bounding_boxes, nullptr, nullptr, nullptr);
-  ECS_REGISTER_SYSTEM(enemy_spawn, nullptr, nullptr, nullptr);
-  ECS_REGISTER_SYSTEM(input, nullptr, nullptr, nullptr);
-  ECS_REGISTER_SYSTEM(movement, nullptr, nullptr, nullptr);
-  ECS_REGISTER_SYSTEM(render, nullptr, nullptr, nullptr);
-  ECS_REGISTER_SYSTEM(weapon, nullptr, nullptr, nullptr);
+  ECS_REGISTER_SYSTEM(background_scroll, nullptr, nullptr, nullptr);
+  ECS_REQUIRE_COMPONENT(background_scroll, BackgroundScrollComponent, PositionComponent, VelocityComponent);
 
-  // Define which components each system operates on
+  ECS_REGISTER_SYSTEM(boundary, nullptr, nullptr, nullptr);
   ECS_REQUIRE_COMPONENT(boundary, PositionComponent, TagComponent);
+
+  ECS_REGISTER_SYSTEM(collision, nullptr, nullptr, nullptr);
   ECS_REQUIRE_COMPONENT(collision, ColliderComponent, PositionComponent, TagComponent);
-  ECS_REQUIRE_COMPONENT(input, InputComponent, PositionComponent, TagComponent);
-  ECS_REQUIRE_COMPONENT(movement, PositionComponent, VelocityComponent);
-  ECS_REQUIRE_COMPONENT(weapon, WeaponComponent, InputComponent, PositionComponent);
-  ECS_REQUIRE_COMPONENT(enemy_spawn, EnemySpawnComponent, TagComponent);
-  ECS_REQUIRE_COMPONENT(render, PositionComponent, SpriteComponent);
+
+  ECS_REGISTER_SYSTEM(debug_bounding_boxes, nullptr, nullptr, nullptr);
   ECS_REQUIRE_COMPONENT(debug_bounding_boxes, PositionComponent, ColliderComponent, SpriteComponent);
+
+  ECS_REGISTER_SYSTEM(enemy_spawn, nullptr, nullptr, nullptr);
+  ECS_REQUIRE_COMPONENT(enemy_spawn, EnemySpawnComponent, TagComponent);
+
+  ECS_REGISTER_SYSTEM(input, nullptr, nullptr, nullptr);
+  ECS_REQUIRE_COMPONENT(input, InputComponent, PositionComponent, TagComponent);
+
+  ECS_REGISTER_SYSTEM(movement, nullptr, nullptr, nullptr);
+  ECS_REQUIRE_COMPONENT(movement, PositionComponent, VelocityComponent);
+
+  ECS_REGISTER_SYSTEM(weapon, nullptr, nullptr, nullptr);
+  ECS_REQUIRE_COMPONENT(weapon, WeaponComponent, InputComponent, PositionComponent);
+
+  ECS_REGISTER_SYSTEM(render, nullptr, nullptr, nullptr);
+  ECS_REQUIRE_COMPONENT(render, PositionComponent, SpriteComponent);
 }
 
 // Set the update functions for each system
@@ -301,6 +358,7 @@ void init_ecs(void) {
 // This function should be called on hot-reload to ensure the latest code is used.
 void update_ecs_system_callbacks(void) {
   ECS_SET_SYSTEM_CALLBACKS(boundary);
+  ECS_SET_SYSTEM_CALLBACKS(background_scroll);
   ECS_SET_SYSTEM_CALLBACKS(collision);
   ECS_SET_SYSTEM_CALLBACKS(debug_bounding_boxes);
   ECS_SET_SYSTEM_CALLBACKS(enemy_spawn);

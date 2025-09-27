@@ -51,6 +51,24 @@ ecs_id_t make_player(float x, float y) {
   return id;
 }
 
+ecs_id_t make_background_scroll(void) {
+  ecs_id_t id = make_entity();
+
+  // Add background scroll component
+  ECS_ADD_COMPONENT(id, BackgroundScrollComponent);
+
+  // Add position
+  PositionComponent *pos = ECS_ADD_COMPONENT(id, PositionComponent);
+  pos->x                 = 0.0f;
+  pos->y                 = 0.0f;
+
+  // Add velocity
+  VelocityComponent *vel = ECS_ADD_COMPONENT(id, VelocityComponent);
+  vel->y                 = 0.5f;    // Scroll down at a constant speed
+
+  return id;
+}
+
 #define BULLET_DEFAULT_SPEED 3.0f
 ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
   ecs_id_t id = make_entity();

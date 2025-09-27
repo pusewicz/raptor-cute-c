@@ -23,11 +23,14 @@ typedef struct GameState {
   CF_Arena     permanent_arena;
   CF_Arena     stage_arena;
   CF_Arena     scratch_arena;
-  ecs_t       *ecs;
-  ecs_id_t     player_entity;
-  ecs_id_t     enemy_spawner_entity;
   CF_DisplayID display_id;
   CF_Rnd       rnd;
+  ecs_t       *ecs;
+
+  // TODO: Move these entity IDs to a separate struct
+  ecs_id_t player_entity;
+  ecs_id_t enemy_spawner_entity;
+  ecs_id_t background_scroll;
 
   // Component and System IDs - persist across hot reloads
   Components components;

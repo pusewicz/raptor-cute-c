@@ -55,6 +55,7 @@ EXPORT void game_init(Platform *platform) {
 
   init_ecs();
 
+  g_state->background_scroll    = make_background_scroll();
   g_state->player_entity        = make_player(0.0f, 0.0f);
   g_state->enemy_spawner_entity = make_enemy_spawner();
 
@@ -74,6 +75,7 @@ EXPORT void game_init(Platform *platform) {
 EXPORT bool game_update(void) {
   cf_arena_reset(&g_state->scratch_arena);
 
+  ECS_UPDATE_SYSTEM(background_scroll);
   ECS_UPDATE_SYSTEM(input);
   ECS_UPDATE_SYSTEM(movement);
   ECS_UPDATE_SYSTEM(weapon);
