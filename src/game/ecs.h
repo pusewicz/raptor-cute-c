@@ -81,8 +81,19 @@ typedef struct InputComponent {
     bool shoot;
 } InputComponent;
 
-typedef CF_V2     PositionComponent;
-typedef CF_Sprite SpriteComponent;
+typedef CF_V2 PositionComponent;
+
+typedef enum ZIndex {
+    Z_BACKGROUND = 0,
+    Z_SPRITES,
+    Z_PLAYER_SPRITE,
+    Z_UI,
+} ZIndex;
+
+typedef struct SpriteComponent {
+    CF_Sprite sprite;
+    ZIndex    z_index;  // Rendering order
+} SpriteComponent;
 
 typedef enum TagComponent { TAG_PLAYER, TAG_ENEMY, TAG_BULLET } TagComponent;
 

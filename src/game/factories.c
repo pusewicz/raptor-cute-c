@@ -39,7 +39,8 @@ ecs_id_t make_player(float x, float y) {
     // Add sprite
     SpriteComponent* sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
     CF_Result        result;
-    *sprite = cf_make_easy_sprite_from_png("assets/player.png", &result);
+    sprite->sprite  = cf_make_easy_sprite_from_png("assets/player.png", &result);
+    sprite->z_index = Z_PLAYER_SPRITE;
     if (cf_is_error(result)) {
         APP_ERROR("Failed to load player sprite: %s\n", result.details);
     }
@@ -100,14 +101,15 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
     // Add sprite
     SpriteComponent* sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
     CF_Result        result;
-    *sprite = cf_make_easy_sprite_from_png("assets/bullet.png", &result);
+    sprite->sprite  = cf_make_easy_sprite_from_png("assets/bullet.png", &result);
+    sprite->z_index = Z_SPRITES;
     if (cf_is_error(result)) {
         APP_ERROR("Failed to load bullet sprite: %s\n", result.details);
     }
 
     // Add collider
     ColliderComponent* collider = ECS_ADD_COMPONENT(id, ColliderComponent);
-    collider->half_extents      = cf_v2(sprite->w / 4.2, sprite->h / 4.2);
+    collider->half_extents      = cf_v2(sprite->sprite.w / 4.2, sprite->sprite.h / 4.2);
 
     // Add tag
     TagComponent* tag = ECS_ADD_COMPONENT(id, TagComponent);
@@ -137,11 +139,12 @@ ecs_id_t make_enemy(float x, float y) {
 
     // Add sprite
     SpriteComponent* sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
-    *sprite                 = cf_make_sprite("assets/alan.ase");
+    sprite->sprite          = cf_make_sprite("assets/alan.ase");
+    sprite->z_index         = Z_SPRITES;
 
     // Add collider
     ColliderComponent* collider = ECS_ADD_COMPONENT(id, ColliderComponent);
-    collider->half_extents      = cf_v2(sprite->w / 2.0f, sprite->h / 2.0f);
+    collider->half_extents      = cf_v2(sprite->sprite.w / 2.0f, sprite->sprite.h / 2.0f);
 
     // Add tag
     TagComponent* tag = ECS_ADD_COMPONENT(id, TagComponent);
