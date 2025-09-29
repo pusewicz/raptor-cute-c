@@ -10,7 +10,12 @@
 #include "../engine/log.h"
 #include "ecs.h"
 
-#define WEAPON_DEFAULT_COOLDOWN 0.15f  // Half a second between shots
+/*
+ * Player
+ */
+
+constexpr float WEAPON_DEFAULT_COOLDOWN = 0.15f;
+
 ecs_id_t make_player(float x, float y) {
     ecs_id_t id = make_entity();
 
@@ -51,6 +56,10 @@ ecs_id_t make_player(float x, float y) {
     return id;
 }
 
+/*
+ * Background Scroll
+ */
+
 ecs_id_t make_background_scroll(void) {
     ecs_id_t id = make_entity();
 
@@ -69,7 +78,12 @@ ecs_id_t make_background_scroll(void) {
     return id;
 }
 
-#define BULLET_DEFAULT_SPEED 3.0f
+/*
+ * Bullets
+ */
+
+constexpr float BULLET_DEFAULT_SPEED = 3.0f;
+
 ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
     ecs_id_t id = make_entity();
 
@@ -102,7 +116,12 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
     return id;
 }
 
-#define ENEMY_DEFAULT_SPEED 0.5f
+/*
+ * Enemies
+ */
+
+constexpr float ENEMY_DEFAULT_SPEED = 0.5f;
+
 ecs_id_t make_enemy(float x, float y) {
     ecs_id_t id = make_entity();
 
@@ -130,6 +149,10 @@ ecs_id_t make_enemy(float x, float y) {
 
     return id;
 }
+
+/*
+ * Enemy Spawner
+ */
 
 ecs_id_t make_enemy_spawner(void) {
     ecs_id_t id = make_entity();
