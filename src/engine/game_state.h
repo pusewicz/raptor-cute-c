@@ -12,6 +12,46 @@
 typedef struct Platform Platform;
 
 /*
+ * Entities
+ */
+
+typedef struct Entities {
+    ecs_id_t background_scroll;
+    ecs_id_t enemy_spawner;
+    ecs_id_t player;
+} Entities;
+
+/*
+ * Components
+ */
+typedef struct {
+    ecs_id_t background_scroll;
+    ecs_id_t collider;
+    ecs_id_t enemy_spawn;
+    ecs_id_t input;
+    ecs_id_t position;
+    ecs_id_t sprite;
+    ecs_id_t velocity;
+    ecs_id_t weapon;
+    ecs_id_t tag;
+} Components;
+
+/*
+ * Systems
+ */
+typedef struct {
+    ecs_id_t background_scroll;
+    ecs_id_t boundary;
+    ecs_id_t collision;
+    ecs_id_t debug_bounding_boxes;
+    ecs_id_t enemy_spawn;
+    ecs_id_t input;
+    ecs_id_t movement;
+    ecs_id_t render;
+    ecs_id_t weapon;
+} Systems;
+
+/*
  * Game State
  *
  * Should be validated with validate_game_state() before use

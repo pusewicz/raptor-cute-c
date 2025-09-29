@@ -47,7 +47,7 @@
 #define make_entity() ecs_create(g_state->ecs)
 
 /*
- * Component structures
+ * Background Scroll Component
  */
 
 constexpr int BACKGROUND_SCROLL_SPRITE_COUNT = 6 * 3;
@@ -58,13 +58,25 @@ typedef struct BackgroundScrollComponent {
     float     max_y_offset;                             // Maximum offset before resetting
 } BackgroundScrollComponent;
 
+/*
+ * Bullet Component
+ */
+
 typedef struct BulletComponent {
     CF_V2 direction;
 } BulletComponent;
 
+/*
+ * Collider Component
+ */
+
 typedef struct ColliderComponent {
     CF_V2 half_extents;
 } ColliderComponent;
+
+/*
+ * Enemy Spawn Component
+ */
 
 typedef struct EnemySpawnComponent {
     float spawn_interval;         // Time between spawns in seconds
@@ -72,6 +84,10 @@ typedef struct EnemySpawnComponent {
     int   max_enemies;            // Maximum number of enemies allowed
     int   current_enemy_count;    // Current number of enemies spawned
 } EnemySpawnComponent;
+
+/*
+ * Input Component
+ */
 
 typedef struct InputComponent {
     bool up;
@@ -81,7 +97,15 @@ typedef struct InputComponent {
     bool shoot;
 } InputComponent;
 
+/*
+ * Position Component
+ */
+
 typedef CF_V2 PositionComponent;
+
+/*
+ * Sprite Component
+ */
 
 typedef enum ZIndex {
     Z_BACKGROUND = 0,
@@ -95,9 +119,21 @@ typedef struct SpriteComponent {
     ZIndex    z_index;  // Rendering order
 } SpriteComponent;
 
+/*
+ * Tag Component
+ */
+
 typedef enum TagComponent { TAG_PLAYER, TAG_ENEMY, TAG_BULLET } TagComponent;
 
+/*
+ * Velocity Component
+ */
+
 typedef CF_V2 VelocityComponent;
+
+/*
+ * Weapon Component
+ */
 
 typedef struct WeaponComponent {
     float cooldown;         // Time between shots in seconds
@@ -105,44 +141,8 @@ typedef struct WeaponComponent {
 } WeaponComponent;
 
 /*
- * Entities
+ * Functions
  */
-
-typedef struct Entities {
-    ecs_id_t background_scroll;
-    ecs_id_t enemy_spawner;
-    ecs_id_t player;
-} Entities;
-
-/*
- * Components
- */
-typedef struct {
-    ecs_id_t background_scroll;
-    ecs_id_t collider;
-    ecs_id_t enemy_spawn;
-    ecs_id_t input;
-    ecs_id_t position;
-    ecs_id_t sprite;
-    ecs_id_t velocity;
-    ecs_id_t weapon;
-    ecs_id_t tag;
-} Components;
-
-/*
- * Systems
- */
-typedef struct {
-    ecs_id_t background_scroll;
-    ecs_id_t boundary;
-    ecs_id_t collision;
-    ecs_id_t debug_bounding_boxes;
-    ecs_id_t enemy_spawn;
-    ecs_id_t input;
-    ecs_id_t movement;
-    ecs_id_t render;
-    ecs_id_t weapon;
-} Systems;
 
 void  init_ecs();
 void  update_ecs_system_callbacks(void);
