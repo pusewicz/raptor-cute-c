@@ -50,7 +50,8 @@
  * Component structures
  */
 
-#define BACKGROUND_SCROLL_SPRITE_COUNT 6 * 3
+constexpr int BACKGROUND_SCROLL_SPRITE_COUNT = 6 * 3;
+
 typedef struct BackgroundScrollComponent {
     CF_Sprite sprites[BACKGROUND_SCROLL_SPRITE_COUNT];  // Background sprite
     float     y_offset;                                 // Vertical offset for scrolling
