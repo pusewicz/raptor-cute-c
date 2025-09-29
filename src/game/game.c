@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../engine/common.h"
 #include "../engine/game_state.h"
 #include "../engine/log.h"
 #include "ecs.h"
@@ -49,11 +48,11 @@ EXPORT void game_init(Platform* platform) {
     g_state->debug_bounding_boxes = false;
 
     // Initialize ECS
-    g_state->components = (Components){0};
-    g_state->systems    = (Systems){0};
-    g_state->ecs        = ecs_new(96, nullptr);
+    g_state->ecs = ecs_new(96, nullptr);
     init_ecs();
-    g_state->entities = (Entities){.background_scroll = make_background_scroll(), .player = make_player(0.0f, 0.0f), .enemy_spawner = make_enemy_spawner()};
+    g_state->entities.background_scroll = make_background_scroll();
+    g_state->entities.player            = make_player(0.0f, 0.0f);
+    g_state->entities.enemy_spawner     = make_enemy_spawner();
 
     if (!validate_game_state()) {
         APP_FATAL("GameState validation failed in game_init");
