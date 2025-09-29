@@ -26,7 +26,7 @@ static ecs_ret_t background_scroll_system(ecs_t* ecs, ecs_id_t* entities, int en
     (void)dt;
     (void)udata;
 
-    BackgroundScrollComponent* bg_scroll = ECS_GET(g_state->background_scroll, BackgroundScrollComponent);
+    BackgroundScrollComponent* bg_scroll = ECS_GET(g_state->entities.background_scroll, BackgroundScrollComponent);
     bg_scroll->y_offset += 0.1f;
     if (bg_scroll->y_offset >= bg_scroll->max_y_offset) {
         bg_scroll->y_offset = 0;
@@ -88,7 +88,7 @@ static ecs_ret_t collision_system(ecs_t* ecs, ecs_id_t* entities, int entity_cou
             if (ecs_is_entity_ready(ecs, entities_to_destroy[i])) {
                 TagComponent* tag = ECS_GET(entities_to_destroy[i], TagComponent);
                 if (*tag == TAG_ENEMY) {
-                    EnemySpawnComponent* spawn = ECS_GET(g_state->enemy_spawner_entity, EnemySpawnComponent);
+                    EnemySpawnComponent* spawn = ECS_GET(g_state->entities.enemy_spawner, EnemySpawnComponent);
                     --spawn->current_enemy_count;
                 }
                 ecs_queue_destroy(ecs, entities_to_destroy[i]);
@@ -129,7 +129,7 @@ static ecs_ret_t boundary_system(ecs_t* ecs, ecs_id_t* entities, int entity_coun
                     // TODO: Add add/remove callbacks to the spawn system to
                     // always keep track of the number of enemies
                     if (*tag == TAG_ENEMY) {
-                        EnemySpawnComponent* spawn = ECS_GET(g_state->enemy_spawner_entity, EnemySpawnComponent);
+                        EnemySpawnComponent* spawn = ECS_GET(g_state->entities.enemy_spawner, EnemySpawnComponent);
                         --spawn->current_enemy_count;
                     }
                     ecs_queue_destroy(ecs, entity_id);
@@ -184,7 +184,7 @@ static ecs_ret_t input_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, 
     (void)entity_count;
     (void)udata;
 
-    InputComponent* input = ECS_GET(g_state->player_entity, InputComponent);
+    InputComponent* input = ECS_GET(g_state->entities.player, InputComponent);
 
     input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
     input->down  = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
@@ -202,8 +202,8 @@ static ecs_ret_t movement_system(ecs_t* ecs, ecs_id_t* entities, int entity_coun
 
     // TODO: Special case for player for now
     {
-        VelocityComponent* vel   = ECS_GET(g_state->player_entity, VelocityComponent);
-        InputComponent*    input = ECS_GET(g_state->player_entity, InputComponent);
+        VelocityComponent* vel   = ECS_GET(g_state->entities.player, VelocityComponent);
+        InputComponent*    input = ECS_GET(g_state->entities.player, InputComponent);
         float              speed = 1.0f;
 
         vel->x = vel->y = 0.0f;
@@ -253,7 +253,7 @@ static ecs_ret_t enemy_spawn_system(ecs_t* ecs, ecs_id_t* entities, int entity_c
     (void)dt;
     (void)udata;
 
-    EnemySpawnComponent* spawn = ECS_GET(g_state->enemy_spawner_entity, EnemySpawnComponent);
+    EnemySpawnComponent* spawn = ECS_GET(g_state->entities.enemy_spawner, EnemySpawnComponent);
 
     spawn->time_since_last_spawn += (float)dt;
 
@@ -276,17 +276,17 @@ static ecs_ret_t weapon_system(ecs_t* ecs, ecs_id_t* entities, int entity_count,
     (void)entity_count;
     (void)udata;
 
-    WeaponComponent* weapon = ECS_GET(g_state->player_entity, WeaponComponent);
+    WeaponComponent* weapon = ECS_GET(g_state->entities.player, WeaponComponent);
 
     if (weapon->time_since_shot < weapon->cooldown) {
         weapon->time_since_shot += (float)dt;
         return 0;
     }
 
-    InputComponent* input = ECS_GET(g_state->player_entity, InputComponent);
+    InputComponent* input = ECS_GET(g_state->entities.player, InputComponent);
     if (input->shoot) {
         weapon->time_since_shot = 0.0f;
-        PositionComponent* pos  = ECS_GET(g_state->player_entity, PositionComponent);
+        PositionComponent* pos  = ECS_GET(g_state->entities.player, PositionComponent);
         make_bullet(pos->x, pos->y, cf_v2(0, 1));
     }
 

@@ -53,9 +53,7 @@ EXPORT void game_init(Platform* platform) {
     g_state->systems    = (Systems){0};
     g_state->ecs        = ecs_new(96, nullptr);
     init_ecs();
-    g_state->background_scroll    = make_background_scroll();
-    g_state->player_entity        = make_player(0.0f, 0.0f);
-    g_state->enemy_spawner_entity = make_enemy_spawner();
+    g_state->entities = (Entities){.background_scroll = make_background_scroll(), .player = make_player(0.0f, 0.0f), .enemy_spawner = make_enemy_spawner()};
 
     if (!validate_game_state()) {
         APP_FATAL("GameState validation failed in game_init");
@@ -88,11 +86,11 @@ EXPORT bool game_update(void) {
 }
 
 static void game_render_debug(void) {
-    InputComponent*      input  = ECS_GET(g_state->player_entity, InputComponent);
-    WeaponComponent*     weapon = ECS_GET(g_state->player_entity, WeaponComponent);
-    PositionComponent*   pos    = ECS_GET(g_state->player_entity, PositionComponent);
-    VelocityComponent*   vel    = ECS_GET(g_state->player_entity, VelocityComponent);
-    EnemySpawnComponent* spawn  = ECS_GET(g_state->enemy_spawner_entity, EnemySpawnComponent);
+    InputComponent*      input  = ECS_GET(g_state->entities.player, InputComponent);
+    WeaponComponent*     weapon = ECS_GET(g_state->entities.player, WeaponComponent);
+    PositionComponent*   pos    = ECS_GET(g_state->entities.player, PositionComponent);
+    VelocityComponent*   vel    = ECS_GET(g_state->entities.player, VelocityComponent);
+    EnemySpawnComponent* spawn  = ECS_GET(g_state->entities.enemy_spawner, EnemySpawnComponent);
 
     /*
      * Debug info

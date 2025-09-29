@@ -27,12 +27,8 @@ typedef struct GameState {
     CF_Rnd       rnd;
     ecs_t*       ecs;
 
-    // TODO: Move these entity IDs to a separate struct
-    ecs_id_t player_entity;
-    ecs_id_t enemy_spawner_entity;
-    ecs_id_t background_scroll;
-
-    // Component and System IDs - persist across hot reloads
+    // ECS IDs - persist across hot reloads
+    Entities   entities;
     Components components;
     Systems    systems;
 

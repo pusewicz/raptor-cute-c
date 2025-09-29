@@ -93,6 +93,16 @@ typedef struct WeaponComponent {
 } WeaponComponent;
 
 /*
+ * Entities
+ */
+
+typedef struct Entities {
+    ecs_id_t background_scroll;
+    ecs_id_t enemy_spawner;
+    ecs_id_t player;
+} Entities;
+
+/*
  * Components
  */
 typedef struct {
