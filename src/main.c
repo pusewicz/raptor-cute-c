@@ -71,7 +71,10 @@ int main(int argc, char* argv[]) {
 
         platform_begin_frame();
         game_library.render();
-        platform_end_frame();
+        int draw_calls = platform_end_frame();
+        if (game_library.set_draw_calls) {
+            game_library.set_draw_calls(draw_calls);
+        }
     }
 
     game_library.shutdown();

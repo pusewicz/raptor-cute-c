@@ -97,6 +97,7 @@ static void game_render_debug(void) {
     ImGui_Begin("Debug", nullptr, 0);
 
     ImGui_Text("FPS: %.2f", cf_app_get_framerate());
+    ImGui_Text("Draw Calls: %d", g_state->draw_calls);
 
     ImGui_Text("Player Position: (%.2f, %.2f)", pos->x, pos->y);
     ImGui_Text("Player Velocity: (%.2f, %.2f)", vel->x, vel->y);
@@ -157,4 +158,10 @@ EXPORT void game_hot_reload(void* game_state) {
 
     // Update system callbacks to new function addresses
     update_ecs_system_callbacks();
+}
+
+EXPORT void game_set_draw_calls(int draw_calls) {
+    if (g_state) {
+        g_state->draw_calls = draw_calls;
+    }
 }

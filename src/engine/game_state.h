@@ -58,6 +58,7 @@ typedef struct GameState {
     } systems;
 
     bool debug_bounding_boxes;
+    int  draw_calls;
 } GameState;
 
 extern GameState* g_state;
