@@ -220,6 +220,12 @@ static ecs_ret_t movement_system(ecs_t* ecs, ecs_id_t* entities, int entity_coun
 
         pos->x += vel->x;
         pos->y += vel->y;
+
+        // Clamp player position to canvas bounds
+        if (entities[i] == g_state->entities.player) {
+            pos->x = cf_clamp(pos->x, -g_state->canvas_size.x / 2.0f, g_state->canvas_size.x / 2.0f);
+            pos->y = cf_clamp(pos->y, -g_state->canvas_size.y / 2.0f, g_state->canvas_size.y / 2.0f);
+        }
     }
 
     return 0;
