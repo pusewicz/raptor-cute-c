@@ -158,7 +158,7 @@ static ecs_ret_t debug_bounding_boxes_system(ecs_t* ecs, ecs_id_t* entities, int
         SpriteComponent*   sprite        = ECS_GET(entity_id, SpriteComponent);
         PositionComponent* position      = ECS_GET(entity_id, PositionComponent);
         ColliderComponent* collider      = ECS_GET(entity_id, ColliderComponent);
-        CF_Aabb            aabb_sprite   = cf_make_aabb_center_half_extents(*position, cf_v2(sprite->w / 2.0f, sprite->h / 2.0f));
+        CF_Aabb            aabb_sprite   = cf_make_aabb_center_half_extents(*position, cf_v2(sprite->sprite.w / 2.0f, sprite->sprite.h / 2.0f));
         CF_Aabb            aabb_collider = cf_make_aabb_center_half_extents(*position, collider->half_extents);
 
         cf_draw_push();
@@ -234,10 +234,12 @@ static ecs_ret_t render_system(ecs_t* ecs, ecs_id_t* entities, int entity_count,
         PositionComponent* pos    = ECS_GET(entities[i], PositionComponent);
         SpriteComponent*   sprite = ECS_GET(entities[i], SpriteComponent);
 
-        cf_sprite_update(sprite);
+        cf_sprite_update(&sprite->sprite);
         cf_draw_push();
+        cf_draw_push_layer(sprite->z_index);
         cf_draw_translate_v2(*pos);
-        cf_draw_sprite(sprite);
+        cf_draw_sprite(&sprite->sprite);
+        cf_draw_pop_layer();
         cf_draw_pop();
     }
 
