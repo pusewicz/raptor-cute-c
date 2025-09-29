@@ -69,4 +69,9 @@ namespace :headers do
   end
 end
 
+desc "Formats the source code using clang-format"
+task :format do
+  sh %(fd --full-path src/ -e "c" -e "h" | xargs clang-format -i)
+end
+
 task default: :compile

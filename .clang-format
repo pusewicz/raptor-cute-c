@@ -1,5 +1,5 @@
 ---
-BasedOnStyle: LLVM
+BasedOnStyle: Google
 AlignAfterOpenBracket: Align
 AlignConsecutiveMacros: "true"
 AlignConsecutiveAssignments: "true"
@@ -11,16 +11,15 @@ BinPackParameters: "false"
 IncludeBlocks: Regroup
 IndentCaseLabels: "true"
 IndentPPDirectives: BeforeHash
-IndentWidth: "2"
+IndentWidth: 4
 KeepEmptyLinesAtTheStartOfBlocks: "false"
 Language: C
 SpaceInEmptyParentheses: "false"
-SpacesBeforeTrailingComments: "4"
 SpacesInContainerLiterals: "true"
 Standard: Latest
-TabWidth: "2"
+TabWidth: "4"
+DerivePointerAlignment: false
+PointerAlignment: Left
 UseTab: Never
-ColumnLimit: 120
-
+ColumnLimit: 200
 ---
-
