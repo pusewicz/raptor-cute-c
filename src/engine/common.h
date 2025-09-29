@@ -5,17 +5,15 @@
 #define GiB(x) (MiB(x) * 1024)
 
 #ifdef DEBUG
-  #if _MSC_VER
-    #define assert(condition) \
-      if (!(condition))       \
-      __debugbreak()
-  #else
-    #define assert(condition) \
-      if (!(condition))       \
-      __builtin_trap()
-  #endif
+    #if _MSC_VER
+        #define assert(condition) \
+            if (!(condition)) __debugbreak()
+    #else
+        #define assert(condition) \
+            if (!(condition)) __builtin_trap()
+    #endif
 #else
-  #define assert(condition)
+    #define assert(condition)
 #endif
 
 #define countof(array)   (sizeof(array) / sizeof(array[0]))
