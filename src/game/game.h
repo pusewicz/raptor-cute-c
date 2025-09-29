@@ -16,3 +16,4 @@ EXPORT void  game_render(void);
 EXPORT void  game_shutdown(void);
 EXPORT void* game_state(void);
 EXPORT void  game_hot_reload(void* game_state);
+EXPORT void  game_set_draw_calls(int draw_calls);

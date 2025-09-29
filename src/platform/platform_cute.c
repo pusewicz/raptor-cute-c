@@ -63,7 +63,9 @@ void* platform_allocate_memory(size_t size) { return cf_calloc(size, 1); }
 void  platform_free_memory(void* p) { cf_free(p); }
 
 void platform_begin_frame(void) {}
-void platform_end_frame(void) { cf_app_draw_onto_screen(true); }
+int platform_end_frame(void) {
+    return cf_app_draw_onto_screen(true);
+}
 
 GameLibrary platform_load_game_library(void) {
     GameLibrary game_library = {0};
@@ -126,6 +128,12 @@ GameLibrary platform_load_game_library(void) {
         return game_library;
     }
 
+    game_library.set_draw_calls = (GameSetDrawCallsFunction)cf_load_function(game_library.library, "game_set_draw_calls");
+    if (!game_library.set_draw_calls) {
+        APP_WARN("Failed to load function: %s\n", SDL_GetError());
+        return game_library;
+    }
+
     game_library.ok = true;
     APP_INFO("Game library loaded from %s.\n", game_library.path);
     return game_library;
@@ -134,14 +142,15 @@ GameLibrary platform_load_game_library(void) {
 void platform_unload_game_library(GameLibrary* game_library) {
     APP_DEBUG("Unloading library %s\n", game_library->path);
     cf_unload_shared_library(game_library->library);
-    game_library->hot_reload = nullptr;
-    game_library->state      = nullptr;
-    game_library->shutdown   = nullptr;
-    game_library->render     = nullptr;
-    game_library->update     = nullptr;
-    game_library->init       = nullptr;
-    game_library->library    = nullptr;
-    game_library->ok         = false;
+    game_library->set_draw_calls = nullptr;
+    game_library->hot_reload     = nullptr;
+    game_library->state          = nullptr;
+    game_library->shutdown       = nullptr;
+    game_library->render         = nullptr;
+    game_library->update         = nullptr;
+    game_library->init           = nullptr;
+    game_library->library        = nullptr;
+    game_library->ok             = false;
 }
 
 uint64_t platform_get_performance_counter(void) { return SDL_GetPerformanceCounter(); }

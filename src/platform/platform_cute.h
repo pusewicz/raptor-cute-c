@@ -11,6 +11,7 @@ typedef void* (*GameRenderFunction)(void);
 typedef void (*GameShutdownFunction)(void);
 typedef void* (*GameStateFunction)(void);
 typedef void (*GameHotReloadFunction)(void* game_state);
+typedef void (*GameSetDrawCallsFunction)(int draw_calls);
 
 typedef struct GameLibrary {
     void*       library;
@@ -22,6 +23,7 @@ typedef struct GameLibrary {
     GameShutdownFunction  shutdown;
     GameStateFunction     state;
     GameHotReloadFunction hot_reload;
+    GameSetDrawCallsFunction set_draw_calls;
 
     bool ok;
 } GameLibrary;
@@ -33,7 +35,7 @@ void* platform_allocate_memory(size_t size);
 void  platform_free_memory(void* p);
 
 void platform_begin_frame(void);
-void platform_end_frame(void);
+int  platform_end_frame(void);
 
 GameLibrary platform_load_game_library(void);
 void        platform_unload_game_library(GameLibrary* game_library);
