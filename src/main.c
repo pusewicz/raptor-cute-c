@@ -61,7 +61,6 @@ int main(int argc, char* argv[]) {
             void* state = game_library.state();
             platform_unload_game_library(&game_library);
 
-            /* cf_sleep(50); */
             GameLibrary new_game_library = platform_load_game_library();
             if (new_game_library.ok) {
                 game_library = new_game_library;
