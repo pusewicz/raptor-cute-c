@@ -31,7 +31,8 @@ constexpr int STAGE_ARENA_SIZE        = CF_MB * 64;
 constexpr int SCRATCH_ARENA_SIZE      = CF_MB * 64;
 constexpr int DEFAULT_ARENA_ALIGNMENT = 16;
 
-enum { CANVAS_WIDTH = 180, CANVAS_HEIGHT = 320 };
+constexpr int CANVAS_WIDTH  = 180;
+constexpr int CANVAS_HEIGHT = 320;
 
 EXPORT void game_init(Platform* platform) {
     g_state = platform->allocate_memory(sizeof(GameState));

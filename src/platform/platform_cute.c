@@ -18,7 +18,7 @@
 #include "../engine/common.h"
 #include "../engine/log.h"
 
-enum { MAX_PATH_LENGTH = 1024 };
+constexpr int MAX_PATH_LENGTH = 1024;
 
 #ifndef GAME_LIBRARY_NAME
     #error "GAME_LIBRARY_NAME must be defined"
