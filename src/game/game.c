@@ -3,6 +3,7 @@
 #include <cute_alloc.h>
 #include <cute_app.h>
 #include <cute_c_runtime.h>
+#include <cute_defines.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
 #include <cute_time.h>
@@ -26,10 +27,10 @@ GameState* g_state = nullptr;
     #define EXPORT
 #endif
 
-#define PERMANENT_ARENA_SIZE    MiB(64)
-#define STAGE_ARENA_SIZE        MiB(64)
-#define SCRATCH_ARENA_SIZE      MiB(64)
-#define DEFAULT_ARENA_ALIGNMENT 16
+constexpr int PERMANENT_ARENA_SIZE    = CF_MB * 64;
+constexpr int STAGE_ARENA_SIZE        = CF_MB * 64;
+constexpr int SCRATCH_ARENA_SIZE      = CF_MB * 64;
+constexpr int DEFAULT_ARENA_ALIGNMENT = 16;
 
 enum { CANVAS_WIDTH = 180, CANVAS_HEIGHT = 320 };
 
