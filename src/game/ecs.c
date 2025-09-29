@@ -313,9 +313,7 @@ static void init_background_scroll(ecs_t* ecs, ecs_id_t entity_id, void* ptr, vo
     comp->max_y_offset = comp->sprites[0].h;
 }
 
-void init_ecs(size_t entity_count) {
-    g_state->ecs = ecs_new(entity_count, nullptr);
-
+void init_ecs() {
     ECS_REGISTER_COMPONENT(BackgroundScrollComponent, init_background_scroll, nullptr);
     ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(EnemySpawnComponent, nullptr, nullptr);

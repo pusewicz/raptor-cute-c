@@ -122,6 +122,6 @@ typedef struct {
     ecs_id_t weapon;
 } Systems;
 
-void  init_ecs(size_t entity_count);
+void  init_ecs();
 void  update_ecs_system_callbacks(void);
 void* add_component_impl(ecs_id_t entity, ecs_id_t component_id, void* args);
