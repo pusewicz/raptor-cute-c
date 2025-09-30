@@ -1,12 +1,14 @@
 #include "ecs.h"
 
 #include "../engine/game_state.h"
+#include "../engine/log.h"
 #include "factories.h"
 
 #define PICO_ECS_IMPLEMENTATION
 
 #include <cute_array.h>
 #include <cute_color.h>
+#include <cute_coroutine.h>
 #include <cute_draw.h>
 #include <cute_input.h>
 #include <cute_math.h>
@@ -86,11 +88,6 @@ static ecs_ret_t collision_system(ecs_t* ecs, ecs_id_t* entities, int entity_cou
     if (entities_to_destroy) {
         for (int i = 0; i < asize(entities_to_destroy); ++i) {
             if (ecs_is_entity_ready(ecs, entities_to_destroy[i])) {
-                TagComponent* tag = ECS_GET(entities_to_destroy[i], TagComponent);
-                if (*tag == TAG_ENEMY) {
-                    EnemySpawnComponent* spawn = ECS_GET(g_state->entities.enemy_spawner, EnemySpawnComponent);
-                    --spawn->current_enemy_count;
-                }
                 ecs_queue_destroy(ecs, entities_to_destroy[i]);
             }
         }
@@ -126,18 +123,26 @@ static ecs_ret_t boundary_system(ecs_t* ecs, ecs_id_t* entities, int entity_coun
             switch (*tag) {
                 case TAG_BULLET:
                 case TAG_ENEMY:
-                    // TODO: Add add/remove callbacks to the spawn system to
-                    // always keep track of the number of enemies
-                    if (*tag == TAG_ENEMY) {
-                        EnemySpawnComponent* spawn = ECS_GET(g_state->entities.enemy_spawner, EnemySpawnComponent);
-                        --spawn->current_enemy_count;
-                    }
                     ecs_queue_destroy(ecs, entity_id);
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    return 0;
+}
+
+static ecs_ret_t coroutine_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
+    (void)ecs;
+    (void)entities;
+    (void)entity_count;
+    (void)dt;
+    (void)udata;
+
+    if (cf_coroutine_state(g_state->coroutines.spawner) != CF_COROUTINE_STATE_DEAD) {
+        cf_coroutine_resume(g_state->coroutines.spawner);
     }
 
     return 0;
@@ -252,32 +257,6 @@ static ecs_ret_t render_system(ecs_t* ecs, ecs_id_t* entities, int entity_count,
     return 0;
 }
 
-// TODO: Replace with a coroutine system so it's easier to design spawn
-// patterns
-static ecs_ret_t enemy_spawn_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
-    (void)ecs;
-    (void)entities;
-    (void)entity_count;
-    (void)dt;
-    (void)udata;
-
-    EnemySpawnComponent* spawn = ECS_GET(g_state->entities.enemy_spawner, EnemySpawnComponent);
-
-    spawn->time_since_last_spawn += (float)dt;
-
-    if (spawn->time_since_last_spawn >= spawn->spawn_interval && spawn->current_enemy_count < spawn->max_enemies) {
-        spawn->time_since_last_spawn = 0.0f;
-        spawn->current_enemy_count++;
-
-        float x = cf_rnd_range_float(&g_state->rnd, -20.0f, 20.0f);
-        float y = g_state->canvas_size.y * 0.1f;
-
-        make_enemy(x, y);
-    }
-
-    return 0;
-}
-
 static ecs_ret_t weapon_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
     (void)ecs;
     (void)entities;
@@ -324,7 +303,6 @@ static void init_background_scroll(ecs_t* ecs, ecs_id_t entity_id, void* ptr, vo
 void init_ecs() {
     ECS_REGISTER_COMPONENT(BackgroundScrollComponent, init_background_scroll, nullptr);
     ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
-    ECS_REGISTER_COMPONENT(EnemySpawnComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PositionComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(SpriteComponent, nullptr, nullptr);
@@ -341,11 +319,10 @@ void init_ecs() {
     ECS_REGISTER_SYSTEM(collision, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(collision, ColliderComponent, PositionComponent, TagComponent);
 
+    ECS_REGISTER_SYSTEM(coroutine, nullptr, nullptr, nullptr);
+
     ECS_REGISTER_SYSTEM(debug_bounding_boxes, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(debug_bounding_boxes, PositionComponent, ColliderComponent, SpriteComponent);
-
-    ECS_REGISTER_SYSTEM(enemy_spawn, nullptr, nullptr, nullptr);
-    ECS_REQUIRE_COMPONENT(enemy_spawn, EnemySpawnComponent, TagComponent);
 
     ECS_REGISTER_SYSTEM(input, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(input, InputComponent, PositionComponent, TagComponent);
@@ -368,8 +345,8 @@ void update_ecs_system_callbacks(void) {
     ECS_SET_SYSTEM_CALLBACKS(boundary);
     ECS_SET_SYSTEM_CALLBACKS(background_scroll);
     ECS_SET_SYSTEM_CALLBACKS(collision);
+    ECS_SET_SYSTEM_CALLBACKS(coroutine);
     ECS_SET_SYSTEM_CALLBACKS(debug_bounding_boxes);
-    ECS_SET_SYSTEM_CALLBACKS(enemy_spawn);
     ECS_SET_SYSTEM_CALLBACKS(input);
     ECS_SET_SYSTEM_CALLBACKS(movement);
     ECS_SET_SYSTEM_CALLBACKS(render);
