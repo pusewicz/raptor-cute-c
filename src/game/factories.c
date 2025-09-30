@@ -144,7 +144,7 @@ ecs_id_t make_enemy(float x, float y) {
 
     // Add collider
     ColliderComponent* collider = ECS_ADD_COMPONENT(id, ColliderComponent);
-    collider->half_extents      = cf_v2(sprite->sprite.w / 2.0f, sprite->sprite.h / 2.0f);
+    collider->half_extents      = cf_v2(sprite->sprite.w / 3.0f, sprite->sprite.h / 3.0f);
 
     // Add tag
     TagComponent* tag = ECS_ADD_COMPONENT(id, TagComponent);
