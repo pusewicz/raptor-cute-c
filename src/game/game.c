@@ -15,6 +15,7 @@
 
 #include "../engine/game_state.h"
 #include "../engine/log.h"
+#include "coroutine.h"
 #include "ecs.h"
 #include "factories.h"
 
@@ -54,6 +55,8 @@ EXPORT void game_init(Platform* platform) {
     g_state->entities.background_scroll = make_background_scroll();
     g_state->entities.player            = make_player(0.0f, 0.0f);
 
+    init_coroutines();
+
     if (!validate_game_state()) {
         APP_FATAL("GameState validation failed in game_init");
         CF_ASSERT(false);
@@ -71,6 +74,7 @@ EXPORT bool game_update(void) {
     cf_arena_reset(&g_state->scratch_arena);
 
     ECS_UPDATE_SYSTEM(background_scroll);
+    ECS_UPDATE_SYSTEM(coroutine);
     ECS_UPDATE_SYSTEM(input);
     ECS_UPDATE_SYSTEM(movement);
     ECS_UPDATE_SYSTEM(weapon);

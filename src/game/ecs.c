@@ -1,12 +1,14 @@
 #include "ecs.h"
 
 #include "../engine/game_state.h"
+#include "../engine/log.h"
 #include "factories.h"
 
 #define PICO_ECS_IMPLEMENTATION
 
 #include <cute_array.h>
 #include <cute_color.h>
+#include <cute_coroutine.h>
 #include <cute_draw.h>
 #include <cute_input.h>
 #include <cute_math.h>
@@ -127,6 +129,20 @@ static ecs_ret_t boundary_system(ecs_t* ecs, ecs_id_t* entities, int entity_coun
                     break;
             }
         }
+    }
+
+    return 0;
+}
+
+static ecs_ret_t coroutine_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
+    (void)ecs;
+    (void)entities;
+    (void)entity_count;
+    (void)dt;
+    (void)udata;
+
+    if (cf_coroutine_state(g_state->coroutines.spawner) != CF_COROUTINE_STATE_DEAD) {
+        cf_coroutine_resume(g_state->coroutines.spawner);
     }
 
     return 0;
@@ -303,6 +319,8 @@ void init_ecs() {
     ECS_REGISTER_SYSTEM(collision, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(collision, ColliderComponent, PositionComponent, TagComponent);
 
+    ECS_REGISTER_SYSTEM(coroutine, nullptr, nullptr, nullptr);
+
     ECS_REGISTER_SYSTEM(debug_bounding_boxes, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(debug_bounding_boxes, PositionComponent, ColliderComponent, SpriteComponent);
 
@@ -327,6 +345,7 @@ void update_ecs_system_callbacks(void) {
     ECS_SET_SYSTEM_CALLBACKS(boundary);
     ECS_SET_SYSTEM_CALLBACKS(background_scroll);
     ECS_SET_SYSTEM_CALLBACKS(collision);
+    ECS_SET_SYSTEM_CALLBACKS(coroutine);
     ECS_SET_SYSTEM_CALLBACKS(debug_bounding_boxes);
     ECS_SET_SYSTEM_CALLBACKS(input);
     ECS_SET_SYSTEM_CALLBACKS(movement);
