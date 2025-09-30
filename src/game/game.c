@@ -88,45 +88,37 @@ EXPORT bool game_update(void) {
 }
 
 static void game_render_debug(void) {
-    InputComponent*    input  = ECS_GET(g_state->entities.player, InputComponent);
     WeaponComponent*   weapon = ECS_GET(g_state->entities.player, WeaponComponent);
     PositionComponent* pos    = ECS_GET(g_state->entities.player, PositionComponent);
     VelocityComponent* vel    = ECS_GET(g_state->entities.player, VelocityComponent);
 
-    /*
-     * Debug info
-     */
-    ImGui_Begin("Debug", nullptr, 0);
+    ImGui_Begin("Debug Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
+    if (ImGui_CollapsingHeader("Debug", true)) {
+        ImGui_Checkbox("Draw Bounding Boxes", &g_state->debug_bounding_boxes);
+    }
 
-    ImGui_Text("FPS: %.2f", cf_app_get_framerate());
+    if (ImGui_CollapsingHeader("Player", true)) {
+        ImGui_Text("Position: (%.2f, %.2f)", pos->x, pos->y);
+        ImGui_Text("Velocity: (%.2f, %.2f)", vel->x, vel->y);
+    }
 
-    ImGui_Text("Player Position: (%.2f, %.2f)", pos->x, pos->y);
-    ImGui_Text("Player Velocity: (%.2f, %.2f)", vel->x, vel->y);
+    if (ImGui_CollapsingHeader("Weapon", true)) {
+        ImGui_DragFloat("Cooldown", &weapon->cooldown);
+        ImGui_Text("Time Since Last Shot: %.2f", weapon->time_since_shot);
+    }
 
-    ImGui_Text("Input.UP: %d", input->up);
-    ImGui_Text("Input.DOWN: %d", input->down);
-    ImGui_Text("Input.LEFT: %d", input->left);
-    ImGui_Text("Input.RIGHT: %d", input->right);
-    ImGui_Text("Input.SHOOT: %d", input->shoot);
+    if (ImGui_CollapsingHeader("Performance", true)) {
+        ImGui_Text("FPS: %.2f", 1.0f / CF_DELTA_TIME);
+    }
 
-    ImGui_Checkbox("Draw Bounding Boxes", &g_state->debug_bounding_boxes);
-    ImGui_End();
-
-    ImGui_Begin("Weapon", nullptr, 0);
-    ImGui_DragFloat("Cooldown", &weapon->cooldown);
-    ImGui_Text("Time Since Last Shot: %.2f", weapon->time_since_shot);
-    ImGui_End();
-
-    /*
-     * Window info
-     */
-    ImGui_Begin("Window", nullptr, 0);
-    ImGui_Text("Screen: %dx%d", cf_display_width(g_state->display_id), cf_display_height(g_state->display_id));
-    ImGui_Text("Size: %dx%d", cf_app_get_width(), cf_app_get_height());
-    ImGui_Text("Canvas: %dx%d", cf_app_get_canvas_width(), cf_app_get_canvas_height());
-    ImGui_Text("Canvas(logical): %.0fx%.0f", g_state->canvas_size.x, g_state->canvas_size.y);
-    ImGui_Text("Game Scale: %.2f", g_state->scale);
-    ImGui_Text("DPI Scale: %.2f", cf_app_get_dpi_scale());
+    if (ImGui_CollapsingHeader("Window", true)) {
+        ImGui_Text("Screen: %dx%d", cf_display_width(g_state->display_id), cf_display_height(g_state->display_id));
+        ImGui_Text("Size: %dx%d", cf_app_get_width(), cf_app_get_height());
+        ImGui_Text("Canvas: %dx%d", cf_app_get_canvas_width(), cf_app_get_canvas_height());
+        ImGui_Text("Canvas(logical): %.0fx%.0f", g_state->canvas_size.x, g_state->canvas_size.y);
+        ImGui_Text("Game Scale: %.2f", g_state->scale);
+        ImGui_Text("DPI Scale: %.2f", cf_app_get_dpi_scale());
+    }
     ImGui_End();
 }
 
