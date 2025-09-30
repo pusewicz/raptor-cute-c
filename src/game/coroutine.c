@@ -17,7 +17,7 @@ static void wait_for(float seconds) {
     }
 }
 
-void enemy_spawner(CF_Coroutine co) {
+static void enemy_spawner(CF_Coroutine co) {
     (void)co;
 
     while (1) {
