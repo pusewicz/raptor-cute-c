@@ -19,15 +19,13 @@ void co_sleep(CF_Coroutine co, float seconds) {
 
 void enemy_spawner(CF_Coroutine co) {
     while (1) {
-        APP_DEBUG("Spawning enemy");
-        make_enemy(100, 50);
-        APP_DEBUG("Sleeping for 2 seconds");
+        float canvas_top = g_state->canvas_size.y / 2.0f;
+
+        make_enemy(0, canvas_top);
         co_sleep(co, 2.0f);
 
-        APP_DEBUG("Spawning 2 enemies");
-        make_enemy(200, 50);
-        make_enemy(300, 50);
-        APP_DEBUG("Sleeping for 1 second");
+        make_enemy(-10, canvas_top);
+        make_enemy(10, canvas_top);
         co_sleep(co, 1.0f);
     }
 }
