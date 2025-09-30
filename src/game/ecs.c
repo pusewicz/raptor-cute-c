@@ -79,6 +79,17 @@ static ecs_ret_t collision_system(ecs_t* ecs, ecs_id_t* entities, int entity_cou
             CF_Aabb aabb_b = cf_make_aabb_center_half_extents(*pos_b, col_b->half_extents);
 
             if (cf_aabb_to_aabb(aabb_a, aabb_b)) {
+                // Show explosion if bullet hits enemy
+                {
+                    TagComponent* tag_a = ECS_GET(entity_a, TagComponent);
+                    TagComponent* tag_b = ECS_GET(entity_b, TagComponent);
+
+                    if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
+                        CF_V2* explosion_pos = (*tag_a == TAG_BULLET) ? pos_b : pos_a;
+                        make_explosion(explosion_pos->x, explosion_pos->y);
+                    }
+                }
+
                 apush(entities_to_destroy, entity_a);
                 apush(entities_to_destroy, entity_b);
             }
@@ -244,6 +255,12 @@ static ecs_ret_t render_system(ecs_t* ecs, ecs_id_t* entities, int entity_count,
     for (int i = 0; i < entity_count; i++) {
         PositionComponent* pos    = ECS_GET(entities[i], PositionComponent);
         SpriteComponent*   sprite = ECS_GET(entities[i], SpriteComponent);
+
+        // Destroy sprite if animation is not looped and has finished
+        if (!cf_sprite_get_loop(&sprite->sprite) && cf_sprite_will_finish(&sprite->sprite)) {
+            ecs_queue_destroy(g_state->ecs, entities[i]);
+            continue;
+        }
 
         cf_sprite_update(&sprite->sprite);
         cf_draw_push();
