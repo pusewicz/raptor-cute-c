@@ -149,5 +149,6 @@ EXPORT void game_hot_reload(void* game_state) {
     update_ecs_system_callbacks();
 
     // Re-initialize coroutines
+    cleanup_coroutines();
     init_coroutines();
 }
