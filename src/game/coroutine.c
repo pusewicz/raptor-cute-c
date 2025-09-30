@@ -6,27 +6,29 @@
 #include <cute_time.h>
 
 #include "../engine/game_state.h"
-#include "../engine/log.h"
 #include "factories.h"
 
-void co_sleep(CF_Coroutine co, float seconds) {
-    float elapsed = 0.0f;
-    while (elapsed < seconds) {
-        cf_coroutine_yield(co);
-        elapsed += CF_DELTA_TIME;
+static void wait_for(float seconds) {
+    CF_Coroutine coro     = cf_coroutine_currently_running();
+    double       end_time = CF_SECONDS + (double)seconds;
+
+    while (CF_SECONDS < end_time) {
+        cf_coroutine_yield(coro);
     }
 }
 
 void enemy_spawner(CF_Coroutine co) {
+    (void)co;
+
     while (1) {
         float canvas_top = g_state->canvas_size.y / 2.0f;
 
         make_enemy(0, canvas_top);
-        co_sleep(co, 2.0f);
+        wait_for(2.0f);
 
         make_enemy(-10, canvas_top);
         make_enemy(10, canvas_top);
-        co_sleep(co, 1.0f);
+        wait_for(1.0f);
     }
 }
 
