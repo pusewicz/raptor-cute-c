@@ -35,7 +35,6 @@
 #define UNDERSCORE_BulletComponent           bullet
 #define UNDERSCORE_BackgroundScrollComponent background_scroll
 #define UNDERSCORE_ColliderComponent         collider
-#define UNDERSCORE_EnemySpawnComponent       enemy_spawn
 #define UNDERSCORE_InputComponent            input
 #define UNDERSCORE_PositionComponent         position
 #define UNDERSCORE_SpriteComponent           sprite
@@ -73,17 +72,6 @@ typedef struct BulletComponent {
 typedef struct ColliderComponent {
     CF_V2 half_extents;
 } ColliderComponent;
-
-/*
- * Enemy Spawn Component
- */
-
-typedef struct EnemySpawnComponent {
-    float spawn_interval;         // Time between spawns in seconds
-    float time_since_last_spawn;  // Time since last spawn in seconds
-    int   max_enemies;            // Maximum number of enemies allowed
-    int   current_enemy_count;    // Current number of enemies spawned
-} EnemySpawnComponent;
 
 /*
  * Input Component

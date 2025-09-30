@@ -53,7 +53,6 @@ EXPORT void game_init(Platform* platform) {
     init_ecs();
     g_state->entities.background_scroll = make_background_scroll();
     g_state->entities.player            = make_player(0.0f, 0.0f);
-    g_state->entities.enemy_spawner     = make_enemy_spawner();
 
     if (!validate_game_state()) {
         APP_FATAL("GameState validation failed in game_init");
@@ -75,7 +74,6 @@ EXPORT bool game_update(void) {
     ECS_UPDATE_SYSTEM(input);
     ECS_UPDATE_SYSTEM(movement);
     ECS_UPDATE_SYSTEM(weapon);
-    ECS_UPDATE_SYSTEM(enemy_spawn);
     ECS_UPDATE_SYSTEM(collision);
     ECS_UPDATE_SYSTEM(boundary);
 #ifdef DEBUG
@@ -86,11 +84,10 @@ EXPORT bool game_update(void) {
 }
 
 static void game_render_debug(void) {
-    InputComponent*      input  = ECS_GET(g_state->entities.player, InputComponent);
-    WeaponComponent*     weapon = ECS_GET(g_state->entities.player, WeaponComponent);
-    PositionComponent*   pos    = ECS_GET(g_state->entities.player, PositionComponent);
-    VelocityComponent*   vel    = ECS_GET(g_state->entities.player, VelocityComponent);
-    EnemySpawnComponent* spawn  = ECS_GET(g_state->entities.enemy_spawner, EnemySpawnComponent);
+    InputComponent*    input  = ECS_GET(g_state->entities.player, InputComponent);
+    WeaponComponent*   weapon = ECS_GET(g_state->entities.player, WeaponComponent);
+    PositionComponent* pos    = ECS_GET(g_state->entities.player, PositionComponent);
+    VelocityComponent* vel    = ECS_GET(g_state->entities.player, VelocityComponent);
 
     /*
      * Debug info
@@ -101,10 +98,6 @@ static void game_render_debug(void) {
 
     ImGui_Text("Player Position: (%.2f, %.2f)", pos->x, pos->y);
     ImGui_Text("Player Velocity: (%.2f, %.2f)", vel->x, vel->y);
-
-    ImGui_Text("Enemy.Max: %d", spawn->max_enemies);
-    ImGui_Text("Enemy.Count: %d", spawn->current_enemy_count);
-    ImGui_Text("Enemy.TimeSinceLastSpawn: %.2f", spawn->time_since_last_spawn);
 
     ImGui_Text("Input.UP: %d", input->up);
     ImGui_Text("Input.DOWN: %d", input->down);

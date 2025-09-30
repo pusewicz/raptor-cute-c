@@ -152,19 +152,3 @@ ecs_id_t make_enemy(float x, float y) {
 
     return id;
 }
-
-/*
- * Enemy Spawner
- */
-
-ecs_id_t make_enemy_spawner(void) {
-    ecs_id_t id = make_entity();
-
-    EnemySpawnComponent* spawn = ECS_ADD_COMPONENT(id, EnemySpawnComponent);
-    // Spawn an enemy every 2 seconds
-    spawn->spawn_interval = spawn->time_since_last_spawn = 2.0f;
-    spawn->max_enemies                                   = 5;
-    spawn->current_enemy_count                           = 0;
-
-    return id;
-}
