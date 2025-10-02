@@ -1,7 +1,10 @@
 #include "ecs.h"
 
+#include <dcimgui.h>
+
 #include "../engine/game_state.h"
 #include "../engine/log.h"
+#include "event.h"
 #include "factories.h"
 
 #define PICO_ECS_IMPLEMENTATION
@@ -55,44 +58,28 @@ static ecs_ret_t background_scroll_system(ecs_t* ecs, ecs_id_t* entities, int en
     return 0;
 }
 
-static ecs_ret_t collision_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
-    (void)dt;
-    (void)udata;
-
-    dyna ecs_id_t* entities_to_destroy = nullptr;
-
-    for (int i = 0; i < entity_count; i++) {
-        for (int j = i + 1; j < entity_count; j++) {
-            ecs_id_t entity_a = entities[i];
-            ecs_id_t entity_b = entities[j];
-
-            if (!ecs_is_entity_ready(ecs, entity_a) || !ecs_is_entity_ready(ecs, entity_b)) {
+static ecs_ret_t collision_system(ecs_t* ecs [[maybe_unused]], ecs_id_t* entities, int entity_count, ecs_dt_t dt [[maybe_unused]], void* udata [[maybe_unused]]) {
+    for (int i = 0; i < entity_count; ++i) {
+        if (!ECS_READY(entities[i])) {
+            continue;
+        }
+        for (int j = i + 1; j < entity_count; ++j) {
+            if (!ECS_READY(entities[j]) || entities[i] == entities[j]) {
                 continue;
             }
 
-            PositionComponent* pos_a = ECS_GET(entity_a, PositionComponent);
-            PositionComponent* pos_b = ECS_GET(entity_b, PositionComponent);
-            ColliderComponent* col_a = ECS_GET(entity_a, ColliderComponent);
-            ColliderComponent* col_b = ECS_GET(entity_b, ColliderComponent);
+            PositionComponent* pos_a = ECS_GET(entities[i], PositionComponent);
+            PositionComponent* pos_b = ECS_GET(entities[j], PositionComponent);
+            ColliderComponent* col_a = ECS_GET(entities[i], ColliderComponent);
+            ColliderComponent* col_b = ECS_GET(entities[j], ColliderComponent);
 
             CF_Aabb aabb_a = cf_make_aabb_center_half_extents(*pos_a, col_a->half_extents);
             CF_Aabb aabb_b = cf_make_aabb_center_half_extents(*pos_b, col_b->half_extents);
 
             if (cf_aabb_to_aabb(aabb_a, aabb_b)) {
-                apush(entities_to_destroy, entity_a);
-                apush(entities_to_destroy, entity_b);
+                event_trigger(EVENT_COLLISION, &(CollisionEvent){.entity_a = entities[i], .entity_b = entities[j]});
             }
         }
-    }
-
-    if (entities_to_destroy) {
-        for (int i = 0; i < asize(entities_to_destroy); ++i) {
-            if (ecs_is_entity_ready(ecs, entities_to_destroy[i])) {
-                ecs_queue_destroy(ecs, entities_to_destroy[i]);
-            }
-        }
-
-        afree(entities_to_destroy);
     }
 
     return 0;
@@ -106,10 +93,7 @@ static ecs_ret_t collision_system(ecs_t* ecs, ecs_id_t* entities, int entity_cou
  *
  * If the entity is an enemy or a bullet, it destroys the entity.
  */
-static ecs_ret_t boundary_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
-    (void)dt;
-    (void)udata;
-
+static ecs_ret_t boundary_system(ecs_t* ecs [[maybe_unused]], ecs_id_t* entities, int entity_count, ecs_dt_t dt [[maybe_unused]], void* udata [[maybe_unused]]) {
     for (int i = 0; i < entity_count; ++i) {
         ecs_id_t           entity_id   = entities[i];
         ColliderComponent* collider    = ECS_GET(entity_id, ColliderComponent);
@@ -123,7 +107,7 @@ static ecs_ret_t boundary_system(ecs_t* ecs, ecs_id_t* entities, int entity_coun
             switch (*tag) {
                 case TAG_BULLET:
                 case TAG_ENEMY:
-                    ecs_queue_destroy(ecs, entity_id);
+                    ECS_QUEUE_DESTROY(entity_id);
                     break;
                 default:
                     break;
@@ -149,13 +133,13 @@ static ecs_ret_t coroutine_system(ecs_t* ecs, ecs_id_t* entities, int entity_cou
 }
 
 static ecs_ret_t debug_bounding_boxes_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
-    if (!g_state->debug_bounding_boxes) {
-        return 0;
-    }
-
     (void)ecs;
     (void)dt;
     (void)udata;
+
+    if (!g_state->debug_bounding_boxes) {
+        return 0;
+    }
 
     for (int i = 0; i < entity_count; ++i) {
         ecs_id_t entity_id = entities[i];
@@ -244,6 +228,12 @@ static ecs_ret_t render_system(ecs_t* ecs, ecs_id_t* entities, int entity_count,
     for (int i = 0; i < entity_count; i++) {
         PositionComponent* pos    = ECS_GET(entities[i], PositionComponent);
         SpriteComponent*   sprite = ECS_GET(entities[i], SpriteComponent);
+
+        // Destroy sprite if animation is not looped and has finished
+        if (!cf_sprite_get_loop(&sprite->sprite) && cf_sprite_will_finish(&sprite->sprite)) {
+            ECS_QUEUE_DESTROY(entities[i]);
+            continue;
+        }
 
         cf_sprite_update(&sprite->sprite);
         cf_draw_push();

@@ -152,3 +152,24 @@ ecs_id_t make_enemy(float x, float y) {
 
     return id;
 }
+
+/*
+ * Explosion
+ */
+
+ecs_id_t make_explosion(float x, float y) {
+    ecs_id_t id = make_entity();
+
+    // Add position
+    PositionComponent* pos = ECS_ADD_COMPONENT(id, PositionComponent);
+    pos->x                 = x;
+    pos->y                 = y;
+
+    // Add sprite
+    SpriteComponent* sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
+    sprite->sprite          = cf_make_sprite("assets/explosion.ase");
+    sprite->z_index         = Z_SPRITES;
+    cf_sprite_set_loop(&sprite->sprite, false);
+
+    return id;
+}

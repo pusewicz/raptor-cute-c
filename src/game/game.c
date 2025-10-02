@@ -17,6 +17,7 @@
 #include "../engine/log.h"
 #include "coroutine.h"
 #include "ecs.h"
+#include "event.h"
 #include "factories.h"
 
 GameState* g_state = nullptr;
@@ -56,6 +57,7 @@ EXPORT void game_init(Platform* platform) {
     g_state->entities.player            = make_player(0.0f, 0.0f);
 
     init_coroutines();
+    init_events();
 
     if (!validate_game_state()) {
         APP_FATAL("GameState validation failed in game_init");
@@ -140,4 +142,5 @@ EXPORT void game_hot_reload(void* game_state) {
     // Re-initialize coroutines
     cleanup_coroutines();
     init_coroutines();
+    init_events();
 }
