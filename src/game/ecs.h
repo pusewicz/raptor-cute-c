@@ -11,7 +11,10 @@
  */
 
 // Get a component of type T from an entity
-#define ECS_GET(entity, T) (T*)ecs_get(g_state->ecs, entity, g_state->components.COMPONENT_TO_UNDERSCORE(T))
+#define ECS_GET(entity, T)        (T*)ecs_get(g_state->ecs, entity, g_state->components.COMPONENT_TO_UNDERSCORE(T))
+#define ECS_READY(entity)         (ecs_is_ready(g_state->ecs, entity))
+#define ECS_DESTROY(entity)       ecs_destroy(g_state->ecs, entity)
+#define ECS_QUEUE_DESTROY(entity) ecs_queue_destroy(g_state->ecs, entity)
 
 #define ECS_REGISTER_COMPONENT(T, ...)          g_state->components.COMPONENT_TO_UNDERSCORE(T) = ecs_register_component(g_state->ecs, sizeof(T), __VA_ARGS__)
 #define ECS_REGISTER_SYSTEM(name, ...)          g_state->systems.name = ecs_register_system(g_state->ecs, name##_system, __VA_ARGS__)
