@@ -83,7 +83,7 @@ static void game_render_debug(void) {
     PositionComponent* pos    = ECS_GET(g_state->entities.player, PositionComponent);
     VelocityComponent* vel    = ECS_GET(g_state->entities.player, VelocityComponent);
 
-    ImGui_Begin("Debug Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
+    ImGui_Begin("Debug Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     if (ImGui_CollapsingHeader("Debug", true)) {
         ImGui_Checkbox("Draw Bounding Boxes", &g_state->debug_bounding_boxes);
     }
