@@ -73,18 +73,9 @@ EXPORT void game_init(Platform* platform) {
 EXPORT bool game_update(void) {
     cf_arena_reset(&g_state->scratch_arena);
 
-    ECS_UPDATE_SYSTEM(background_scroll);
-    ECS_UPDATE_SYSTEM(coroutine);
-    ECS_UPDATE_SYSTEM(input);
-    ECS_UPDATE_SYSTEM(movement);
-    ECS_UPDATE_SYSTEM(weapon);
-    ECS_UPDATE_SYSTEM(collision);
-    ECS_UPDATE_SYSTEM(boundary);
-#ifdef DEBUG
-    ECS_UPDATE_SYSTEM(debug_bounding_boxes);
-#endif
+    ecs_ret_t ret = ecs_update_systems(g_state->ecs, CF_DELTA_TIME);
 
-    return true;
+    return ret == 0;
 }
 
 static void game_render_debug(void) {
@@ -123,8 +114,6 @@ static void game_render_debug(void) {
 }
 
 EXPORT void game_render(void) {
-    ECS_UPDATE_SYSTEM(render);
-
 #ifdef DEBUG
     game_render_debug();
 #endif
