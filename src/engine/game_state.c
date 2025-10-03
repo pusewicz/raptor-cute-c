@@ -12,7 +12,11 @@ bool validate_game_state(void) {
         return false;
     }
     if (g_state->canvas_size.x <= 0 || g_state->canvas_size.y <= 0) {
-        APP_WARN("g_state->canvas_size is invalid: (%.2f, %.2f)", g_state->canvas_size.x, g_state->canvas_size.y);
+        APP_WARN(
+            "g_state->canvas_size is invalid: (%.2f, %.2f)",
+            g_state->canvas_size.x,
+            g_state->canvas_size.y
+        );
         return false;
     }
     if (g_state->scale <= 0) {

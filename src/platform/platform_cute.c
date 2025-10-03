@@ -46,9 +46,19 @@ void platform_init(const char* argv0) {
 
     const int window_width  = 180;
     const int window_height = 320;
-    const int options       = CF_APP_OPTIONS_WINDOW_POS_CENTERED_BIT | CF_APP_OPTIONS_RESIZABLE_BIT;
+    const int options =
+        CF_APP_OPTIONS_WINDOW_POS_CENTERED_BIT | CF_APP_OPTIONS_RESIZABLE_BIT;
 
-    CF_Result result = cf_make_app("Raptor", cf_default_display(), 0, 0, window_width, window_height, options, argv0);
+    CF_Result result = cf_make_app(
+        "Raptor",
+        cf_default_display(),
+        0,
+        0,
+        window_width,
+        window_height,
+        options,
+        argv0
+    );
     if (cf_is_error(result)) {
         APP_FATAL("Could not make app: %s", result.details);
         CF_ASSERT(false);
@@ -68,21 +78,31 @@ void platform_end_frame(void) { cf_app_draw_onto_screen(true); }
 GameLibrary platform_load_game_library(void) {
     GameLibrary game_library = {0};
 
-    const char* base_path = SDL_GetBasePath();
+    const char* base_path    = SDL_GetBasePath();
     if (!base_path) {
         APP_FATAL("Failed to get base path: %s\n", SDL_GetError());
         CF_ASSERT(false);
     }
     const char* game_library_name = GAME_LIBRARY_NAME;
 
-    SDL_snprintf(game_library_path, countof(game_library_path), "%s%s", base_path, game_library_name);
+    SDL_snprintf(
+        game_library_path,
+        countof(game_library_path),
+        "%s%s",
+        base_path,
+        game_library_name
+    );
 
     if (!SDL_GetPathInfo(game_library_path, &path_info)) {
-        APP_FATAL("Failed to get path info for %s: %s\n", game_library_path, SDL_GetError());
+        APP_FATAL(
+            "Failed to get path info for %s: %s\n",
+            game_library_path,
+            SDL_GetError()
+        );
         CF_ASSERT(false);
     }
 
-    game_library.path = game_library_path;
+    game_library.path    = game_library_path;
 
     game_library.library = cf_load_shared_library(game_library.path);
     if (!game_library.library) {
@@ -90,37 +110,47 @@ GameLibrary platform_load_game_library(void) {
         return game_library;
     }
 
-    game_library.init = (GameInitFunction)cf_load_function(game_library.library, "game_init");
+    game_library.init =
+        (GameInitFunction)cf_load_function(game_library.library, "game_init");
     if (!game_library.init) {
         APP_WARN("Failed to load function: %s\n", SDL_GetError());
         return game_library;
     }
 
-    game_library.update = (GameUpdateFunction)cf_load_function(game_library.library, "game_update");
+    game_library.update = (GameUpdateFunction)cf_load_function(
+        game_library.library, "game_update"
+    );
     if (!game_library.update) {
         APP_WARN("Failed to load function: %s\n", SDL_GetError());
         return game_library;
     }
 
-    game_library.render = (GameRenderFunction)cf_load_function(game_library.library, "game_render");
+    game_library.render = (GameRenderFunction)cf_load_function(
+        game_library.library, "game_render"
+    );
     if (!game_library.render) {
         APP_WARN("Failed to load function: %s\n", SDL_GetError());
         return game_library;
     }
 
-    game_library.shutdown = (GameShutdownFunction)cf_load_function(game_library.library, "game_shutdown");
+    game_library.shutdown = (GameShutdownFunction)cf_load_function(
+        game_library.library, "game_shutdown"
+    );
     if (!game_library.shutdown) {
         APP_WARN("Failed to load function: %s\n", SDL_GetError());
         return game_library;
     }
 
-    game_library.state = (GameStateFunction)cf_load_function(game_library.library, "game_state");
+    game_library.state =
+        (GameStateFunction)cf_load_function(game_library.library, "game_state");
     if (!game_library.state) {
         APP_WARN("Failed to load function: %s\n", SDL_GetError());
         return game_library;
     }
 
-    game_library.hot_reload = (GameHotReloadFunction)cf_load_function(game_library.library, "game_hot_reload");
+    game_library.hot_reload = (GameHotReloadFunction)cf_load_function(
+        game_library.library, "game_hot_reload"
+    );
     if (!game_library.hot_reload) {
         APP_WARN("Failed to load function: %s\n", SDL_GetError());
         return game_library;
@@ -144,5 +174,9 @@ void platform_unload_game_library(GameLibrary* game_library) {
     game_library->ok         = false;
 }
 
-uint64_t platform_get_performance_counter(void) { return SDL_GetPerformanceCounter(); }
-uint64_t platform_get_performance_frequency(void) { return SDL_GetPerformanceFrequency(); }
+uint64_t platform_get_performance_counter(void) {
+    return SDL_GetPerformanceCounter();
+}
+uint64_t platform_get_performance_frequency(void) {
+    return SDL_GetPerformanceFrequency();
+}

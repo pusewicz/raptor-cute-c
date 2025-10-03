@@ -33,25 +33,28 @@ constexpr int STAGE_ARENA_SIZE        = CF_MB * 64;
 constexpr int SCRATCH_ARENA_SIZE      = CF_MB * 64;
 constexpr int DEFAULT_ARENA_ALIGNMENT = 16;
 
-constexpr int CANVAS_WIDTH  = 180;
-constexpr int CANVAS_HEIGHT = 320;
+constexpr int CANVAS_WIDTH            = 180;
+constexpr int CANVAS_HEIGHT           = 320;
 
 EXPORT void game_init(Platform* platform) {
-    g_state = platform->allocate_memory(sizeof(GameState));
+    g_state              = platform->allocate_memory(sizeof(GameState));
 
-    const int scale               = 3;
-    g_state->display_id           = cf_default_display();
-    g_state->platform             = platform;
-    g_state->canvas_size          = cf_v2(CANVAS_WIDTH, CANVAS_HEIGHT);
-    g_state->scale                = scale;
-    g_state->permanent_arena      = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, PERMANENT_ARENA_SIZE);
-    g_state->stage_arena          = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, STAGE_ARENA_SIZE);
-    g_state->scratch_arena        = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
+    const int scale      = 3;
+    g_state->display_id  = cf_default_display();
+    g_state->platform    = platform;
+    g_state->canvas_size = cf_v2(CANVAS_WIDTH, CANVAS_HEIGHT);
+    g_state->scale       = scale;
+    g_state->permanent_arena =
+        cf_make_arena(DEFAULT_ARENA_ALIGNMENT, PERMANENT_ARENA_SIZE);
+    g_state->stage_arena =
+        cf_make_arena(DEFAULT_ARENA_ALIGNMENT, STAGE_ARENA_SIZE);
+    g_state->scratch_arena =
+        cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
     g_state->rnd                  = cf_rnd_seed((uint32_t)time(nullptr));
     g_state->debug_bounding_boxes = false;
 
     // Initialize ECS
-    g_state->ecs = ecs_new(96, nullptr);
+    g_state->ecs                  = ecs_new(96, nullptr);
     init_ecs();
     g_state->entities.background_scroll = make_background_scroll();
     g_state->entities.player            = make_player(0.0f, 0.0f);
@@ -64,8 +67,14 @@ EXPORT void game_init(Platform* platform) {
         CF_ASSERT(false);
     }
 
-    cf_app_set_canvas_size((int)g_state->canvas_size.x * g_state->scale, (int)g_state->canvas_size.y * g_state->scale);
-    cf_app_set_size((int)g_state->canvas_size.x * g_state->scale, (int)g_state->canvas_size.y * g_state->scale);
+    cf_app_set_canvas_size(
+        (int)g_state->canvas_size.x * g_state->scale,
+        (int)g_state->canvas_size.y * g_state->scale
+    );
+    cf_app_set_size(
+        (int)g_state->canvas_size.x * g_state->scale,
+        (int)g_state->canvas_size.y * g_state->scale
+    );
     cf_app_center_window();
 #ifdef DEBUG
     cf_app_init_imgui();
@@ -81,9 +90,12 @@ EXPORT bool game_update(void) {
 }
 
 static void game_render_debug(void) {
-    WeaponComponent*   weapon = ECS_GET(g_state->entities.player, WeaponComponent);
-    PositionComponent* pos    = ECS_GET(g_state->entities.player, PositionComponent);
-    VelocityComponent* vel    = ECS_GET(g_state->entities.player, VelocityComponent);
+    WeaponComponent* weapon =
+        ECS_GET(g_state->entities.player, WeaponComponent);
+    PositionComponent* pos =
+        ECS_GET(g_state->entities.player, PositionComponent);
+    VelocityComponent* vel =
+        ECS_GET(g_state->entities.player, VelocityComponent);
 
     ImGui_Begin("Debug Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     if (ImGui_CollapsingHeader("Debug", true)) {
@@ -105,10 +117,22 @@ static void game_render_debug(void) {
     }
 
     if (ImGui_CollapsingHeader("Window", true)) {
-        ImGui_Text("Screen: %dx%d", cf_display_width(g_state->display_id), cf_display_height(g_state->display_id));
+        ImGui_Text(
+            "Screen: %dx%d",
+            cf_display_width(g_state->display_id),
+            cf_display_height(g_state->display_id)
+        );
         ImGui_Text("Size: %dx%d", cf_app_get_width(), cf_app_get_height());
-        ImGui_Text("Canvas: %dx%d", cf_app_get_canvas_width(), cf_app_get_canvas_height());
-        ImGui_Text("Canvas(logical): %.0fx%.0f", g_state->canvas_size.x, g_state->canvas_size.y);
+        ImGui_Text(
+            "Canvas: %dx%d",
+            cf_app_get_canvas_width(),
+            cf_app_get_canvas_height()
+        );
+        ImGui_Text(
+            "Canvas(logical): %.0fx%.0f",
+            g_state->canvas_size.x,
+            g_state->canvas_size.y
+        );
         ImGui_Text("Game Scale: %.2f", g_state->scale);
         ImGui_Text("DPI Scale: %.2f", cf_app_get_dpi_scale());
     }

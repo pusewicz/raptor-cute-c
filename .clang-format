@@ -1,11 +1,23 @@
 ---
 BasedOnStyle: Google
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: BlockIndent
+AlignArrayOfStructures: Right
+AlignConsecutiveAssignments:
+    Enabled: true
+    AcrossEmptyLines: true
+    AcrossComments: true
 AlignConsecutiveMacros: "true"
-AlignConsecutiveAssignments: "true"
 AlignConsecutiveDeclarations: "true"
-AlignEscapedNewlines: Left
-AlignTrailingComments: "true"
+AlignEscapedNewlines: LeftWithLastLine
+AlignConsecutiveShortCaseStatements:
+    Enabled: true
+    AcrossEmptyLines: true
+    AcrossComments: true
+    AlignCaseColons: false
+AlignTrailingComments:
+    Kind: Always
+    OverEmptyLines: 2
+AllowShortBlocksOnASingleLine: Always
 BinPackArguments: "false"
 BinPackParameters: "false"
 IncludeBlocks: Regroup
@@ -21,5 +33,5 @@ TabWidth: "4"
 DerivePointerAlignment: false
 PointerAlignment: Left
 UseTab: Never
-ColumnLimit: 200
 ---
+

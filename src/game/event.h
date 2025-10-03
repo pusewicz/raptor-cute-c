@@ -2,14 +2,17 @@
 
 #include <pico_ecs.h>
 
-#define EVENT_LIST          \
-    X(EVENT_COLLISION, 0)   \
-    X(EVENT_ENEMY_DEATH, 1) \
+#define EVENT_LIST            \
+    X(EVENT_COLLISION, 0)     \
+    X(EVENT_ENEMY_DEATH, 1)   \
     X(EVENT_PLAYER_DAMAGE, 2)
 
+typedef enum {
 #define X(name, value) name = value,
-typedef enum { EVENT_LIST EVENT_COUNT } EventType;
+    EVENT_LIST
 #undef X
+        EVENT_COUNT
+} EventType;
 
 typedef void (*EventCallback)(void* data);
 

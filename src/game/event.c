@@ -8,22 +8,25 @@
 #include "ecs.h"
 #include "factories.h"
 
+const char* event_type_to_string(EventType color) {
+    switch (color) {
 #define X(name, value) \
     case name:         \
         return #name;
-const char* event_type_to_string(EventType color) {
-    switch (color) {
         EVENT_LIST
+#undef X
         default:
             return "UNKNOWN";
     }
 }
-#undef X
 
 void event_register(EventType type, EventCallback callback) {
     CF_ASSERT(type < EVENT_COUNT);
     CF_ASSERT(event_listener_counts[type] < MAX_EVENT_LISTENERS);
-    APP_DEBUG("Registering event listener for event type %s", event_type_to_string(type));
+    APP_DEBUG(
+        "Registering event listener for event type %s",
+        event_type_to_string(type)
+    );
     int count                    = event_listener_counts[type];
     event_listeners[type][count] = callback;
     event_listener_counts[type]++;
@@ -51,7 +54,8 @@ static void on_collision_destroy_bullet_or_enemy(void* data) {
         TagComponent* tag_a = ECS_GET(e->entity_a, TagComponent);
         TagComponent* tag_b = ECS_GET(e->entity_b, TagComponent);
 
-        if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
+        if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) ||
+            (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
             ECS_QUEUE_DESTROY(e->entity_a);
             ECS_QUEUE_DESTROY(e->entity_b);
         }
@@ -64,10 +68,11 @@ static void on_collision_explosion(void* data) {
         TagComponent* tag_a = ECS_GET(e->entity_a, TagComponent);
         TagComponent* tag_b = ECS_GET(e->entity_b, TagComponent);
 
-        if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
-            PositionComponent* pos_a         = ECS_GET(e->entity_a, PositionComponent);
-            PositionComponent* pos_b         = ECS_GET(e->entity_b, PositionComponent);
-            CF_V2*             explosion_pos = (*tag_a == TAG_BULLET) ? pos_b : pos_a;
+        if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) ||
+            (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
+            PositionComponent* pos_a = ECS_GET(e->entity_a, PositionComponent);
+            PositionComponent* pos_b = ECS_GET(e->entity_b, PositionComponent);
+            CF_V2* explosion_pos     = (*tag_a == TAG_BULLET) ? pos_b : pos_a;
 
             make_explosion(explosion_pos->x, explosion_pos->y);
         }

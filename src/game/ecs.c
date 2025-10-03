@@ -24,14 +24,17 @@
  * System update functions
  */
 
-static ecs_ret_t background_scroll_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
+static ecs_ret_t background_scroll_system(
+    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+) {
     (void)ecs;
     (void)entities;
     (void)entity_count;
     (void)dt;
     (void)udata;
 
-    BackgroundScrollComponent* bg_scroll = ECS_GET(g_state->entities.background_scroll, BackgroundScrollComponent);
+    BackgroundScrollComponent* bg_scroll =
+        ECS_GET(g_state->entities.background_scroll, BackgroundScrollComponent);
     bg_scroll->y_offset += 0.1f;
     if (bg_scroll->y_offset >= bg_scroll->max_y_offset) {
         bg_scroll->y_offset = 0;
@@ -39,7 +42,11 @@ static ecs_ret_t background_scroll_system(ecs_t* ecs, ecs_id_t* entities, int en
 
     {
         cf_draw_push();
-        cf_draw_translate(0, g_state->canvas_size.y / 2.0f - bg_scroll->y_offset + bg_scroll->max_y_offset * 0.5f);
+        cf_draw_translate(
+            0,
+            g_state->canvas_size.y / 2.0f - bg_scroll->y_offset +
+                bg_scroll->max_y_offset * 0.5f
+        );
         int i = 0;
         for (int y = 0; y < (BACKGROUND_SCROLL_SPRITE_COUNT / 3); ++y) {
             for (int x = -1; x <= 1; ++x) {
@@ -58,11 +65,15 @@ static ecs_ret_t background_scroll_system(ecs_t* ecs, ecs_id_t* entities, int en
     return 0;
 }
 
-static ecs_ret_t collision_system(ecs_t* ecs [[maybe_unused]], ecs_id_t* entities, int entity_count, ecs_dt_t dt [[maybe_unused]], void* udata [[maybe_unused]]) {
+static ecs_ret_t collision_system(
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities,
+    int       entity_count,
+    ecs_dt_t  dt [[maybe_unused]],
+    void*     udata [[maybe_unused]]
+) {
     for (int i = 0; i < entity_count; ++i) {
-        if (!ECS_READY(entities[i])) {
-            continue;
-        }
+        if (!ECS_READY(entities[i])) { continue; }
         for (int j = i + 1; j < entity_count; ++j) {
             if (!ECS_READY(entities[j]) || entities[i] == entities[j]) {
                 continue;
@@ -73,11 +84,17 @@ static ecs_ret_t collision_system(ecs_t* ecs [[maybe_unused]], ecs_id_t* entitie
             ColliderComponent* col_a = ECS_GET(entities[i], ColliderComponent);
             ColliderComponent* col_b = ECS_GET(entities[j], ColliderComponent);
 
-            CF_Aabb aabb_a = cf_make_aabb_center_half_extents(*pos_a, col_a->half_extents);
-            CF_Aabb aabb_b = cf_make_aabb_center_half_extents(*pos_b, col_b->half_extents);
+            CF_Aabb aabb_a =
+                cf_make_aabb_center_half_extents(*pos_a, col_a->half_extents);
+            CF_Aabb aabb_b =
+                cf_make_aabb_center_half_extents(*pos_b, col_b->half_extents);
 
             if (cf_aabb_to_aabb(aabb_a, aabb_b)) {
-                event_trigger(EVENT_COLLISION, &(CollisionEvent){.entity_a = entities[i], .entity_b = entities[j]});
+                event_trigger(
+                    EVENT_COLLISION,
+                    &(CollisionEvent){.entity_a = entities[i],
+                                      .entity_b = entities[j]}
+                );
             }
         }
     }
@@ -93,13 +110,22 @@ static ecs_ret_t collision_system(ecs_t* ecs [[maybe_unused]], ecs_id_t* entitie
  *
  * If the entity is an enemy or a bullet, it destroys the entity.
  */
-static ecs_ret_t boundary_system(ecs_t* ecs [[maybe_unused]], ecs_id_t* entities, int entity_count, ecs_dt_t dt [[maybe_unused]], void* udata [[maybe_unused]]) {
+static ecs_ret_t boundary_system(
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities,
+    int       entity_count,
+    ecs_dt_t  dt [[maybe_unused]],
+    void*     udata [[maybe_unused]]
+) {
     for (int i = 0; i < entity_count; ++i) {
         ecs_id_t           entity_id   = entities[i];
         ColliderComponent* collider    = ECS_GET(entity_id, ColliderComponent);
         PositionComponent* position    = ECS_GET(entity_id, PositionComponent);
-        CF_Aabb            canvas_aabb = cf_make_aabb_center_half_extents(cf_v2(0, 0), cf_div_v2_f(g_state->canvas_size, 2.0f));
-        CF_Aabb            entity_aabb = cf_make_aabb_center_half_extents(*position, collider->half_extents);
+        CF_Aabb            canvas_aabb = cf_make_aabb_center_half_extents(
+            cf_v2(0, 0), cf_div_v2_f(g_state->canvas_size, 2.0f)
+        );
+        CF_Aabb entity_aabb =
+            cf_make_aabb_center_half_extents(*position, collider->half_extents);
 
         // Check if entity is outside canvas bounds
         if (!cf_aabb_to_aabb(canvas_aabb, entity_aabb)) {
@@ -118,37 +144,43 @@ static ecs_ret_t boundary_system(ecs_t* ecs [[maybe_unused]], ecs_id_t* entities
     return 0;
 }
 
-static ecs_ret_t coroutine_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
+static ecs_ret_t coroutine_system(
+    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+) {
     (void)ecs;
     (void)entities;
     (void)entity_count;
     (void)dt;
     (void)udata;
 
-    if (cf_coroutine_state(g_state->coroutines.spawner) != CF_COROUTINE_STATE_DEAD) {
+    if (cf_coroutine_state(g_state->coroutines.spawner) !=
+        CF_COROUTINE_STATE_DEAD) {
         cf_coroutine_resume(g_state->coroutines.spawner);
     }
 
     return 0;
 }
 
-static ecs_ret_t debug_bounding_boxes_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
+static ecs_ret_t debug_bounding_boxes_system(
+    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+) {
     (void)ecs;
     (void)dt;
     (void)udata;
 
-    if (!g_state->debug_bounding_boxes) {
-        return 0;
-    }
+    if (!g_state->debug_bounding_boxes) { return 0; }
 
     for (int i = 0; i < entity_count; ++i) {
-        ecs_id_t entity_id = entities[i];
+        ecs_id_t entity_id             = entities[i];
 
-        SpriteComponent*   sprite        = ECS_GET(entity_id, SpriteComponent);
-        PositionComponent* position      = ECS_GET(entity_id, PositionComponent);
-        ColliderComponent* collider      = ECS_GET(entity_id, ColliderComponent);
-        CF_Aabb            aabb_sprite   = cf_make_aabb_center_half_extents(*position, cf_v2(sprite->sprite.w / 2.0f, sprite->sprite.h / 2.0f));
-        CF_Aabb            aabb_collider = cf_make_aabb_center_half_extents(*position, collider->half_extents);
+        SpriteComponent*   sprite      = ECS_GET(entity_id, SpriteComponent);
+        PositionComponent* position    = ECS_GET(entity_id, PositionComponent);
+        ColliderComponent* collider    = ECS_GET(entity_id, ColliderComponent);
+        CF_Aabb            aabb_sprite = cf_make_aabb_center_half_extents(
+            *position, cf_v2(sprite->sprite.w / 2.0f, sprite->sprite.h / 2.0f)
+        );
+        CF_Aabb aabb_collider =
+            cf_make_aabb_center_half_extents(*position, collider->half_extents);
 
         cf_draw_push();
         // Draw sprite box in red
@@ -166,7 +198,9 @@ static ecs_ret_t debug_bounding_boxes_system(ecs_t* ecs, ecs_id_t* entities, int
     return 0;
 }
 
-static ecs_ret_t input_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
+static ecs_ret_t input_system(
+    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+) {
     (void)ecs;
     (void)dt;
     (void)entities;
@@ -175,25 +209,30 @@ static ecs_ret_t input_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, 
 
     InputComponent* input = ECS_GET(g_state->entities.player, InputComponent);
 
-    input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
-    input->down  = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
-    input->left  = cf_key_down(CF_KEY_A) || cf_key_down(CF_KEY_LEFT);
-    input->right = cf_key_down(CF_KEY_D) || cf_key_down(CF_KEY_RIGHT);
-    input->shoot = cf_key_down(CF_KEY_SPACE) || cf_mouse_down(CF_MOUSE_BUTTON_LEFT);
+    input->up             = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
+    input->down           = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
+    input->left           = cf_key_down(CF_KEY_A) || cf_key_down(CF_KEY_LEFT);
+    input->right          = cf_key_down(CF_KEY_D) || cf_key_down(CF_KEY_RIGHT);
+    input->shoot =
+        cf_key_down(CF_KEY_SPACE) || cf_mouse_down(CF_MOUSE_BUTTON_LEFT);
 
     return 0;
 }
 
-static ecs_ret_t movement_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
+static ecs_ret_t movement_system(
+    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+) {
     (void)ecs;
     (void)dt;
     (void)udata;
 
     // TODO: Special case for player for now
     {
-        VelocityComponent* vel   = ECS_GET(g_state->entities.player, VelocityComponent);
-        InputComponent*    input = ECS_GET(g_state->entities.player, InputComponent);
-        float              speed = 1.0f;
+        VelocityComponent* vel =
+            ECS_GET(g_state->entities.player, VelocityComponent);
+        InputComponent* input =
+            ECS_GET(g_state->entities.player, InputComponent);
+        float speed = 1.0f;
 
         vel->x = vel->y = 0.0f;
 
@@ -212,15 +251,25 @@ static ecs_ret_t movement_system(ecs_t* ecs, ecs_id_t* entities, int entity_coun
 
         // Clamp player position to canvas bounds
         if (entities[i] == g_state->entities.player) {
-            pos->x = cf_clamp(pos->x, -g_state->canvas_size.x / 2.0f, g_state->canvas_size.x / 2.0f);
-            pos->y = cf_clamp(pos->y, -g_state->canvas_size.y / 2.0f, g_state->canvas_size.y / 2.0f);
+            pos->x = cf_clamp(
+                pos->x,
+                -g_state->canvas_size.x / 2.0f,
+                g_state->canvas_size.x / 2.0f
+            );
+            pos->y = cf_clamp(
+                pos->y,
+                -g_state->canvas_size.y / 2.0f,
+                g_state->canvas_size.y / 2.0f
+            );
         }
     }
 
     return 0;
 }
 
-static ecs_ret_t render_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
+static ecs_ret_t render_system(
+    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+) {
     (void)ecs;
     (void)dt;
     (void)udata;
@@ -230,7 +279,8 @@ static ecs_ret_t render_system(ecs_t* ecs, ecs_id_t* entities, int entity_count,
         SpriteComponent*   sprite = ECS_GET(entities[i], SpriteComponent);
 
         // Destroy sprite if animation is not looped and has finished
-        if (!cf_sprite_get_loop(&sprite->sprite) && cf_sprite_will_finish(&sprite->sprite)) {
+        if (!cf_sprite_get_loop(&sprite->sprite) &&
+            cf_sprite_will_finish(&sprite->sprite)) {
             ECS_QUEUE_DESTROY(entities[i]);
             continue;
         }
@@ -247,13 +297,16 @@ static ecs_ret_t render_system(ecs_t* ecs, ecs_id_t* entities, int entity_count,
     return 0;
 }
 
-static ecs_ret_t weapon_system(ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata) {
+static ecs_ret_t weapon_system(
+    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+) {
     (void)ecs;
     (void)entities;
     (void)entity_count;
     (void)udata;
 
-    WeaponComponent* weapon = ECS_GET(g_state->entities.player, WeaponComponent);
+    WeaponComponent* weapon =
+        ECS_GET(g_state->entities.player, WeaponComponent);
 
     if (weapon->time_since_shot < weapon->cooldown) {
         weapon->time_since_shot += (float)dt;
@@ -263,16 +316,23 @@ static ecs_ret_t weapon_system(ecs_t* ecs, ecs_id_t* entities, int entity_count,
     InputComponent* input = ECS_GET(g_state->entities.player, InputComponent);
     if (input->shoot) {
         weapon->time_since_shot = 0.0f;
-        PositionComponent* pos  = ECS_GET(g_state->entities.player, PositionComponent);
+        PositionComponent* pos =
+            ECS_GET(g_state->entities.player, PositionComponent);
         make_bullet(pos->x, pos->y, cf_v2(0, 1));
     }
 
     return 0;
 }
 
-void* add_component_impl(ecs_id_t entity_id, ecs_id_t component_id, void* args) { return ecs_add(g_state->ecs, entity_id, component_id, args); }
+void* add_component_impl(
+    ecs_id_t entity_id, ecs_id_t component_id, void* args
+) {
+    return ecs_add(g_state->ecs, entity_id, component_id, args);
+}
 
-static void init_background_scroll(ecs_t* ecs, ecs_id_t entity_id, void* ptr, void* args) {
+static void init_background_scroll(
+    ecs_t* ecs, ecs_id_t entity_id, void* ptr, void* args
+) {
     (void)ecs;
     (void)entity_id;
     (void)args;
@@ -291,7 +351,9 @@ static void init_background_scroll(ecs_t* ecs, ecs_id_t entity_id, void* ptr, vo
 }
 
 void init_ecs() {
-    ECS_REGISTER_COMPONENT(BackgroundScrollComponent, init_background_scroll, nullptr);
+    ECS_REGISTER_COMPONENT(
+        BackgroundScrollComponent, init_background_scroll, nullptr
+    );
     ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PositionComponent, nullptr, nullptr);
@@ -301,27 +363,43 @@ void init_ecs() {
     ECS_REGISTER_COMPONENT(TagComponent, nullptr, nullptr);
 
     ECS_REGISTER_SYSTEM(background_scroll, nullptr, nullptr, nullptr);
-    ECS_REQUIRE_COMPONENT(background_scroll, BackgroundScrollComponent, PositionComponent, VelocityComponent);
+    ECS_REQUIRE_COMPONENT(
+        background_scroll,
+        BackgroundScrollComponent,
+        PositionComponent,
+        VelocityComponent
+    );
 
     ECS_REGISTER_SYSTEM(boundary, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(boundary, PositionComponent, TagComponent);
 
     ECS_REGISTER_SYSTEM(collision, nullptr, nullptr, nullptr);
-    ECS_REQUIRE_COMPONENT(collision, ColliderComponent, PositionComponent, TagComponent);
+    ECS_REQUIRE_COMPONENT(
+        collision, ColliderComponent, PositionComponent, TagComponent
+    );
 
     ECS_REGISTER_SYSTEM(coroutine, nullptr, nullptr, nullptr);
 
     ECS_REGISTER_SYSTEM(debug_bounding_boxes, nullptr, nullptr, nullptr);
-    ECS_REQUIRE_COMPONENT(debug_bounding_boxes, PositionComponent, ColliderComponent, SpriteComponent);
+    ECS_REQUIRE_COMPONENT(
+        debug_bounding_boxes,
+        PositionComponent,
+        ColliderComponent,
+        SpriteComponent
+    );
 
     ECS_REGISTER_SYSTEM(input, nullptr, nullptr, nullptr);
-    ECS_REQUIRE_COMPONENT(input, InputComponent, PositionComponent, TagComponent);
+    ECS_REQUIRE_COMPONENT(
+        input, InputComponent, PositionComponent, TagComponent
+    );
 
     ECS_REGISTER_SYSTEM(movement, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(movement, PositionComponent, VelocityComponent);
 
     ECS_REGISTER_SYSTEM(weapon, nullptr, nullptr, nullptr);
-    ECS_REQUIRE_COMPONENT(weapon, WeaponComponent, InputComponent, PositionComponent);
+    ECS_REQUIRE_COMPONENT(
+        weapon, WeaponComponent, InputComponent, PositionComponent
+    );
 
     ECS_REGISTER_SYSTEM(render, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(render, PositionComponent, SpriteComponent);

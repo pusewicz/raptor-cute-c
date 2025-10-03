@@ -12,9 +12,7 @@ static void wait_for(float seconds) {
     CF_Coroutine coro     = cf_coroutine_currently_running();
     double       end_time = CF_SECONDS + (double)seconds;
 
-    while (CF_SECONDS < end_time) {
-        cf_coroutine_yield(coro);
-    }
+    while (CF_SECONDS < end_time) { cf_coroutine_yield(coro); }
 }
 
 static void enemy_spawner(CF_Coroutine co) {
@@ -32,5 +30,10 @@ static void enemy_spawner(CF_Coroutine co) {
     }
 }
 
-void init_coroutines(void) { g_state->coroutines.spawner = cf_make_coroutine(enemy_spawner, CF_MB, nullptr); }
-void cleanup_coroutines(void) { cf_destroy_coroutine(g_state->coroutines.spawner); }
+void init_coroutines(void) {
+    g_state->coroutines.spawner =
+        cf_make_coroutine(enemy_spawner, CF_MB, nullptr);
+}
+void cleanup_coroutines(void) {
+    cf_destroy_coroutine(g_state->coroutines.spawner);
+}
