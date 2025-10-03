@@ -7,7 +7,7 @@ add_library(
     game.c
     ecs.c
     event.c
-    factories.c
+    factory.c
 )
 target_link_libraries(${NAME}
   PRIVATE project_warnings

@@ -6,7 +6,7 @@
 #include "../engine/game_state.h"
 #include "../engine/log.h"
 #include "ecs.h"
-#include "factories.h"
+#include "factory.h"
 
 const char* event_type_to_string(EventType color) {
     switch (color) {

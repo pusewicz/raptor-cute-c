@@ -18,7 +18,7 @@
 #include "coroutine.h"
 #include "ecs.h"
 #include "event.h"
-#include "factories.h"
+#include "factory.h"
 
 GameState* g_state = nullptr;
 

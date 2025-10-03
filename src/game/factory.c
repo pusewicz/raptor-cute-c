@@ -1,4 +1,4 @@
-#include "factories.h"
+#include "factory.h"
 
 #include <cute_math.h>
 #include <cute_result.h>

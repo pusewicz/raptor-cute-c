@@ -5,7 +5,7 @@
 #include "../engine/game_state.h"
 #include "../engine/log.h"
 #include "event.h"
-#include "factories.h"
+#include "factory.h"
 
 #define PICO_ECS_IMPLEMENTATION
 

@@ -6,7 +6,7 @@
 #include <cute_time.h>
 
 #include "../engine/game_state.h"
-#include "factories.h"
+#include "factory.h"
 
 static void wait_for(float seconds) {
     CF_Coroutine coro     = cf_coroutine_currently_running();
