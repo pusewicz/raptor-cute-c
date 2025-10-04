@@ -38,12 +38,9 @@ ecs_id_t make_player(float x, float y) {
 
     // Add sprite
     SpriteComponent* sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
-    CF_Result        result;
-    sprite->sprite = cf_make_easy_sprite_from_png("assets/player.png", &result);
-    sprite->z_index = Z_PLAYER_SPRITE;
-    if (cf_is_error(result)) {
-        APP_ERROR("Failed to load player sprite: %s\n", result.details);
-    }
+    sprite->sprite          = cf_make_sprite("assets/player.ase");
+    sprite->z_index         = Z_PLAYER_SPRITE;
+    cf_sprite_play(&sprite->sprite, "default");
 
     // Add weapon
     WeaponComponent* weapon = ECS_ADD_COMPONENT(id, WeaponComponent);
