@@ -285,6 +285,17 @@ static ecs_ret_t render_system(
             continue;
         }
 
+        // Player
+        if (entities[i] == g_state->entities.player) {
+            VelocityComponent* vel = ECS_GET(entities[i], VelocityComponent);
+            if (vel->x > 0)
+                cf_sprite_play(&sprite->sprite, "right");
+            else if (vel->x < 0)
+                cf_sprite_play(&sprite->sprite, "left");
+            else
+                cf_sprite_play(&sprite->sprite, "default");
+        }
+
         cf_sprite_update(&sprite->sprite);
         cf_draw_push();
         cf_draw_push_layer(sprite->z_index);
