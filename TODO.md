@@ -1,2 +1,6 @@
 - [ ] Add support for scene switching
 - [ ] Add sounds and loops https://discord.com/channels/432009046833233930/432009046833233932/1422677318341492860 (jamesking | https://github.com/TheMaverickProgrammer)
+- [ ] Add player ship booster
+- [ ] Add player ship turn animations
+- [ ] Add score
+- [ ] Add player lives
