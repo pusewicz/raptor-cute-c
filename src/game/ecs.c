@@ -274,19 +274,23 @@ static ecs_ret_t player_render_system(
     ecs_dt_t  dt [[maybe_unused]],
     void*     udata [[maybe_unused]]
 ) {
+    VelocityComponent* vel =
+        ECS_GET(g_state->entities.player, VelocityComponent);
     PositionComponent* pos =
         ECS_GET(g_state->entities.player, PositionComponent);
     PlayerSpriteComponent* sprite =
         ECS_GET(g_state->entities.player, PlayerSpriteComponent);
-    VelocityComponent* vel =
-        ECS_GET(g_state->entities.player, VelocityComponent);
 
-    if (vel->x > 0 && !cf_sprite_is_playing(&sprite->sprite, "right")) {
-        cf_sprite_play(&sprite->sprite, "right");
-        cf_sprite_play(&sprite->booster_sprite, "right");
-    } else if (vel->x < 0 && !cf_sprite_is_playing(&sprite->sprite, "left")) {
-        cf_sprite_play(&sprite->sprite, "left");
-        cf_sprite_play(&sprite->booster_sprite, "left");
+    if (vel->x > 0) {
+        if (!cf_sprite_is_playing(&sprite->sprite, "right")) {
+            cf_sprite_play(&sprite->sprite, "right");
+            cf_sprite_play(&sprite->booster_sprite, "right");
+        }
+    } else if (vel->x < 0) {
+        if (!cf_sprite_is_playing(&sprite->sprite, "left")) {
+            cf_sprite_play(&sprite->sprite, "left");
+            cf_sprite_play(&sprite->booster_sprite, "left");
+        }
     } else if (!cf_sprite_is_playing(&sprite->sprite, "default")) {
         cf_sprite_play(&sprite->sprite, "default");
         cf_sprite_play(&sprite->booster_sprite, "default");
