@@ -62,10 +62,11 @@
 
 // Helper macros to convert CamelCase to snake_case for component names
 #define COMPONENT_TO_UNDERSCORE(T)           UNDERSCORE_##T
-#define UNDERSCORE_BulletComponent           bullet
 #define UNDERSCORE_BackgroundScrollComponent background_scroll
+#define UNDERSCORE_BulletComponent           bullet
 #define UNDERSCORE_ColliderComponent         collider
 #define UNDERSCORE_InputComponent            input
+#define UNDERSCORE_PlayerSpriteComponent     player_sprite
 #define UNDERSCORE_PositionComponent         position
 #define UNDERSCORE_SpriteComponent           sprite
 #define UNDERSCORE_TagComponent              tag
@@ -136,6 +137,12 @@ typedef struct SpriteComponent {
     CF_Sprite sprite;
     ZIndex    z_index;  // Rendering order
 } SpriteComponent;
+
+typedef struct PlayerSpriteComponent {
+    CF_Sprite sprite;
+    CF_Sprite booster_sprite;
+    ZIndex    z_index;  // Rendering order
+} PlayerSpriteComponent;
 
 /*
  * Tag Component

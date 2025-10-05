@@ -17,30 +17,34 @@
 constexpr float WEAPON_DEFAULT_COOLDOWN = 0.15f;
 
 ecs_id_t make_player(float x, float y) {
-    ecs_id_t id             = make_entity();
+    ecs_id_t id            = make_entity();
 
     // Add position
-    PositionComponent* pos  = ECS_ADD_COMPONENT(id, PositionComponent);
-    pos->x                  = x;
-    pos->y                  = y;
+    PositionComponent* pos = ECS_ADD_COMPONENT(id, PositionComponent);
+    pos->x                 = x;
+    pos->y                 = y;
 
     // Add velocity
-    VelocityComponent* vel  = ECS_ADD_COMPONENT(id, VelocityComponent);
-    vel->x                  = 0.0f;
-    vel->y                  = 0.0f;
+    VelocityComponent* vel = ECS_ADD_COMPONENT(id, VelocityComponent);
+    vel->x                 = 0.0f;
+    vel->y                 = 0.0f;
 
     // Add input controls
-    InputComponent* input   = ECS_ADD_COMPONENT(id, InputComponent);
-    input->up               = false;
-    input->down             = false;
-    input->left             = false;
-    input->right            = false;
+    InputComponent* input  = ECS_ADD_COMPONENT(id, InputComponent);
+    input->up              = false;
+    input->down            = false;
+    input->left            = false;
+    input->right           = false;
 
     // Add sprite
-    SpriteComponent* sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
-    sprite->sprite          = cf_make_sprite("assets/player.ase");
-    sprite->z_index         = Z_PLAYER_SPRITE;
+    PlayerSpriteComponent* sprite =
+        ECS_ADD_COMPONENT(id, PlayerSpriteComponent);
+    sprite->sprite                  = cf_make_sprite("assets/player.ase");
+    sprite->booster_sprite          = cf_make_sprite("assets/boosters.ase");
+    sprite->booster_sprite.offset.y = -sprite->sprite.h;
+    sprite->z_index                 = Z_PLAYER_SPRITE;
     cf_sprite_play(&sprite->sprite, "default");
+    cf_sprite_play(&sprite->booster_sprite, "default");
 
     // Add weapon
     WeaponComponent* weapon = ECS_ADD_COMPONENT(id, WeaponComponent);
