@@ -27,6 +27,7 @@ typedef struct GameState {
     CF_DisplayID display_id;
     CF_Rnd       rnd;
     ecs_t*       ecs;
+    int          score;
 
     struct {
         ecs_id_t background_scroll;
