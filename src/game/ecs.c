@@ -267,6 +267,48 @@ static ecs_ret_t movement_system(
     return 0;
 }
 
+static ecs_ret_t player_render_system(
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities [[maybe_unused]],
+    int       entity_count [[maybe_unused]],
+    ecs_dt_t  dt [[maybe_unused]],
+    void*     udata [[maybe_unused]]
+) {
+    VelocityComponent* vel =
+        ECS_GET(g_state->entities.player, VelocityComponent);
+    PositionComponent* pos =
+        ECS_GET(g_state->entities.player, PositionComponent);
+    PlayerSpriteComponent* sprite =
+        ECS_GET(g_state->entities.player, PlayerSpriteComponent);
+
+    if (vel->x > 0) {
+        if (!cf_sprite_is_playing(&sprite->sprite, "right")) {
+            cf_sprite_play(&sprite->sprite, "right");
+            cf_sprite_play(&sprite->booster_sprite, "right");
+        }
+    } else if (vel->x < 0) {
+        if (!cf_sprite_is_playing(&sprite->sprite, "left")) {
+            cf_sprite_play(&sprite->sprite, "left");
+            cf_sprite_play(&sprite->booster_sprite, "left");
+        }
+    } else if (!cf_sprite_is_playing(&sprite->sprite, "default")) {
+        cf_sprite_play(&sprite->sprite, "default");
+        cf_sprite_play(&sprite->booster_sprite, "default");
+    }
+
+    cf_sprite_update(&sprite->sprite);
+    cf_sprite_update(&sprite->booster_sprite);
+    cf_draw_push();
+    cf_draw_push_layer(sprite->z_index);
+    cf_draw_translate_v2(*pos);
+    cf_draw_sprite(&sprite->sprite);
+    cf_draw_sprite(&sprite->booster_sprite);
+    cf_draw_pop_layer();
+    cf_draw_pop();
+
+    return 0;
+}
+
 static ecs_ret_t render_system(
     ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
 ) {
@@ -283,17 +325,6 @@ static ecs_ret_t render_system(
             cf_sprite_will_finish(&sprite->sprite)) {
             ECS_QUEUE_DESTROY(entities[i]);
             continue;
-        }
-
-        // Player
-        if (entities[i] == g_state->entities.player) {
-            VelocityComponent* vel = ECS_GET(entities[i], VelocityComponent);
-            if (vel->x > 0)
-                cf_sprite_play(&sprite->sprite, "right");
-            else if (vel->x < 0)
-                cf_sprite_play(&sprite->sprite, "left");
-            else
-                cf_sprite_play(&sprite->sprite, "default");
         }
 
         cf_sprite_update(&sprite->sprite);
@@ -367,11 +398,12 @@ void init_ecs() {
     );
     ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
+    ECS_REGISTER_COMPONENT(PlayerSpriteComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PositionComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(SpriteComponent, nullptr, nullptr);
+    ECS_REGISTER_COMPONENT(TagComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(VelocityComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(WeaponComponent, nullptr, nullptr);
-    ECS_REGISTER_COMPONENT(TagComponent, nullptr, nullptr);
 
     ECS_REGISTER_SYSTEM(background_scroll, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(
@@ -414,6 +446,11 @@ void init_ecs() {
 
     ECS_REGISTER_SYSTEM(render, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(render, PositionComponent, SpriteComponent);
+
+    ECS_REGISTER_SYSTEM(player_render, nullptr, nullptr, nullptr);
+    ECS_REQUIRE_COMPONENT(
+        player_render, PositionComponent, PlayerSpriteComponent
+    );
 }
 
 // Set the update functions for each system
@@ -429,5 +466,6 @@ void update_ecs_system_callbacks(void) {
     ECS_SET_SYSTEM_CALLBACKS(input);
     ECS_SET_SYSTEM_CALLBACKS(movement);
     ECS_SET_SYSTEM_CALLBACKS(render);
+    ECS_SET_SYSTEM_CALLBACKS(player_render);
     ECS_SET_SYSTEM_CALLBACKS(weapon);
 }
