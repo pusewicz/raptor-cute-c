@@ -131,22 +131,44 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
 
 constexpr float ENEMY_DEFAULT_SPEED = 0.5f;
 
-ecs_id_t make_enemy(float x, float y) {
-    auto id     = make_entity();
+ecs_id_t make_enemy_of_type(float x, float y, EnemyType type) {
+    auto id            = make_entity();
 
     // Add position
-    auto pos    = ECS_ADD_COMPONENT(id, PositionComponent);
-    pos->x      = x;
-    pos->y      = y;
+    auto pos           = ECS_ADD_COMPONENT(id, PositionComponent);
+    pos->x             = x;
+    pos->y             = y;
 
     // Add velocity
-    auto vel    = ECS_ADD_COMPONENT(id, VelocityComponent);
-    vel->x      = 0.0f;
-    vel->y      = -ENEMY_DEFAULT_SPEED;
+    auto vel           = ECS_ADD_COMPONENT(id, VelocityComponent);
+    vel->x             = 0.0f;
+    vel->y             = -ENEMY_DEFAULT_SPEED;
 
-    // Add sprite
-    auto sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
-    load_sprite(&sprite->sprite, "assets/alan.ase");
+    // Add sprite based on type
+    auto        sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
+    const char* sprite_path;
+    int         score_value;
+
+    switch (type) {
+        case ENEMY_TYPE_ALAN:
+            sprite_path = "assets/alan.ase";
+            score_value = 100;
+            break;
+        case ENEMY_TYPE_BON_BON:
+            sprite_path = "assets/bon_bon.ase";
+            score_value = 150;
+            break;
+        case ENEMY_TYPE_LIPS:
+            sprite_path = "assets/lips.ase";
+            score_value = 200;
+            break;
+        default:
+            sprite_path = "assets/alan.ase";
+            score_value = 100;
+            break;
+    }
+
+    load_sprite(&sprite->sprite, sprite_path);
     sprite->z_index        = Z_SPRITES;
 
     // Add collider
@@ -155,13 +177,20 @@ ecs_id_t make_enemy(float x, float y) {
 
     // Add score
     auto score             = ECS_ADD_COMPONENT(id, ScoreComponent);
-    *score                 = 100;
+    *score                 = score_value;
 
     // Add tag
     auto tag               = ECS_ADD_COMPONENT(id, TagComponent);
     *tag                   = TAG_ENEMY;
 
     return id;
+}
+
+// Convenience function that creates a random enemy type
+ecs_id_t make_enemy(float x, float y) {
+    EnemyType types[] = {ENEMY_TYPE_ALAN, ENEMY_TYPE_BON_BON, ENEMY_TYPE_LIPS};
+    int       type    = cf_rnd_range_int(&g_state->rnd, 0, 2);
+    return make_enemy_of_type(x, y, types[type]);
 }
 
 /*
