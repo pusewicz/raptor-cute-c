@@ -22,6 +22,34 @@
 #include <stddef.h>
 
 /*
+ * Helper functions
+ */
+
+static void damage_player(void) {
+    auto state = ECS_GET(g_state->entities.player, PlayerStateComponent);
+
+    // Only damage if player is alive and not invincible
+    if (!state->is_alive || state->is_invincible) { return; }
+
+    // Decrement lives
+    g_state->lives--;
+
+    // Create explosion at player position
+    auto player_pos = ECS_GET(g_state->entities.player, PositionComponent);
+    make_explosion(player_pos->x, player_pos->y);
+    cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
+
+    // Mark player as dead
+    state->is_alive      = false;
+    state->is_invincible = false;
+
+    // Set respawn delay if player has lives remaining
+    if (g_state->lives > 0) {
+        state->respawn_delay = 2.0f;  // 2 second respawn delay
+    }
+}
+
+/*
  * System update functions
  */
 
@@ -101,28 +129,14 @@ static ecs_ret_t collision_system(
                          (*tag_a == TAG_ENEMY && *tag_b == TAG_PLAYER)) {
                     auto state = ECS_GET(g_state->entities.player, PlayerStateComponent);
 
-                    // Only damage if player is alive and not invincible
+                    // Only process collision if player is alive and not invincible
                     if (state->is_alive && !state->is_invincible) {
                         // Destroy the enemy
                         ecs_id_t enemy_id = (*tag_a == TAG_ENEMY) ? entities[i] : entities[j];
                         ECS_QUEUE_DESTROY(enemy_id);
 
-                        // Decrement lives
-                        g_state->lives--;
-
-                        // Create explosion at player position
-                        auto player_pos = ECS_GET(g_state->entities.player, PositionComponent);
-                        make_explosion(player_pos->x, player_pos->y);
-                        cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
-
-                        // Mark player as dead
-                        state->is_alive      = false;
-                        state->is_invincible = false;
-
-                        // Set respawn delay if player has lives remaining
-                        if (g_state->lives > 0) {
-                            state->respawn_delay = 2.0f;  // 2 second respawn delay
-                        }
+                        // Damage the player
+                        damage_player();
                     }
                 }
                 // Enemy bullet vs Player collision
@@ -130,28 +144,14 @@ static ecs_ret_t collision_system(
                          (*tag_a == TAG_PLAYER && *tag_b == TAG_ENEMY_BULLET)) {
                     auto state = ECS_GET(g_state->entities.player, PlayerStateComponent);
 
-                    // Only damage if player is alive and not invincible
+                    // Only process collision if player is alive and not invincible
                     if (state->is_alive && !state->is_invincible) {
                         // Destroy the enemy bullet
                         ecs_id_t bullet_id = (*tag_a == TAG_ENEMY_BULLET) ? entities[i] : entities[j];
                         ECS_QUEUE_DESTROY(bullet_id);
 
-                        // Decrement lives
-                        g_state->lives--;
-
-                        // Create explosion at player position
-                        auto player_pos = ECS_GET(g_state->entities.player, PositionComponent);
-                        make_explosion(player_pos->x, player_pos->y);
-                        cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
-
-                        // Mark player as dead
-                        state->is_alive      = false;
-                        state->is_invincible = false;
-
-                        // Set respawn delay if player has lives remaining
-                        if (g_state->lives > 0) {
-                            state->respawn_delay = 2.0f;  // 2 second respawn delay
-                        }
+                        // Damage the player
+                        damage_player();
                     }
                 }
             }
