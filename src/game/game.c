@@ -2,6 +2,7 @@
 
 #include <cute_alloc.h>
 #include <cute_app.h>
+#include <cute_audio.h>
 #include <cute_c_runtime.h>
 #include <cute_color.h>
 #include <cute_defines.h>
@@ -20,6 +21,7 @@
 #include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
 #include "../engine/log.h"
+#include "asset/audio.h"
 #include "asset/font.h"
 #include "asset/sprite.h"
 #include "coroutine.h"
@@ -80,6 +82,12 @@ EXPORT void game_init(Platform* platform) {
 #endif
 
     load_font("assets/tiny-and-chunky.ttf", "TinyAndChunky");
+
+    load_audio(&g_state->audio.music, "assets/music.ogg");
+    load_audio(&g_state->audio.laser_shoot, "assets/laser-shoot.ogg");
+    load_audio(&g_state->audio.explosion, "assets/explosion.ogg");
+    load_sprite(&g_state->sprites.life_icon, "assets/life_icon.png");
+    cf_music_play(g_state->audio.music, 0.5f);
 }
 
 EXPORT bool game_update(void) {
@@ -146,14 +154,11 @@ EXPORT void game_render(void) {
             }
         }
 
-        CF_Sprite life_icon = {0};
-        load_sprite(&life_icon, "assets/life_icon.png");
-
         // Render life icons
         const int icon_margin_right  = 4;
         const int icon_margin_bottom = 4;
-        float     icon_width         = (float)life_icon.w;
-        float     icon_height        = (float)life_icon.h;
+        float     icon_width         = (float)g_state->sprites.life_icon.w;
+        float     icon_height        = (float)g_state->sprites.life_icon.h;
         float     canvas_half_width  = (float)cf_app_get_canvas_width() / 2 / g_state->scale;
         float     canvas_half_height = (float)cf_app_get_canvas_height() / 2 / g_state->scale;
 
@@ -162,7 +167,7 @@ EXPORT void game_render(void) {
             float y = -canvas_half_height + icon_margin_bottom + icon_height / 4;
             cf_draw() {
                 cf_draw_translate_v2(cf_v2(x, y));
-                cf_draw_sprite(&life_icon);
+                cf_draw_sprite(&g_state->sprites.life_icon);
             }
         }
     }

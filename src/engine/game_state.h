@@ -2,11 +2,13 @@
 
 #include <cute_alloc.h>
 #include <cute_app.h>
+#include <cute_audio.h>
 #include <cute_color.h>
 #include <cute_coroutine.h>
 #include <cute_draw.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
+#include <cute_sprite.h>
 
 #include "../game/ecs.h"
 #include "pico_ecs.h"
@@ -65,6 +67,16 @@ typedef struct GameState {
     struct {
         CF_Coroutine spawner;
     } coroutines;
+
+    struct {
+        CF_Audio music;
+        CF_Audio laser_shoot;
+        CF_Audio explosion;
+    } audio;
+
+    struct {
+        CF_Sprite life_icon;
+    } sprites;
 
     bool debug_bounding_boxes;
 } GameState;

@@ -33,3 +33,14 @@ https://github.com/user-attachments/assets/08e2b5d0-6ecd-49f0-ad4d-f82f6726f973
    cd build
    ./Raptor
    ```
+
+### Credits
+
+#### Sprites
+
+  - [GrafxKid](https://grafxkid.itch.io)
+
+#### Sounds
+
+  - @TheMaverickProgrammer
+
