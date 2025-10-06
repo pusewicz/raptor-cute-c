@@ -1,46 +1,71 @@
-# Raptor
+# 🚀 Raptor
 
-Raptor is a small shoot 'em up game made with [Cute Framework](https://github.com/RandyGaul/cute_framework) and written in C.
+A classic arcade-style shoot 'em up that brings retro gaming action to modern systems! Built with [Cute Framework](https://github.com/RandyGaul/cute_framework) and written in pure C23, Raptor features smooth gameplay, hot-reloadable game logic for rapid development, and beautiful pixel art.
 
 https://github.com/user-attachments/assets/08e2b5d0-6ecd-49f0-ad4d-f82f6726f973
+
+## ✨ Features
+
+- **Fast-paced arcade action** with smooth scrolling and responsive controls
+- **Hot-reloadable game library** - modify code and see changes instantly without restarting
+- **Custom memory management** with arena allocators for optimal performance
+- **Beautiful pixel art** from renowned artist GrafxKid
+- **Pure C23** codebase showcasing modern C development practices
 
 ## Controls
 
 - Arrow Keys/WASD: Move the ship
 - Space/Mouse Button 1: Shoot
 
-## Building
+## 🎮 Quick Start
 
 ### Prerequisites
 
-- [CMake](https://cmake.org/)
+- [CMake](https://cmake.org/) 3.15 or higher
+- A C23-compatible compiler (GCC, Clang, or MSVC)
+- [Ninja build system](https://ninja-build.org/) (recommended)
 
 ### macOS
 
-1. Install dependencies using Homebrew:
-   ```sh
-   brew install cmake
-   ```
-2. Clone the repository:
-   ```sh
-   git clone https://github.com/pusewicz/raptor-cute-c.git
-   cd raptor-cute-c
-   ```
-3. Build and run the project:
-   ```sh
-   cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
-   cmake --build build
-   cd build
-   ./Raptor
-   ```
+```sh
+# Install dependencies
+brew install cmake ninja
 
-### Credits
+# Clone and enter the project
+git clone https://github.com/pusewicz/raptor-cute-c.git
+cd raptor-cute-c
 
-#### Sprites
+# Build and play!
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
+cd build
+./Raptor
+```
 
-  - [GrafxKid](https://grafxkid.itch.io)
+### 🔥 Developer Mode (Hot Reload)
 
-#### Sounds
+Want to modify the game while it's running? Use the watch mode:
 
-  - @TheMaverickProgrammer
+```sh
+rake watch  # Auto-recompiles on file changes
+rake run    # Run the game in another terminal
+```
+
+Now edit `src/game/game.c` and watch your changes appear instantly in the running game!
+
+## 🙏 Credits
+
+This project wouldn't be possible without the amazing work of:
+
+- **Sprites**: [GrafxKid](https://grafxkid.itch.io) - Gorgeous pixel art assets
+- **Sounds**: [TheMaverickProgrammer](https://github.com/TheMaverickProgrammer) - Crisp sound effects
+- **Framework**: [Cute Framework](https://github.com/RandyGaul/cute_framework) by Randy Gaul - Powerful and lightweight C game framework
+
+## 📝 License
+
+See the [LICENSE](LICENSE) file for details.
+
+---
+
+Made with ❤️ and C23. Pull requests welcome!
 
