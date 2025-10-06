@@ -4,7 +4,7 @@
 
 #include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
-#include "../engine/log.h"
+#include "asset/sprite.h"
 #include "event.h"
 #include "factory.h"
 
@@ -327,7 +327,7 @@ static void init_background_scroll(
     auto comp = (BackgroundScrollComponent*)ptr;
 
     for (int i = 0; i < BACKGROUND_SCROLL_SPRITE_COUNT; ++i) {
-        comp->sprites[i] = cf_make_sprite("assets/background.ase");
+        load_sprite(&comp->sprites[i], "assets/background.ase");
 
         // Set the initial frame to 0 or 1 based on the index to create a
         // checkerboard pattern

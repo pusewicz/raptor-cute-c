@@ -8,6 +8,7 @@
 #include <cute_draw.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
+#include <cute_sprite.h>
 #include <cute_time.h>
 #include <dcimgui.h>
 #include <pico_ecs.h>
@@ -20,6 +21,7 @@
 #include "../engine/game_state.h"
 #include "../engine/log.h"
 #include "asset/font.h"
+#include "asset/sprite.h"
 #include "coroutine.h"
 #include "ecs.h"
 #include "event.h"
@@ -54,6 +56,7 @@ EXPORT void game_init(Platform* platform) {
     g_state->scratch_arena        = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
     g_state->rnd                  = cf_rnd_seed((uint32_t)time(nullptr));
     g_state->debug_bounding_boxes = false;
+    g_state->lives                = 3;
 
     // Initialize ECS
     g_state->ecs                  = ecs_new(96, nullptr);
@@ -140,6 +143,26 @@ EXPORT void game_render(void) {
             }
             cf_draw_color(cf_color_white()) {
                 cf_draw_text(score_text, cf_v2(offset_x - margin_right, offset_y - margin_top), -1);
+            }
+        }
+
+        CF_Sprite life_icon = {0};
+        load_sprite(&life_icon, "assets/life_icon.png");
+
+        // Render life icons
+        const int icon_margin_right  = 4;
+        const int icon_margin_bottom = 4;
+        float     icon_width         = (float)life_icon.w;
+        float     icon_height        = (float)life_icon.h;
+        float     canvas_half_width  = (float)cf_app_get_canvas_width() / 2 / g_state->scale;
+        float     canvas_half_height = (float)cf_app_get_canvas_height() / 2 / g_state->scale;
+
+        for (int i = 0; i < g_state->lives; i++) {
+            float x = canvas_half_width - icon_margin_right - (i + 1) * (icon_width) + icon_width / 2;
+            float y = -canvas_half_height + icon_margin_bottom + icon_height / 4;
+            cf_draw() {
+                cf_draw_translate_v2(cf_v2(x, y));
+                cf_draw_sprite(&life_icon);
             }
         }
     }
