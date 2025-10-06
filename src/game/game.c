@@ -84,18 +84,15 @@ EXPORT void game_init(Platform* platform) {
 EXPORT bool game_update(void) {
     cf_arena_reset(&g_state->scratch_arena);
 
-    ecs_ret_t ret = ecs_update_systems(g_state->ecs, CF_DELTA_TIME);
+    auto ret = ecs_update_systems(g_state->ecs, CF_DELTA_TIME);
 
     return ret == 0;
 }
 
 static void game_render_debug(void) {
-    WeaponComponent* weapon =
-        ECS_GET(g_state->entities.player, WeaponComponent);
-    PositionComponent* pos =
-        ECS_GET(g_state->entities.player, PositionComponent);
-    VelocityComponent* vel =
-        ECS_GET(g_state->entities.player, VelocityComponent);
+    auto weapon = ECS_GET(g_state->entities.player, WeaponComponent);
+    auto pos    = ECS_GET(g_state->entities.player, PositionComponent);
+    auto vel    = ECS_GET(g_state->entities.player, VelocityComponent);
 
     ImGui_Begin("Debug Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
     if (ImGui_CollapsingHeader("Debug", true)) {

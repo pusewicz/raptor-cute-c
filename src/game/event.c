@@ -49,10 +49,10 @@ void event_clear_listeners(void) {
 }
 
 static void on_collision_destroy_bullet_or_enemy(void* data) {
-    CollisionEvent* e = (CollisionEvent*)data;
+    auto e = (CollisionEvent*)data;
     {
-        TagComponent* tag_a = ECS_GET(e->entity_a, TagComponent);
-        TagComponent* tag_b = ECS_GET(e->entity_b, TagComponent);
+        auto tag_a = ECS_GET(e->entity_a, TagComponent);
+        auto tag_b = ECS_GET(e->entity_b, TagComponent);
 
         if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) ||
             (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
@@ -63,16 +63,16 @@ static void on_collision_destroy_bullet_or_enemy(void* data) {
 }
 
 static void on_collision_explosion(void* data) {
-    CollisionEvent* e = (CollisionEvent*)data;
+    auto e = (CollisionEvent*)data;
     {
-        TagComponent* tag_a = ECS_GET(e->entity_a, TagComponent);
-        TagComponent* tag_b = ECS_GET(e->entity_b, TagComponent);
+        auto tag_a = ECS_GET(e->entity_a, TagComponent);
+        auto tag_b = ECS_GET(e->entity_b, TagComponent);
 
         if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) ||
             (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
-            PositionComponent* pos_a = ECS_GET(e->entity_a, PositionComponent);
-            PositionComponent* pos_b = ECS_GET(e->entity_b, PositionComponent);
-            CF_V2* explosion_pos     = (*tag_a == TAG_BULLET) ? pos_b : pos_a;
+            auto pos_a         = ECS_GET(e->entity_a, PositionComponent);
+            auto pos_b         = ECS_GET(e->entity_b, PositionComponent);
+            auto explosion_pos = (*tag_a == TAG_BULLET) ? pos_b : pos_a;
 
             make_explosion(explosion_pos->x, explosion_pos->y);
         }
