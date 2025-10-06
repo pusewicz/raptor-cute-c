@@ -69,4 +69,4 @@ The project uses a **hot-reloadable game library architecture**:
 
 ### Instructions
 
-- Always confirm the code compiles by executing `rake compile`.
+- Always format and compile after changes: `rake format compile`.
