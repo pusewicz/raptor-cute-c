@@ -45,14 +45,15 @@ The project uses a **hot-reloadable game library architecture**:
 2. **Game Library Interface**: Function pointers for hot reloading:
    - `game_init()` - Initialize game state
    - `game_update()` - Main game loop logic
-   - `game_render()` - Rendering (currently unused)
+   - `game_render()` - Rendering
    - `game_shutdown()` - Cleanup
+   - `game_state()` - Returns current game state pointer
+   - `game_hot_reload()` - Restores game state after library reload
 
 3. **Platform Abstraction**: Platform-specific code isolated in `platform/` directory with functions for:
    - Memory allocation/deallocation
-   - Game library loading/reloading
-   - Input handling
-   - Frame timing
+   - Game library loading/reloading/unloading
+   - Frame timing (begin/end frame)
 
 ### Dependencies
 
