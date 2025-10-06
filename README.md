@@ -58,7 +58,7 @@ Now edit `src/game/game.c` and watch your changes appear instantly in the runnin
 This project wouldn't be possible without the amazing work of:
 
 - **Sprites**: [GrafxKid](https://grafxkid.itch.io) - Gorgeous pixel art assets
-- **Sounds**: @TheMaverickProgrammer - Crisp sound effects
+- **Sounds**: [TheMaverickProgrammer](https://github.com/TheMaverickProgrammer) - Crisp sound effects
 - **Framework**: [Cute Framework](https://github.com/RandyGaul/cute_framework) by Randy Gaul - Powerful and lightweight C game framework
 
 ## 📝 License
