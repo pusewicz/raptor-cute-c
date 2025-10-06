@@ -17,12 +17,13 @@ bool load_sprite(CF_Sprite* sprite, const char* path) {
     if (has_extension(path, "png")) {
         CF_Result result = {0};
         *sprite          = cf_make_easy_sprite_from_png(path, &result);
-        if (result.code != CF_RESULT_SUCCESS) {
+
+        if (cf_is_error(result)) {
             APP_ERROR("Could not load sprite: %s", result.details != NULL ? result.details : "No details");
             return false;
-        } else {
-            return true;
         }
+
+        return true;
     } else if (has_extension(path, "ase") || has_extension(path, "aseprite")) {
         *sprite = cf_make_sprite(path);
         return true;
