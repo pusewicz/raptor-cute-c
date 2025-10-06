@@ -5,10 +5,8 @@
 #ifndef APP_DEACTIVATE_LOGGING
 
     #if DEBUG
-        #define APP_TRACE(...)                                 \
-            SDL_LogTrace(SDL_LOG_CATEGORY_CUSTOM, __VA_ARGS__)
-        #define APP_DEBUG(...)                                 \
-            SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, __VA_ARGS__)
+        #define APP_TRACE(...) SDL_LogTrace(SDL_LOG_CATEGORY_CUSTOM, __VA_ARGS__)
+        #define APP_DEBUG(...) SDL_LogDebug(SDL_LOG_CATEGORY_CUSTOM, __VA_ARGS__)
     #else
         #define APP_TRACE(...)
         #define APP_DEBUG(...)
