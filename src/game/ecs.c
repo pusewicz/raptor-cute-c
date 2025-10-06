@@ -25,15 +25,13 @@
  */
 
 static ecs_ret_t background_scroll_system(
-    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities [[maybe_unused]],
+    int       entity_count [[maybe_unused]],
+    ecs_dt_t  dt [[maybe_unused]],
+    void*     udata [[maybe_unused]]
 ) {
-    (void)ecs;
-    (void)entities;
-    (void)entity_count;
-    (void)dt;
-    (void)udata;
-
-    BackgroundScrollComponent* bg_scroll =
+    auto bg_scroll =
         ECS_GET(g_state->entities.background_scroll, BackgroundScrollComponent);
     bg_scroll->y_offset += 0.1f;
     if (bg_scroll->y_offset >= bg_scroll->max_y_offset) {
@@ -79,14 +77,13 @@ static ecs_ret_t collision_system(
                 continue;
             }
 
-            PositionComponent* pos_a = ECS_GET(entities[i], PositionComponent);
-            PositionComponent* pos_b = ECS_GET(entities[j], PositionComponent);
-            ColliderComponent* col_a = ECS_GET(entities[i], ColliderComponent);
-            ColliderComponent* col_b = ECS_GET(entities[j], ColliderComponent);
-
-            CF_Aabb aabb_a =
+            auto pos_a = ECS_GET(entities[i], PositionComponent);
+            auto pos_b = ECS_GET(entities[j], PositionComponent);
+            auto col_a = ECS_GET(entities[i], ColliderComponent);
+            auto col_b = ECS_GET(entities[j], ColliderComponent);
+            auto aabb_a =
                 cf_make_aabb_center_half_extents(*pos_a, col_a->half_extents);
-            CF_Aabb aabb_b =
+            auto aabb_b =
                 cf_make_aabb_center_half_extents(*pos_b, col_b->half_extents);
 
             if (cf_aabb_to_aabb(aabb_a, aabb_b)) {
@@ -118,18 +115,18 @@ static ecs_ret_t boundary_system(
     void*     udata [[maybe_unused]]
 ) {
     for (int i = 0; i < entity_count; ++i) {
-        ecs_id_t           entity_id   = entities[i];
-        ColliderComponent* collider    = ECS_GET(entity_id, ColliderComponent);
-        PositionComponent* position    = ECS_GET(entity_id, PositionComponent);
-        CF_Aabb            canvas_aabb = cf_make_aabb_center_half_extents(
+        auto entity_id   = entities[i];
+        auto collider    = ECS_GET(entity_id, ColliderComponent);
+        auto position    = ECS_GET(entity_id, PositionComponent);
+        auto canvas_aabb = cf_make_aabb_center_half_extents(
             cf_v2(0, 0), cf_div_v2_f(g_state->canvas_size, 2.0f)
         );
-        CF_Aabb entity_aabb =
+        auto entity_aabb =
             cf_make_aabb_center_half_extents(*position, collider->half_extents);
 
         // Check if entity is outside canvas bounds
         if (!cf_aabb_to_aabb(canvas_aabb, entity_aabb)) {
-            TagComponent* tag = ECS_GET(entity_id, TagComponent);
+            auto tag = ECS_GET(entity_id, TagComponent);
             switch (*tag) {
                 case TAG_BULLET:
                 case TAG_ENEMY:
@@ -145,14 +142,12 @@ static ecs_ret_t boundary_system(
 }
 
 static ecs_ret_t coroutine_system(
-    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities [[maybe_unused]],
+    int       entity_count [[maybe_unused]],
+    ecs_dt_t  dt [[maybe_unused]],
+    void*     udata [[maybe_unused]]
 ) {
-    (void)ecs;
-    (void)entities;
-    (void)entity_count;
-    (void)dt;
-    (void)udata;
-
     if (cf_coroutine_state(g_state->coroutines.spawner) !=
         CF_COROUTINE_STATE_DEAD) {
         cf_coroutine_resume(g_state->coroutines.spawner);
@@ -162,24 +157,24 @@ static ecs_ret_t coroutine_system(
 }
 
 static ecs_ret_t debug_bounding_boxes_system(
-    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities,
+    int       entity_count,
+    ecs_dt_t  dt [[maybe_unused]],
+    void*     udata [[maybe_unused]]
 ) {
-    (void)ecs;
-    (void)dt;
-    (void)udata;
-
     if (!g_state->debug_bounding_boxes) { return 0; }
 
     for (int i = 0; i < entity_count; ++i) {
-        ecs_id_t entity_id             = entities[i];
+        ecs_id_t entity_id = entities[i];
 
-        SpriteComponent*   sprite      = ECS_GET(entity_id, SpriteComponent);
-        PositionComponent* position    = ECS_GET(entity_id, PositionComponent);
-        ColliderComponent* collider    = ECS_GET(entity_id, ColliderComponent);
-        CF_Aabb            aabb_sprite = cf_make_aabb_center_half_extents(
+        auto sprite        = ECS_GET(entity_id, SpriteComponent);
+        auto position      = ECS_GET(entity_id, PositionComponent);
+        auto collider      = ECS_GET(entity_id, ColliderComponent);
+        auto aabb_sprite   = cf_make_aabb_center_half_extents(
             *position, cf_v2(sprite->sprite.w / 2.0f, sprite->sprite.h / 2.0f)
         );
-        CF_Aabb aabb_collider =
+        auto aabb_collider =
             cf_make_aabb_center_half_extents(*position, collider->half_extents);
 
         cf_draw_push();
@@ -199,20 +194,18 @@ static ecs_ret_t debug_bounding_boxes_system(
 }
 
 static ecs_ret_t input_system(
-    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities [[maybe_unused]],
+    int       entity_count [[maybe_unused]],
+    ecs_dt_t  dt [[maybe_unused]],
+    void*     udata [[maybe_unused]]
 ) {
-    (void)ecs;
-    (void)dt;
-    (void)entities;
-    (void)entity_count;
-    (void)udata;
+    auto input   = ECS_GET(g_state->entities.player, InputComponent);
 
-    InputComponent* input = ECS_GET(g_state->entities.player, InputComponent);
-
-    input->up             = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
-    input->down           = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
-    input->left           = cf_key_down(CF_KEY_A) || cf_key_down(CF_KEY_LEFT);
-    input->right          = cf_key_down(CF_KEY_D) || cf_key_down(CF_KEY_RIGHT);
+    input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
+    input->down  = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
+    input->left  = cf_key_down(CF_KEY_A) || cf_key_down(CF_KEY_LEFT);
+    input->right = cf_key_down(CF_KEY_D) || cf_key_down(CF_KEY_RIGHT);
     input->shoot =
         cf_key_down(CF_KEY_SPACE) || cf_mouse_down(CF_MOUSE_BUTTON_LEFT);
 
@@ -220,18 +213,16 @@ static ecs_ret_t input_system(
 }
 
 static ecs_ret_t movement_system(
-    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities,
+    int       entity_count,
+    ecs_dt_t  dt [[maybe_unused]],
+    void*     udata [[maybe_unused]]
 ) {
-    (void)ecs;
-    (void)dt;
-    (void)udata;
-
     // TODO: Special case for player for now
     {
-        VelocityComponent* vel =
-            ECS_GET(g_state->entities.player, VelocityComponent);
-        InputComponent* input =
-            ECS_GET(g_state->entities.player, InputComponent);
+        auto  vel   = ECS_GET(g_state->entities.player, VelocityComponent);
+        auto  input = ECS_GET(g_state->entities.player, InputComponent);
         float speed = 1.0f;
 
         vel->x = vel->y = 0.0f;
@@ -243,8 +234,8 @@ static ecs_ret_t movement_system(
     }
 
     for (int i = 0; i < entity_count; i++) {
-        PositionComponent* pos = ECS_GET(entities[i], PositionComponent);
-        VelocityComponent* vel = ECS_GET(entities[i], VelocityComponent);
+        auto pos = ECS_GET(entities[i], PositionComponent);
+        auto vel = ECS_GET(entities[i], VelocityComponent);
 
         pos->x += vel->x;
         pos->y += vel->y;
@@ -274,12 +265,9 @@ static ecs_ret_t player_render_system(
     ecs_dt_t  dt [[maybe_unused]],
     void*     udata [[maybe_unused]]
 ) {
-    VelocityComponent* vel =
-        ECS_GET(g_state->entities.player, VelocityComponent);
-    PositionComponent* pos =
-        ECS_GET(g_state->entities.player, PositionComponent);
-    PlayerSpriteComponent* sprite =
-        ECS_GET(g_state->entities.player, PlayerSpriteComponent);
+    auto vel    = ECS_GET(g_state->entities.player, VelocityComponent);
+    auto pos    = ECS_GET(g_state->entities.player, PositionComponent);
+    auto sprite = ECS_GET(g_state->entities.player, PlayerSpriteComponent);
 
     if (vel->x > 0) {
         if (!cf_sprite_is_playing(&sprite->sprite, "right")) {
@@ -310,15 +298,15 @@ static ecs_ret_t player_render_system(
 }
 
 static ecs_ret_t render_system(
-    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities,
+    int       entity_count,
+    ecs_dt_t  dt [[maybe_unused]],
+    void*     udata [[maybe_unused]]
 ) {
-    (void)ecs;
-    (void)dt;
-    (void)udata;
-
     for (int i = 0; i < entity_count; i++) {
-        PositionComponent* pos    = ECS_GET(entities[i], PositionComponent);
-        SpriteComponent*   sprite = ECS_GET(entities[i], SpriteComponent);
+        auto pos    = ECS_GET(entities[i], PositionComponent);
+        auto sprite = ECS_GET(entities[i], SpriteComponent);
 
         // Destroy sprite if animation is not looped and has finished
         if (!cf_sprite_get_loop(&sprite->sprite) &&
@@ -340,26 +328,23 @@ static ecs_ret_t render_system(
 }
 
 static ecs_ret_t weapon_system(
-    ecs_t* ecs, ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities [[maybe_unused]],
+    int       entity_count [[maybe_unused]],
+    ecs_dt_t  dt,
+    void*     udata [[maybe_unused]]
 ) {
-    (void)ecs;
-    (void)entities;
-    (void)entity_count;
-    (void)udata;
-
-    WeaponComponent* weapon =
-        ECS_GET(g_state->entities.player, WeaponComponent);
+    auto weapon = ECS_GET(g_state->entities.player, WeaponComponent);
 
     if (weapon->time_since_shot < weapon->cooldown) {
         weapon->time_since_shot += (float)dt;
         return 0;
     }
 
-    InputComponent* input = ECS_GET(g_state->entities.player, InputComponent);
+    auto input = ECS_GET(g_state->entities.player, InputComponent);
     if (input->shoot) {
         weapon->time_since_shot = 0.0f;
-        PositionComponent* pos =
-            ECS_GET(g_state->entities.player, PositionComponent);
+        auto pos = ECS_GET(g_state->entities.player, PositionComponent);
         make_bullet(pos->x, pos->y, cf_v2(0, 1));
     }
 
@@ -373,13 +358,12 @@ void* add_component_impl(
 }
 
 static void init_background_scroll(
-    ecs_t* ecs, ecs_id_t entity_id, void* ptr, void* args
+    ecs_t*   ecs [[maybe_unused]],
+    ecs_id_t entity_id [[maybe_unused]],
+    void*    ptr,
+    void*    args [[maybe_unused]]
 ) {
-    (void)ecs;
-    (void)entity_id;
-    (void)args;
-
-    BackgroundScrollComponent* comp = (BackgroundScrollComponent*)ptr;
+    auto comp = (BackgroundScrollComponent*)ptr;
 
     for (int i = 0; i < BACKGROUND_SCROLL_SPRITE_COUNT; ++i) {
         comp->sprites[i] = cf_make_sprite("assets/background.ase");
