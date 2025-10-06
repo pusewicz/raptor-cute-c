@@ -3,18 +3,23 @@
 #include <cute_alloc.h>
 #include <cute_app.h>
 #include <cute_c_runtime.h>
+#include <cute_color.h>
 #include <cute_defines.h>
+#include <cute_draw.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
 #include <cute_time.h>
 #include <dcimgui.h>
 #include <pico_ecs.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
+#include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
 #include "../engine/log.h"
+#include "asset/font.h"
 #include "coroutine.h"
 #include "ecs.h"
 #include "event.h"
@@ -54,7 +59,7 @@ EXPORT void game_init(Platform* platform) {
     g_state->ecs                  = ecs_new(96, nullptr);
     init_ecs();
     g_state->entities.background_scroll = make_background_scroll();
-    g_state->entities.player            = make_player(0.0f, 0.0f);
+    g_state->entities.player            = make_player(0.0f, -g_state->canvas_size.y / 3);
 
     init_coroutines();
     init_events();
@@ -70,6 +75,8 @@ EXPORT void game_init(Platform* platform) {
 #ifdef DEBUG
     cf_app_init_imgui();
 #endif
+
+    load_font("assets/tiny-and-chunky.ttf", "TinyAndChunky");
 }
 
 EXPORT bool game_update(void) {
@@ -114,6 +121,28 @@ static void game_render_debug(void) {
 }
 
 EXPORT void game_render(void) {
+    // Render UI
+    char score_text[6 + 1];
+
+    cf_draw() {
+        cf_font("TinyAndChunky") {
+            cf_push_font_size(7);
+            snprintf(score_text, 7, "%06d", g_state->score);
+            float     text_width   = cf_text_width(score_text, -1);
+            float     text_height  = cf_text_height(score_text, -1);
+            float     offset_x     = (float)cf_app_get_canvas_width() / 2 / g_state->scale - text_width;
+            float     offset_y     = (float)cf_app_get_canvas_height() / 2 / g_state->scale + text_height / 2;
+            const int margin_top   = 4;
+            const int margin_right = 4;
+
+            cf_draw_color(cf_make_color_rgb(20, 91, 132)) {
+                cf_draw_text(score_text, cf_v2(offset_x + 1 - margin_right, offset_y - 1 - margin_top), -1);
+            }
+            cf_draw_color(cf_color_white()) {
+                cf_draw_text(score_text, cf_v2(offset_x - margin_right, offset_y - margin_top), -1);
+            }
+        }
+    }
 #ifdef DEBUG
     game_render_debug();
 #endif

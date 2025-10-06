@@ -42,31 +42,30 @@ void event_clear_listeners(void) {
 }
 
 static void on_collision_destroy_bullet_or_enemy(void* data) {
-    auto e = (CollisionEvent*)data;
-    {
-        auto tag_a = ECS_GET(e->entity_a, TagComponent);
-        auto tag_b = ECS_GET(e->entity_b, TagComponent);
+    auto e     = (CollisionEvent*)data;
+    auto tag_a = ECS_GET(e->entity_a, TagComponent);
+    auto tag_b = ECS_GET(e->entity_b, TagComponent);
 
-        if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
-            ECS_QUEUE_DESTROY(e->entity_a);
-            ECS_QUEUE_DESTROY(e->entity_b);
-        }
+    if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
+        auto score = ECS_GET((*tag_a == TAG_ENEMY) ? e->entity_a : e->entity_b, ScoreComponent);
+        g_state->score += *score;
+
+        ECS_QUEUE_DESTROY(e->entity_a);
+        ECS_QUEUE_DESTROY(e->entity_b);
     }
 }
 
 static void on_collision_explosion(void* data) {
-    auto e = (CollisionEvent*)data;
-    {
-        auto tag_a = ECS_GET(e->entity_a, TagComponent);
-        auto tag_b = ECS_GET(e->entity_b, TagComponent);
+    auto e     = (CollisionEvent*)data;
+    auto tag_a = ECS_GET(e->entity_a, TagComponent);
+    auto tag_b = ECS_GET(e->entity_b, TagComponent);
 
-        if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
-            auto pos_a         = ECS_GET(e->entity_a, PositionComponent);
-            auto pos_b         = ECS_GET(e->entity_b, PositionComponent);
-            auto explosion_pos = (*tag_a == TAG_BULLET) ? pos_b : pos_a;
+    if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
+        auto pos_a         = ECS_GET(e->entity_a, PositionComponent);
+        auto pos_b         = ECS_GET(e->entity_b, PositionComponent);
+        auto explosion_pos = (*tag_a == TAG_BULLET) ? pos_b : pos_a;
 
-            make_explosion(explosion_pos->x, explosion_pos->y);
-        }
+        make_explosion(explosion_pos->x, explosion_pos->y);
     }
 }
 

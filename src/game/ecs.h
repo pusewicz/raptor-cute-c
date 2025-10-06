@@ -54,6 +54,7 @@
 #define UNDERSCORE_InputComponent            input
 #define UNDERSCORE_PlayerSpriteComponent     player_sprite
 #define UNDERSCORE_PositionComponent         position
+#define UNDERSCORE_ScoreComponent            score
 #define UNDERSCORE_SpriteComponent           sprite
 #define UNDERSCORE_TagComponent              tag
 #define UNDERSCORE_VelocityComponent         velocity
@@ -129,6 +130,12 @@ typedef struct PlayerSpriteComponent {
     CF_Sprite booster_sprite;
     ZIndex    z_index;  // Rendering order
 } PlayerSpriteComponent;
+
+/**
+ * Score component
+ */
+
+typedef int ScoreComponent;
 
 /*
  * Tag Component

@@ -8,3 +8,4 @@
 #define cf_draw()            CF_SCOPE(cf_draw_push(), cf_draw_pop())
 #define cf_draw_color(color) CF_SCOPE(cf_draw_push_color(color), cf_draw_pop_color())
 #define cf_draw_layer(layer) CF_SCOPE(cf_draw_push_layer(layer), cf_draw_pop_layer())
+#define cf_font(font)        CF_SCOPE(cf_push_font(font), cf_pop_font())
