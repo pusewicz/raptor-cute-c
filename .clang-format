@@ -33,5 +33,6 @@ TabWidth: "4"
 DerivePointerAlignment: false
 PointerAlignment: Left
 UseTab: Never
+ColumnLimit: 120 # Configured in .editorconfig
 ---
 
