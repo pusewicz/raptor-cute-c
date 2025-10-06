@@ -47,8 +47,8 @@ void platform_init(const char* argv0) {
     const int window_width  = 180;
     const int window_height = 320;
     const int options       = CF_APP_OPTIONS_WINDOW_POS_CENTERED_BIT | CF_APP_OPTIONS_RESIZABLE_BIT;
-
     CF_Result result = cf_make_app("Raptor", cf_default_display(), 0, 0, window_width, window_height, options, argv0);
+
     if (cf_is_error(result)) {
         APP_FATAL("Could not make app: %s", result.details);
         CF_ASSERT(false);
