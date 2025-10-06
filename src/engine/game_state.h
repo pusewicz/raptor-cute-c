@@ -43,6 +43,7 @@ typedef struct GameState {
         ecs_id_t collider;
         ecs_id_t input;
         ecs_id_t player_sprite;
+        ecs_id_t player_state;
         ecs_id_t position;
         ecs_id_t score;
         ecs_id_t sprite;
@@ -60,6 +61,7 @@ typedef struct GameState {
         ecs_id_t input;
         ecs_id_t movement;
         ecs_id_t player_render;
+        ecs_id_t player_state;
         ecs_id_t render;
         ecs_id_t weapon;
     } systems;

@@ -45,14 +45,25 @@ ecs_id_t make_player(float x, float y) {
     cf_sprite_play(&sprite->sprite, "default");
     cf_sprite_play(&sprite->booster_sprite, "default");
 
+    // Add collider
+    auto collider              = ECS_ADD_COMPONENT(id, ColliderComponent);
+    collider->half_extents     = cf_v2(sprite->sprite.w / 4.0, sprite->sprite.h / 4.0);
+
     // Add weapon
-    auto weapon             = ECS_ADD_COMPONENT(id, WeaponComponent);
-    weapon->cooldown        = WEAPON_DEFAULT_COOLDOWN;
-    weapon->time_since_shot = 0.0f;
+    auto weapon                = ECS_ADD_COMPONENT(id, WeaponComponent);
+    weapon->cooldown           = WEAPON_DEFAULT_COOLDOWN;
+    weapon->time_since_shot    = 0.0f;
 
     // Add tag
-    auto tag                = ECS_ADD_COMPONENT(id, TagComponent);
-    *tag                    = TAG_PLAYER;
+    auto tag                   = ECS_ADD_COMPONENT(id, TagComponent);
+    *tag                       = TAG_PLAYER;
+
+    // Add player state
+    auto state                 = ECS_ADD_COMPONENT(id, PlayerStateComponent);
+    state->is_alive            = true;
+    state->is_invincible       = false;
+    state->invincibility_timer = 0.0f;
+    state->respawn_delay       = 0.0f;
 
     return id;
 }
