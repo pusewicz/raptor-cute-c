@@ -51,6 +51,7 @@
 #define UNDERSCORE_BackgroundScrollComponent background_scroll
 #define UNDERSCORE_BulletComponent           bullet
 #define UNDERSCORE_ColliderComponent         collider
+#define UNDERSCORE_EnemyWeaponComponent      enemy_weapon
 #define UNDERSCORE_InputComponent            input
 #define UNDERSCORE_PlayerSpriteComponent     player_sprite
 #define UNDERSCORE_PlayerStateComponent      player_state
@@ -142,7 +143,7 @@ typedef int ScoreComponent;
  * Tag Component
  */
 
-typedef enum TagComponent { TAG_PLAYER, TAG_ENEMY, TAG_BULLET } TagComponent;
+typedef enum TagComponent { TAG_PLAYER, TAG_ENEMY, TAG_PLAYER_BULLET, TAG_ENEMY_BULLET } TagComponent;
 
 /*
  * Velocity Component
@@ -158,6 +159,16 @@ typedef struct WeaponComponent {
     float cooldown;         // Time between shots in seconds
     float time_since_shot;  // Time since last shot in seconds
 } WeaponComponent;
+
+/*
+ * Enemy Weapon Component
+ */
+
+typedef struct EnemyWeaponComponent {
+    float cooldown;         // Time between shots in seconds
+    float time_since_shot;  // Time since last shot in seconds
+    float shoot_chance;     // Probability of shooting when cooldown ready (0.0-1.0)
+} EnemyWeaponComponent;
 
 /*
  * Player State Component

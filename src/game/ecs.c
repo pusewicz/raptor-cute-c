@@ -80,14 +80,15 @@ static ecs_ret_t collision_system(
                 auto tag_a = ECS_GET(entities[i], TagComponent);
                 auto tag_b = ECS_GET(entities[j], TagComponent);
 
-                // Bullet vs Enemy collision
-                if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
+                // Player bullet vs Enemy collision
+                if ((*tag_a == TAG_PLAYER_BULLET && *tag_b == TAG_ENEMY) ||
+                    (*tag_a == TAG_ENEMY && *tag_b == TAG_PLAYER_BULLET)) {
                     // Add score
                     auto score = ECS_GET((*tag_a == TAG_ENEMY) ? entities[i] : entities[j], ScoreComponent);
                     g_state->score += *score;
 
                     // Create explosion
-                    auto explosion_pos = (*tag_a == TAG_BULLET) ? pos_b : pos_a;
+                    auto explosion_pos = (*tag_a == TAG_PLAYER_BULLET) ? pos_b : pos_a;
                     make_explosion(explosion_pos->x, explosion_pos->y);
                     cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
 
@@ -105,6 +106,35 @@ static ecs_ret_t collision_system(
                         // Destroy the enemy
                         ecs_id_t enemy_id = (*tag_a == TAG_ENEMY) ? entities[i] : entities[j];
                         ECS_QUEUE_DESTROY(enemy_id);
+
+                        // Decrement lives
+                        g_state->lives--;
+
+                        // Create explosion at player position
+                        auto player_pos = ECS_GET(g_state->entities.player, PositionComponent);
+                        make_explosion(player_pos->x, player_pos->y);
+                        cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
+
+                        // Mark player as dead
+                        state->is_alive      = false;
+                        state->is_invincible = false;
+
+                        // Set respawn delay if player has lives remaining
+                        if (g_state->lives > 0) {
+                            state->respawn_delay = 2.0f;  // 2 second respawn delay
+                        }
+                    }
+                }
+                // Enemy bullet vs Player collision
+                else if ((*tag_a == TAG_ENEMY_BULLET && *tag_b == TAG_PLAYER) ||
+                         (*tag_a == TAG_PLAYER && *tag_b == TAG_ENEMY_BULLET)) {
+                    auto state = ECS_GET(g_state->entities.player, PlayerStateComponent);
+
+                    // Only damage if player is alive and not invincible
+                    if (state->is_alive && !state->is_invincible) {
+                        // Destroy the enemy bullet
+                        ecs_id_t bullet_id = (*tag_a == TAG_ENEMY_BULLET) ? entities[i] : entities[j];
+                        ECS_QUEUE_DESTROY(bullet_id);
 
                         // Decrement lives
                         g_state->lives--;
@@ -157,7 +187,8 @@ static ecs_ret_t boundary_system(
         if (!cf_aabb_to_aabb(canvas_aabb, entity_aabb)) {
             auto tag = ECS_GET(entity_id, TagComponent);
             switch (*tag) {
-                case TAG_BULLET:
+                case TAG_PLAYER_BULLET:
+                case TAG_ENEMY_BULLET:
                 case TAG_ENEMY:
                     ECS_QUEUE_DESTROY(entity_id);
                     break;
@@ -419,9 +450,37 @@ static ecs_ret_t weapon_system(
         weapon->time_since_shot = 0.0f;
         auto pos                = ECS_GET(g_state->entities.player, PositionComponent);
 
-        make_bullet(pos->x, pos->y, cf_v2(0, 1));
+        make_player_bullet(pos->x, pos->y, cf_v2(0, 1));
 
         cf_play_sound(g_state->audio.laser_shoot, cf_sound_params_defaults());
+    }
+
+    return 0;
+}
+
+static ecs_ret_t enemy_weapon_system(
+    ecs_t* ecs [[maybe_unused]], ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata [[maybe_unused]]
+) {
+    for (int i = 0; i < entity_count; ++i) {
+        auto enemy_weapon = ECS_GET(entities[i], EnemyWeaponComponent);
+
+        // Update time since shot
+        enemy_weapon->time_since_shot += (float)dt;
+
+        // Check if cooldown is ready
+        if (enemy_weapon->time_since_shot >= enemy_weapon->cooldown) {
+            // Random chance to shoot
+            float random_value = cf_rnd_float(&g_state->rnd);
+            if (random_value < enemy_weapon->shoot_chance) {
+                enemy_weapon->time_since_shot = 0.0f;
+                auto pos                      = ECS_GET(entities[i], PositionComponent);
+
+                // Shoot downward (toward player)
+                make_enemy_bullet(pos->x, pos->y, cf_v2(0, -1));
+
+                cf_play_sound(g_state->audio.laser_shoot, cf_sound_params_defaults());
+            }
+        }
     }
 
     return 0;
@@ -450,6 +509,7 @@ static void init_background_scroll(
 void init_ecs() {
     ECS_REGISTER_COMPONENT(BackgroundScrollComponent, init_background_scroll, nullptr);
     ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
+    ECS_REGISTER_COMPONENT(EnemyWeaponComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PlayerSpriteComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PlayerStateComponent, nullptr, nullptr);
@@ -483,6 +543,9 @@ void init_ecs() {
     ECS_REGISTER_SYSTEM(weapon, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(weapon, WeaponComponent, InputComponent, PositionComponent);
 
+    ECS_REGISTER_SYSTEM(enemy_weapon, nullptr, nullptr, nullptr);
+    ECS_REQUIRE_COMPONENT(enemy_weapon, EnemyWeaponComponent, PositionComponent);
+
     ECS_REGISTER_SYSTEM(player_state, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(player_state, PlayerStateComponent);
 
@@ -509,4 +572,5 @@ void update_ecs_system_callbacks(void) {
     ECS_SET_SYSTEM_CALLBACKS(render);
     ECS_SET_SYSTEM_CALLBACKS(player_render);
     ECS_SET_SYSTEM_CALLBACKS(weapon);
+    ECS_SET_SYSTEM_CALLBACKS(enemy_weapon);
 }

@@ -2,6 +2,7 @@
 
 #include <cute_math.h>
 #include <cute_result.h>
+#include <cute_rnd.h>
 #include <cute_sprite.h>
 #include <pico_ecs.h>
 #include <stddef.h>
@@ -91,12 +92,12 @@ ecs_id_t make_background_scroll(void) {
 }
 
 /*
- * Bullets
+ * Player Bullets
  */
 
-constexpr float BULLET_DEFAULT_SPEED = 3.0f;
+constexpr float PLAYER_BULLET_DEFAULT_SPEED = 3.0f;
 
-ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
+ecs_id_t make_player_bullet(float x, float y, CF_V2 direction) {
     auto id     = make_entity();
 
     // Add position
@@ -107,7 +108,7 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
     // Add velocity
     auto vel    = ECS_ADD_COMPONENT(id, VelocityComponent);
     vel->x      = 0.0f;
-    vel->y      = BULLET_DEFAULT_SPEED * direction.y;
+    vel->y      = PLAYER_BULLET_DEFAULT_SPEED * direction.y;
 
     // Add sprite
     auto sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
@@ -120,7 +121,7 @@ ecs_id_t make_bullet(float x, float y, CF_V2 direction) {
 
     // Add tag
     auto tag               = ECS_ADD_COMPONENT(id, TagComponent);
-    *tag                   = TAG_BULLET;
+    *tag                   = TAG_PLAYER_BULLET;
 
     return id;
 }
@@ -169,19 +170,25 @@ ecs_id_t make_enemy_of_type(float x, float y, EnemyType type) {
     }
 
     load_sprite(&sprite->sprite, sprite_path);
-    sprite->z_index        = Z_SPRITES;
+    sprite->z_index         = Z_SPRITES;
 
     // Add collider
-    auto collider          = ECS_ADD_COMPONENT(id, ColliderComponent);
-    collider->half_extents = cf_v2(sprite->sprite.w / 3.0f, sprite->sprite.h / 3.0f);
+    auto collider           = ECS_ADD_COMPONENT(id, ColliderComponent);
+    collider->half_extents  = cf_v2(sprite->sprite.w / 3.0f, sprite->sprite.h / 3.0f);
 
     // Add score
-    auto score             = ECS_ADD_COMPONENT(id, ScoreComponent);
-    *score                 = score_value;
+    auto score              = ECS_ADD_COMPONENT(id, ScoreComponent);
+    *score                  = score_value;
 
     // Add tag
-    auto tag               = ECS_ADD_COMPONENT(id, TagComponent);
-    *tag                   = TAG_ENEMY;
+    auto tag                = ECS_ADD_COMPONENT(id, TagComponent);
+    *tag                    = TAG_ENEMY;
+
+    // Add weapon with random cooldown and shoot chance
+    auto weapon             = ECS_ADD_COMPONENT(id, EnemyWeaponComponent);
+    weapon->cooldown        = cf_rnd_range_float(&g_state->rnd, 1.5f, 3.5f);
+    weapon->time_since_shot = cf_rnd_range_float(&g_state->rnd, 0.0f, weapon->cooldown);
+    weapon->shoot_chance    = 0.3f;  // 30% chance to shoot when cooldown ready
 
     return id;
 }
@@ -191,6 +198,41 @@ ecs_id_t make_enemy(float x, float y) {
     EnemyType types[] = {ENEMY_TYPE_ALAN, ENEMY_TYPE_BON_BON, ENEMY_TYPE_LIPS};
     int       type    = cf_rnd_range_int(&g_state->rnd, 0, 2);
     return make_enemy_of_type(x, y, types[type]);
+}
+
+/*
+ * Enemy Bullets
+ */
+
+constexpr float ENEMY_BULLET_DEFAULT_SPEED = 1.22f;
+
+ecs_id_t make_enemy_bullet(float x, float y, CF_V2 direction) {
+    auto id     = make_entity();
+
+    // Add position
+    auto pos    = ECS_ADD_COMPONENT(id, PositionComponent);
+    pos->x      = x;
+    pos->y      = y;
+
+    // Add velocity
+    auto vel    = ECS_ADD_COMPONENT(id, VelocityComponent);
+    vel->x      = ENEMY_BULLET_DEFAULT_SPEED * direction.x;
+    vel->y      = ENEMY_BULLET_DEFAULT_SPEED * direction.y;
+
+    // Add sprite
+    auto sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
+    load_sprite(&sprite->sprite, "assets/enemy_bullet.ase");
+    sprite->z_index        = Z_SPRITES;
+
+    // Add collider
+    auto collider          = ECS_ADD_COMPONENT(id, ColliderComponent);
+    collider->half_extents = cf_v2(sprite->sprite.w / 4.2f, sprite->sprite.h / 4.2f);
+
+    // Add tag
+    auto tag               = ECS_ADD_COMPONENT(id, TagComponent);
+    *tag                   = TAG_ENEMY_BULLET;
+
+    return id;
 }
 
 /*
