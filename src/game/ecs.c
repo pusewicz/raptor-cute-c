@@ -2,6 +2,7 @@
 
 #include <dcimgui.h>
 
+#include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
 #include "../engine/log.h"
 #include "event.h"
@@ -39,25 +40,25 @@ static ecs_ret_t background_scroll_system(
     }
 
     {
-        cf_draw_push();
-        cf_draw_translate(
-            0,
-            g_state->canvas_size.y / 2.0f - bg_scroll->y_offset +
-                bg_scroll->max_y_offset * 0.5f
-        );
-        int i = 0;
-        for (int y = 0; y < (BACKGROUND_SCROLL_SPRITE_COUNT / 3); ++y) {
-            for (int x = -1; x <= 1; ++x) {
-                CF_Sprite* sprite = &bg_scroll->sprites[i];
-                cf_draw_push();
-                cf_draw_translate(x * sprite->w, -y * sprite->h);
-                cf_sprite_update(sprite);
-                cf_sprite_draw(sprite);
-                cf_draw_pop();
-                ++i;
+        cf_draw() {
+            cf_draw_translate(
+                0,
+                g_state->canvas_size.y / 2.0f - bg_scroll->y_offset +
+                    bg_scroll->max_y_offset * 0.5f
+            );
+            int i = 0;
+            for (int y = 0; y < (BACKGROUND_SCROLL_SPRITE_COUNT / 3); ++y) {
+                for (int x = -1; x <= 1; ++x) {
+                    CF_Sprite* sprite = &bg_scroll->sprites[i];
+                    cf_draw() {
+                        cf_draw_translate(x * sprite->w, -y * sprite->h);
+                        cf_sprite_update(sprite);
+                        cf_sprite_draw(sprite);
+                    }
+                    ++i;
+                }
             }
         }
-        cf_draw_pop();
     }
 
     return 0;
@@ -177,17 +178,15 @@ static ecs_ret_t debug_bounding_boxes_system(
         auto aabb_collider =
             cf_make_aabb_center_half_extents(*position, collider->half_extents);
 
-        cf_draw_push();
-        // Draw sprite box in red
-        cf_draw_push_color(cf_color_red());
-        cf_draw_box(aabb_sprite, 0, 0);
-        cf_draw_pop_color();
+        cf_draw() {
+            // Draw sprite box in red
+            cf_draw_color(cf_color_red()) { cf_draw_box(aabb_sprite, 0, 0); }
 
-        // Draw collider box in blue
-        cf_draw_push_color(cf_color_blue());
-        cf_draw_quad(aabb_collider, 0, 0);
-        cf_draw_pop_color();
-        cf_draw_pop();
+            // Draw collider box in blue
+            cf_draw_color(cf_color_blue()) {
+                cf_draw_quad(aabb_collider, 0, 0);
+            }
+        }
     }
 
     return 0;
@@ -286,13 +285,13 @@ static ecs_ret_t player_render_system(
 
     cf_sprite_update(&sprite->sprite);
     cf_sprite_update(&sprite->booster_sprite);
-    cf_draw_push();
-    cf_draw_push_layer(sprite->z_index);
-    cf_draw_translate_v2(*pos);
-    cf_draw_sprite(&sprite->sprite);
-    cf_draw_sprite(&sprite->booster_sprite);
-    cf_draw_pop_layer();
-    cf_draw_pop();
+    cf_draw() {
+        cf_draw_layer(sprite->z_index) {
+            cf_draw_translate_v2(*pos);
+            cf_draw_sprite(&sprite->sprite);
+            cf_draw_sprite(&sprite->booster_sprite);
+        }
+    }
 
     return 0;
 }
@@ -316,12 +315,12 @@ static ecs_ret_t render_system(
         }
 
         cf_sprite_update(&sprite->sprite);
-        cf_draw_push();
-        cf_draw_push_layer(sprite->z_index);
-        cf_draw_translate_v2(*pos);
-        cf_draw_sprite(&sprite->sprite);
-        cf_draw_pop_layer();
-        cf_draw_pop();
+        cf_draw() {
+            cf_draw_layer(sprite->z_index) {
+                cf_draw_translate_v2(*pos);
+                cf_draw_sprite(&sprite->sprite);
+            }
+        }
     }
 
     return 0;
