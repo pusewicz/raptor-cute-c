@@ -13,9 +13,7 @@ static inline bool has_extension(const char* filename, const char* extension) {
     return strcmp(dot + 1, extension) == 0;
 }
 
-bool load_sprite(void* asset, const char* path) {
-    CF_Sprite* sprite = asset;
-
+bool load_sprite(CF_Sprite* sprite, const char* path) {
     if (has_extension(path, "png")) {
         CF_Result result = {0};
         *sprite          = cf_make_easy_sprite_from_png(path, &result);
