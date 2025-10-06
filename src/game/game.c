@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
 #include "../engine/log.h"
 #include "asset/font.h"
@@ -123,21 +124,25 @@ EXPORT void game_render(void) {
     // Render UI
     char score_text[6 + 1];
 
-    cf_draw_push();
-    cf_push_font("TinyAndChunky");
-    cf_push_font_size(7);
-    snprintf(score_text, 7, "%06d", g_state->score);
-    float text_width  = cf_text_width(score_text, -1);
-    float text_height = cf_text_height(score_text, -1);
-    int   offset_x    = cf_app_get_canvas_width() / 2 / g_state->scale;
-    int   offset_y    = cf_app_get_canvas_height() / 2 / g_state->scale;
-    cf_draw_push_color(cf_make_color_rgb(20, 91, 132));
-    cf_draw_text(score_text, cf_v2(offset_x - 16, offset_y - 24), -1);
-    cf_draw_push_color(cf_color_white());
-    cf_draw_text(score_text, cf_v2(offset_x - 17, offset_y - 25), -1);
-    cf_pop_font();
-    cf_draw_pop();
+    cf_draw() {
+        cf_font("TinyAndChunky") {
+            cf_push_font_size(7);
+            snprintf(score_text, 7, "%06d", g_state->score);
+            float     text_width   = cf_text_width(score_text, -1);
+            float     text_height  = cf_text_height(score_text, -1);
+            float     offset_x     = (float)cf_app_get_canvas_width() / 2 / g_state->scale - text_width;
+            float     offset_y     = (float)cf_app_get_canvas_height() / 2 / g_state->scale + text_height / 2;
+            const int margin_top   = 4;
+            const int margin_right = 4;
 
+            cf_draw_color(cf_make_color_rgb(20, 91, 132)) {
+                cf_draw_text(score_text, cf_v2(offset_x + 1 - margin_right, offset_y - 1 - margin_top), -1);
+            }
+            cf_draw_color(cf_color_white()) {
+                cf_draw_text(score_text, cf_v2(offset_x - margin_right, offset_y - margin_top), -1);
+            }
+        }
+    }
 #ifdef DEBUG
     game_render_debug();
 #endif
