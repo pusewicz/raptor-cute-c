@@ -59,7 +59,7 @@ EXPORT void game_init(Platform* platform) {
     g_state->ecs                  = ecs_new(96, nullptr);
     init_ecs();
     g_state->entities.background_scroll = make_background_scroll();
-    g_state->entities.player            = make_player(0.0f, 0.0f);
+    g_state->entities.player            = make_player(0.0f, -g_state->canvas_size.y / 3);
 
     init_coroutines();
     init_events();
