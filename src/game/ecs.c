@@ -6,7 +6,6 @@
 #include "../engine/game_state.h"
 #include "asset/audio.h"
 #include "asset/sprite.h"
-#include "event.h"
 #include "factory.h"
 
 #define PICO_ECS_IMPLEMENTATION
@@ -78,7 +77,53 @@ static ecs_ret_t collision_system(
             auto aabb_b = cf_make_aabb_center_half_extents(*pos_b, col_b->half_extents);
 
             if (cf_aabb_to_aabb(aabb_a, aabb_b)) {
-                event_trigger(EVENT_COLLISION, &(CollisionEvent){.entity_a = entities[i], .entity_b = entities[j]});
+                auto tag_a = ECS_GET(entities[i], TagComponent);
+                auto tag_b = ECS_GET(entities[j], TagComponent);
+
+                // Bullet vs Enemy collision
+                if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
+                    // Add score
+                    auto score = ECS_GET((*tag_a == TAG_ENEMY) ? entities[i] : entities[j], ScoreComponent);
+                    g_state->score += *score;
+
+                    // Create explosion
+                    auto explosion_pos = (*tag_a == TAG_BULLET) ? pos_b : pos_a;
+                    make_explosion(explosion_pos->x, explosion_pos->y);
+                    cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
+
+                    // Destroy both entities
+                    ECS_QUEUE_DESTROY(entities[i]);
+                    ECS_QUEUE_DESTROY(entities[j]);
+                }
+                // Player vs Enemy collision
+                else if ((*tag_a == TAG_PLAYER && *tag_b == TAG_ENEMY) ||
+                         (*tag_a == TAG_ENEMY && *tag_b == TAG_PLAYER)) {
+                    auto state = ECS_GET(g_state->entities.player, PlayerStateComponent);
+
+                    // Only damage if player is alive and not invincible
+                    if (state->is_alive && !state->is_invincible) {
+                        // Destroy the enemy
+                        ecs_id_t enemy_id = (*tag_a == TAG_ENEMY) ? entities[i] : entities[j];
+                        ECS_QUEUE_DESTROY(enemy_id);
+
+                        // Decrement lives
+                        g_state->lives--;
+
+                        // Create explosion at player position
+                        auto player_pos = ECS_GET(g_state->entities.player, PositionComponent);
+                        make_explosion(player_pos->x, player_pos->y);
+                        cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
+
+                        // Mark player as dead
+                        state->is_alive      = false;
+                        state->is_invincible = false;
+
+                        // Set respawn delay if player has lives remaining
+                        if (g_state->lives > 0) {
+                            state->respawn_delay = 2.0f;  // 2 second respawn delay
+                        }
+                    }
+                }
             }
         }
     }

@@ -26,7 +26,6 @@
 #include "asset/sprite.h"
 #include "coroutine.h"
 #include "ecs.h"
-#include "event.h"
 #include "factory.h"
 
 GameState* g_state = nullptr;
@@ -67,7 +66,6 @@ EXPORT void game_init(Platform* platform) {
     g_state->entities.player            = make_player(0.0f, -g_state->canvas_size.y / 3);
 
     init_coroutines();
-    init_events();
 
     if (!validate_game_state()) {
         APP_FATAL("GameState validation failed in game_init");
@@ -197,5 +195,4 @@ EXPORT void game_hot_reload(void* game_state) {
     // Re-initialize coroutines
     cleanup_coroutines();
     init_coroutines();
-    init_events();
 }

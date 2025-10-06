@@ -9,7 +9,6 @@ add_library(
     coroutine.c
     game.c
     ecs.c
-    event.c
     factory.c
 )
 target_link_libraries(${NAME}
