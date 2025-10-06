@@ -66,3 +66,7 @@ The project uses a **hot-reloadable game library architecture**:
 - Release builds strip debug info
 - Assets folder is symlinked to build directory during build
 - Uses Ninja build system for faster incremental builds
+
+### Instructions
+
+- Always confirm the code compiles by executing `rake compile`.
