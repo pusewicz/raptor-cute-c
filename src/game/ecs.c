@@ -343,6 +343,7 @@ void init_ecs() {
     ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PlayerSpriteComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PositionComponent, nullptr, nullptr);
+    ECS_REGISTER_COMPONENT(ScoreComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(SpriteComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(TagComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(VelocityComponent, nullptr, nullptr);

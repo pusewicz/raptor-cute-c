@@ -48,6 +48,9 @@ static void on_collision_destroy_bullet_or_enemy(void* data) {
         auto tag_b = ECS_GET(e->entity_b, TagComponent);
 
         if ((*tag_a == TAG_BULLET && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_BULLET)) {
+            auto score = ECS_GET((*tag_a == TAG_ENEMY) ? e->entity_a : e->entity_b, ScoreComponent);
+            g_state->score += *score;
+
             ECS_QUEUE_DESTROY(e->entity_a);
             ECS_QUEUE_DESTROY(e->entity_b);
         }

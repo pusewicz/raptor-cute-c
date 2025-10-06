@@ -40,6 +40,7 @@ typedef struct GameState {
         ecs_id_t input;
         ecs_id_t player_sprite;
         ecs_id_t position;
+        ecs_id_t score;
         ecs_id_t sprite;
         ecs_id_t tag;
         ecs_id_t velocity;

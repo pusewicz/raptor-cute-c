@@ -144,6 +144,10 @@ ecs_id_t make_enemy(float x, float y) {
     auto collider          = ECS_ADD_COMPONENT(id, ColliderComponent);
     collider->half_extents = cf_v2(sprite->sprite.w / 3.0f, sprite->sprite.h / 3.0f);
 
+    // Add score
+    auto score             = ECS_ADD_COMPONENT(id, ScoreComponent);
+    *score                 = 100;
+
     // Add tag
     auto tag               = ECS_ADD_COMPONENT(id, TagComponent);
     *tag                   = TAG_ENEMY;
