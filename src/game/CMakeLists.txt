@@ -3,6 +3,7 @@ set(NAME "gamelib")
 add_library(
     ${NAME} SHARED
     ../engine/game_state.c
+    asset/audio.c
     asset/font.c
     asset/sprite.c
     coroutine.c

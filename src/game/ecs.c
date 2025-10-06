@@ -4,13 +4,14 @@
 
 #include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
+#include "asset/audio.h"
 #include "asset/sprite.h"
 #include "event.h"
 #include "factory.h"
 
 #define PICO_ECS_IMPLEMENTATION
 
-#include <cute_array.h>
+#include <cute_audio.h>
 #include <cute_color.h>
 #include <cute_coroutine.h>
 #include <cute_draw.h>
@@ -311,7 +312,10 @@ static ecs_ret_t weapon_system(
     if (input->shoot) {
         weapon->time_since_shot = 0.0f;
         auto pos                = ECS_GET(g_state->entities.player, PositionComponent);
+
         make_bullet(pos->x, pos->y, cf_v2(0, 1));
+
+        cf_play_sound(g_state->audio.laser_shoot, cf_sound_params_defaults());
     }
 
     return 0;

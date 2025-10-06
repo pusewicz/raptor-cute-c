@@ -1,10 +1,12 @@
 #include "event.h"
 
+#include <cute_audio.h>
 #include <cute_c_runtime.h>
 #include <cute_math.h>
 
 #include "../engine/game_state.h"
 #include "../engine/log.h"
+#include "asset/audio.h"
 #include "ecs.h"
 #include "factory.h"
 
@@ -66,6 +68,8 @@ static void on_collision_explosion(void* data) {
         auto explosion_pos = (*tag_a == TAG_BULLET) ? pos_b : pos_a;
 
         make_explosion(explosion_pos->x, explosion_pos->y);
+
+        cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
     }
 }
 
