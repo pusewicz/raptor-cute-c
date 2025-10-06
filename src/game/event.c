@@ -44,7 +44,8 @@ void event_clear_listeners(void) {
 }
 
 static void on_collision_destroy_bullet_or_enemy(void* data) {
-    auto e     = (CollisionEvent*)data;
+    auto e = (CollisionEvent*)data;
+    if (!ECS_READY(e->entity_a) || !ECS_READY(e->entity_b)) { return; }
     auto tag_a = ECS_GET(e->entity_a, TagComponent);
     auto tag_b = ECS_GET(e->entity_b, TagComponent);
 
@@ -58,7 +59,8 @@ static void on_collision_destroy_bullet_or_enemy(void* data) {
 }
 
 static void on_collision_explosion(void* data) {
-    auto e     = (CollisionEvent*)data;
+    auto e = (CollisionEvent*)data;
+    if (!ECS_READY(e->entity_a) || !ECS_READY(e->entity_b)) { return; }
     auto tag_a = ECS_GET(e->entity_a, TagComponent);
     auto tag_b = ECS_GET(e->entity_b, TagComponent);
 
@@ -73,8 +75,52 @@ static void on_collision_explosion(void* data) {
     }
 }
 
+static void on_collision_player_damage(void* data) {
+    auto e = (CollisionEvent*)data;
+    if (!ECS_READY(e->entity_a) || !ECS_READY(e->entity_b)) { return; }
+    auto tag_a = ECS_GET(e->entity_a, TagComponent);
+    auto tag_b = ECS_GET(e->entity_b, TagComponent);
+
+    // Check if player collides with enemy
+    if ((*tag_a == TAG_PLAYER && *tag_b == TAG_ENEMY) || (*tag_a == TAG_ENEMY && *tag_b == TAG_PLAYER)) {
+        auto state = ECS_GET(g_state->entities.player, PlayerStateComponent);
+
+        // Only damage if player is alive and not invincible
+        if (state->is_alive && !state->is_invincible) {
+            // Destroy the enemy
+            ecs_id_t enemy_id = (*tag_a == TAG_ENEMY) ? e->entity_a : e->entity_b;
+            ECS_QUEUE_DESTROY(enemy_id);
+
+            event_trigger(EVENT_PLAYER_DAMAGE, nullptr);
+        }
+    }
+}
+
+static void on_player_damage(void* data [[maybe_unused]]) {
+    auto state = ECS_GET(g_state->entities.player, PlayerStateComponent);
+    auto pos   = ECS_GET(g_state->entities.player, PositionComponent);
+
+    // Decrement lives
+    g_state->lives--;
+
+    // Create explosion at player position
+    make_explosion(pos->x, pos->y);
+    cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
+
+    // Mark player as dead
+    state->is_alive      = false;
+    state->is_invincible = false;
+
+    // Set respawn delay if player has lives remaining
+    if (g_state->lives > 0) {
+        state->respawn_delay = 2.0f;  // 2 second respawn delay
+    }
+}
+
 void init_events(void) {
     event_clear_listeners();
     event_register(EVENT_COLLISION, on_collision_explosion);
     event_register(EVENT_COLLISION, on_collision_destroy_bullet_or_enemy);
+    event_register(EVENT_COLLISION, on_collision_player_damage);
+    event_register(EVENT_PLAYER_DAMAGE, on_player_damage);
 }

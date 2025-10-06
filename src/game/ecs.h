@@ -53,6 +53,7 @@
 #define UNDERSCORE_ColliderComponent         collider
 #define UNDERSCORE_InputComponent            input
 #define UNDERSCORE_PlayerSpriteComponent     player_sprite
+#define UNDERSCORE_PlayerStateComponent      player_state
 #define UNDERSCORE_PositionComponent         position
 #define UNDERSCORE_ScoreComponent            score
 #define UNDERSCORE_SpriteComponent           sprite
@@ -157,6 +158,17 @@ typedef struct WeaponComponent {
     float cooldown;         // Time between shots in seconds
     float time_since_shot;  // Time since last shot in seconds
 } WeaponComponent;
+
+/*
+ * Player State Component
+ */
+
+typedef struct PlayerStateComponent {
+    bool  is_alive;
+    bool  is_invincible;
+    float invincibility_timer;
+    float respawn_delay;
+} PlayerStateComponent;
 
 /*
  * Functions

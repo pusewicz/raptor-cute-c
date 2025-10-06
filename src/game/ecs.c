@@ -177,7 +177,18 @@ static ecs_ret_t input_system(
     ecs_dt_t  dt [[maybe_unused]],
     void*     udata [[maybe_unused]]
 ) {
-    auto input   = ECS_GET(g_state->entities.player, InputComponent);
+    auto state = ECS_GET(g_state->entities.player, PlayerStateComponent);
+    auto input = ECS_GET(g_state->entities.player, InputComponent);
+
+    // Disable input if player is dead
+    if (!state->is_alive) {
+        input->up    = false;
+        input->down  = false;
+        input->left  = false;
+        input->right = false;
+        input->shoot = false;
+        return 0;
+    }
 
     input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
     input->down  = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
@@ -226,6 +237,41 @@ static ecs_ret_t movement_system(
     return 0;
 }
 
+static ecs_ret_t player_state_system(
+    ecs_t*    ecs [[maybe_unused]],
+    ecs_id_t* entities [[maybe_unused]],
+    int       entity_count [[maybe_unused]],
+    ecs_dt_t  dt,
+    void*     udata [[maybe_unused]]
+) {
+    auto state = ECS_GET(g_state->entities.player, PlayerStateComponent);
+
+    // Handle respawn delay
+    if (!state->is_alive && state->respawn_delay > 0.0f) {
+        state->respawn_delay -= (float)dt;
+        if (state->respawn_delay <= 0.0f) {
+            // Respawn player
+            state->is_alive            = true;
+            state->is_invincible       = true;
+            state->invincibility_timer = 3.0f;  // 3 seconds of invincibility
+
+            // Reset player position
+            auto pos                   = ECS_GET(g_state->entities.player, PositionComponent);
+            pos->x                     = 0.0f;
+            pos->y                     = -g_state->canvas_size.y / 3;
+        }
+        return 0;
+    }
+
+    // Handle invincibility timer
+    if (state->is_invincible && state->invincibility_timer > 0.0f) {
+        state->invincibility_timer -= (float)dt;
+        if (state->invincibility_timer <= 0.0f) { state->is_invincible = false; }
+    }
+
+    return 0;
+}
+
 static ecs_ret_t player_render_system(
     ecs_t*    ecs [[maybe_unused]],
     ecs_id_t* entities [[maybe_unused]],
@@ -233,6 +279,11 @@ static ecs_ret_t player_render_system(
     ecs_dt_t  dt [[maybe_unused]],
     void*     udata [[maybe_unused]]
 ) {
+    auto state = ECS_GET(g_state->entities.player, PlayerStateComponent);
+
+    // Don't render if player is dead
+    if (!state->is_alive) { return 0; }
+
     auto vel    = ECS_GET(g_state->entities.player, VelocityComponent);
     auto pos    = ECS_GET(g_state->entities.player, PositionComponent);
     auto sprite = ECS_GET(g_state->entities.player, PlayerSpriteComponent);
@@ -254,11 +305,21 @@ static ecs_ret_t player_render_system(
 
     cf_sprite_update(&sprite->sprite);
     cf_sprite_update(&sprite->booster_sprite);
-    cf_draw() {
-        cf_draw_layer(sprite->z_index) {
-            cf_draw_translate_v2(*pos);
-            cf_draw_sprite(&sprite->sprite);
-            cf_draw_sprite(&sprite->booster_sprite);
+
+    // Flicker effect during invincibility
+    bool should_render = true;
+    if (state->is_invincible) {
+        // Flicker every 0.1 seconds
+        should_render = ((int)(state->invincibility_timer * 10) % 2) == 0;
+    }
+
+    if (should_render) {
+        cf_draw() {
+            cf_draw_layer(sprite->z_index) {
+                cf_draw_translate_v2(*pos);
+                cf_draw_sprite(&sprite->sprite);
+                cf_draw_sprite(&sprite->booster_sprite);
+            }
         }
     }
 
@@ -346,6 +407,7 @@ void init_ecs() {
     ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PlayerSpriteComponent, nullptr, nullptr);
+    ECS_REGISTER_COMPONENT(PlayerStateComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PositionComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(ScoreComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(SpriteComponent, nullptr, nullptr);
@@ -368,7 +430,7 @@ void init_ecs() {
     ECS_REQUIRE_COMPONENT(debug_bounding_boxes, PositionComponent, ColliderComponent, SpriteComponent);
 
     ECS_REGISTER_SYSTEM(input, nullptr, nullptr, nullptr);
-    ECS_REQUIRE_COMPONENT(input, InputComponent, PositionComponent, TagComponent);
+    ECS_REQUIRE_COMPONENT(input, InputComponent, PlayerStateComponent, PositionComponent, TagComponent);
 
     ECS_REGISTER_SYSTEM(movement, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(movement, PositionComponent, VelocityComponent);
@@ -376,11 +438,14 @@ void init_ecs() {
     ECS_REGISTER_SYSTEM(weapon, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(weapon, WeaponComponent, InputComponent, PositionComponent);
 
+    ECS_REGISTER_SYSTEM(player_state, nullptr, nullptr, nullptr);
+    ECS_REQUIRE_COMPONENT(player_state, PlayerStateComponent);
+
     ECS_REGISTER_SYSTEM(render, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(render, PositionComponent, SpriteComponent);
 
     ECS_REGISTER_SYSTEM(player_render, nullptr, nullptr, nullptr);
-    ECS_REQUIRE_COMPONENT(player_render, PositionComponent, PlayerSpriteComponent);
+    ECS_REQUIRE_COMPONENT(player_render, PositionComponent, PlayerSpriteComponent, PlayerStateComponent);
 }
 
 // Set the update functions for each system
@@ -395,6 +460,7 @@ void update_ecs_system_callbacks(void) {
     ECS_SET_SYSTEM_CALLBACKS(debug_bounding_boxes);
     ECS_SET_SYSTEM_CALLBACKS(input);
     ECS_SET_SYSTEM_CALLBACKS(movement);
+    ECS_SET_SYSTEM_CALLBACKS(player_state);
     ECS_SET_SYSTEM_CALLBACKS(render);
     ECS_SET_SYSTEM_CALLBACKS(player_render);
     ECS_SET_SYSTEM_CALLBACKS(weapon);
