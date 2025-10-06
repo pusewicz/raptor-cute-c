@@ -4,6 +4,7 @@
 #include <cute_app.h>
 #include <cute_color.h>
 #include <cute_coroutine.h>
+#include <cute_draw.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
 
@@ -28,6 +29,7 @@ typedef struct GameState {
     CF_Rnd       rnd;
     ecs_t*       ecs;
     int          score;
+    int          lives;
 
     struct {
         ecs_id_t background_scroll;

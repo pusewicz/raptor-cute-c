@@ -4,6 +4,7 @@ add_library(
     ${NAME} SHARED
     ../engine/game_state.c
     asset/font.c
+    asset/sprite.c
     coroutine.c
     game.c
     ecs.c
