@@ -570,13 +570,18 @@ static void init_background_scroll(
     comp->max_y_offset = comp->sprites[0].h;
 }
 
+static void cleanup_particle(ecs_t* ecs [[maybe_unused]], ecs_id_t entity_id [[maybe_unused]], void* ptr) {
+    auto comp = (ParticleComponent*)ptr;
+    cf_easy_sprite_unload(&comp->sprite);
+}
+
 void init_ecs() {
     ECS_REGISTER_COMPONENT(BackgroundScrollComponent, init_background_scroll, nullptr);
     ECS_REGISTER_COMPONENT(ColliderComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(EnemyWeaponComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(HealthComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
-    ECS_REGISTER_COMPONENT(ParticleComponent, nullptr, nullptr);
+    ECS_REGISTER_COMPONENT(ParticleComponent, nullptr, cleanup_particle);
     ECS_REGISTER_COMPONENT(PlayerSpriteComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PlayerStateComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PositionComponent, nullptr, nullptr);
