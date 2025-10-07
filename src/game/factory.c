@@ -53,7 +53,7 @@ ecs_id_t make_player(float x, float y) {
     // Add weapon
     auto weapon                = ECS_ADD_COMPONENT(id, WeaponComponent);
     weapon->cooldown           = WEAPON_DEFAULT_COOLDOWN;
-    weapon->time_since_shot    = 0.0f;
+    weapon->time_since_shot    = WEAPON_DEFAULT_COOLDOWN;
 
     // Add tag
     auto tag                   = ECS_ADD_COMPONENT(id, TagComponent);
