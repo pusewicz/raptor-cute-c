@@ -238,6 +238,10 @@ static ecs_ret_t coroutine_system(
         cf_coroutine_resume(g_state->coroutines.spawner);
     }
 
+    if (cf_coroutine_state(g_state->coroutines.shooting_star_spawner) != CF_COROUTINE_STATE_DEAD) {
+        cf_coroutine_resume(g_state->coroutines.shooting_star_spawner);
+    }
+
     return 0;
 }
 

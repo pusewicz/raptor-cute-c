@@ -3,6 +3,7 @@
 #include <cute_alloc.h>
 #include <cute_coroutine.h>
 #include <cute_defines.h>
+#include <cute_rnd.h>
 #include <cute_time.h>
 
 #include "../engine/game_state.h"
@@ -28,5 +29,26 @@ static void enemy_spawner(CF_Coroutine co [[maybe_unused]]) {
     }
 }
 
-void init_coroutines(void) { g_state->coroutines.spawner = cf_make_coroutine(enemy_spawner, CF_MB, nullptr); }
-void cleanup_coroutines(void) { cf_destroy_coroutine(g_state->coroutines.spawner); }
+static void shooting_star_spawner(CF_Coroutine co [[maybe_unused]]) {
+    while (1) {
+        // Wait for random delay between 5-10 seconds
+        float delay = cf_rnd_range_float(&g_state->rnd, 5.0f, 10.0f);
+        wait_for(delay);
+
+        // Spawn shooting star at random Y position
+        float canvas_half = g_state->canvas_size.y / 2.0f;
+        float y           = cf_rnd_range_float(&g_state->rnd, -canvas_half + 20.0f, canvas_half - 20.0f);
+
+        make_shooting_star(y);
+    }
+}
+
+void init_coroutines(void) {
+    g_state->coroutines.spawner               = cf_make_coroutine(enemy_spawner, CF_MB, nullptr);
+    g_state->coroutines.shooting_star_spawner = cf_make_coroutine(shooting_star_spawner, CF_MB, nullptr);
+}
+
+void cleanup_coroutines(void) {
+    cf_destroy_coroutine(g_state->coroutines.spawner);
+    cf_destroy_coroutine(g_state->coroutines.shooting_star_spawner);
+}

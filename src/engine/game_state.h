@@ -39,6 +39,7 @@ typedef struct GameState {
 
     struct {
         CF_Coroutine spawner;
+        CF_Coroutine shooting_star_spawner;
     } coroutines;
 
     struct {

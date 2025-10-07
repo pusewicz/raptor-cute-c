@@ -164,6 +164,7 @@ typedef CF_V2 PositionComponent;
 
 typedef enum ZIndex {
     Z_BACKGROUND = 0,
+    Z_BACKGROUND_EFFECTS,
     Z_SPRITES,
     Z_PLAYER_SPRITE,
     Z_PARTICLES,
