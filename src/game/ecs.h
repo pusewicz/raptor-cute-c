@@ -166,6 +166,7 @@ typedef enum ZIndex {
     Z_BACKGROUND = 0,
     Z_SPRITES,
     Z_PLAYER_SPRITE,
+    Z_PARTICLES,
     Z_UI,
 } ZIndex;
 
