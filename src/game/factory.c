@@ -149,23 +149,28 @@ ecs_id_t make_enemy_of_type(float x, float y, EnemyType type) {
     auto        sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
     const char* sprite_path;
     int         score_value;
+    int         health_value;
 
     switch (type) {
         case ENEMY_TYPE_ALAN:
-            sprite_path = "assets/alan.ase";
-            score_value = 100;
+            sprite_path  = "assets/alan.ase";
+            score_value  = 100;
+            health_value = 1;
             break;
         case ENEMY_TYPE_BON_BON:
-            sprite_path = "assets/bon_bon.ase";
-            score_value = 150;
+            sprite_path  = "assets/bon_bon.ase";
+            score_value  = 150;
+            health_value = 2;
             break;
         case ENEMY_TYPE_LIPS:
-            sprite_path = "assets/lips.ase";
-            score_value = 200;
+            sprite_path  = "assets/lips.ase";
+            score_value  = 200;
+            health_value = 3;
             break;
         default:
-            sprite_path = "assets/alan.ase";
-            score_value = 100;
+            sprite_path  = "assets/alan.ase";
+            score_value  = 100;
+            health_value = 1;
             break;
     }
 
@@ -179,6 +184,11 @@ ecs_id_t make_enemy_of_type(float x, float y, EnemyType type) {
     // Add score
     auto score              = ECS_ADD_COMPONENT(id, ScoreComponent);
     *score                  = score_value;
+
+    // Add health
+    auto health             = ECS_ADD_COMPONENT(id, HealthComponent);
+    health->current         = health_value;
+    health->maximum         = health_value;
 
     // Add tag
     auto tag                = ECS_ADD_COMPONENT(id, TagComponent);

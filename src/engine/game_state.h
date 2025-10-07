@@ -42,6 +42,7 @@ typedef struct GameState {
         ecs_id_t background_scroll;
         ecs_id_t collider;
         ecs_id_t enemy_weapon;
+        ecs_id_t health;
         ecs_id_t input;
         ecs_id_t player_sprite;
         ecs_id_t player_state;

@@ -52,6 +52,7 @@
 #define UNDERSCORE_BulletComponent           bullet
 #define UNDERSCORE_ColliderComponent         collider
 #define UNDERSCORE_EnemyWeaponComponent      enemy_weapon
+#define UNDERSCORE_HealthComponent           health
 #define UNDERSCORE_InputComponent            input
 #define UNDERSCORE_PlayerSpriteComponent     player_sprite
 #define UNDERSCORE_PlayerStateComponent      player_state
@@ -169,6 +170,15 @@ typedef struct EnemyWeaponComponent {
     float time_since_shot;  // Time since last shot in seconds
     float shoot_chance;     // Probability of shooting when cooldown ready (0.0-1.0)
 } EnemyWeaponComponent;
+
+/*
+ * Health Component
+ */
+
+typedef struct HealthComponent {
+    int current;  // Current health
+    int maximum;  // Maximum health
+} HealthComponent;
 
 /*
  * Player State Component
