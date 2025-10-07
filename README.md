@@ -2,7 +2,7 @@
 
 A classic arcade-style shoot 'em up that brings retro gaming action to modern systems! Built with [Cute Framework](https://github.com/RandyGaul/cute_framework) and written in pure C23, Raptor features smooth gameplay, hot-reloadable game logic for rapid development, and beautiful pixel art.
 
-https://github.com/user-attachments/assets/08e2b5d0-6ecd-49f0-ad4d-f82f6726f973
+![Screenshot](./assets/screenshot.gif)
 
 ## ✨ Features
 
