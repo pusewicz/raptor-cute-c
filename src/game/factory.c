@@ -4,7 +4,6 @@
 #include <cute_result.h>
 #include <cute_rnd.h>
 #include <cute_sprite.h>
-#include <math.h>
 #include <pico_ecs.h>
 #include <stddef.h>
 
@@ -288,8 +287,8 @@ void make_hit_particles(float x, float y, CF_V2 direction, int count) {
         float spread         = cf_rnd_range_float(&g_state->rnd, -0.5f, 0.5f);  // ±0.5 radians spread
         float angle          = base_angle + spread;
         float speed          = cf_rnd_range_float(&g_state->rnd, 0.5f, 2.0f);
-        particle->velocity.x = cosf(angle) * speed;
-        particle->velocity.y = sinf(angle) * speed;
+        particle->velocity.x = CF_COSF(angle) * speed;
+        particle->velocity.y = CF_SINF(angle) * speed;
         particle->lifetime   = cf_rnd_range_float(&g_state->rnd, 0.2f, 0.5f);
         particle->time_alive = 0.0f;
         particle->size       = (float)cf_rnd_range_int(&g_state->rnd, 1, 3);
