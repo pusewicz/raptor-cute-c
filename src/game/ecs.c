@@ -452,11 +452,12 @@ static ecs_ret_t particle_system(
         // Calculate fade based on lifetime and update sprite opacity (fade to 50%, not 0%)
         particle->sprite.opacity = 1.0f - (particle->time_alive / particle->lifetime) * 0.5f;
 
-        // Update sprite and render particle
+        // Update sprite and render particle with scaling
         cf_sprite_update(&particle->sprite);
         cf_draw() {
             cf_draw_layer(Z_SPRITES) {
                 cf_draw_translate_v2(*pos);
+                cf_draw_scale(particle->size, particle->size);
                 cf_draw_sprite(&particle->sprite);
             }
         }

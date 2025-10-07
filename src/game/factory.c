@@ -292,20 +292,12 @@ void make_hit_particles(float x, float y, CF_V2 direction, int count) {
         particle->velocity.y = sinf(angle) * speed;
         particle->lifetime   = cf_rnd_range_float(&g_state->rnd, 0.2f, 0.5f);
         particle->time_alive = 0.0f;
+        particle->size       = (float)cf_rnd_range_int(&g_state->rnd, 1, 3);
 
-        // Create a small pixel sprite with random size (1x1, 2x2, or 3x3 white pixels)
-        int      size        = cf_rnd_range_int(&g_state->rnd, 1, 3);
-        CF_Pixel pixels[9]   = {
-            {.colors = {255, 255, 255, 255}},
-            {.colors = {255, 255, 255, 255}},
-            {.colors = {255, 255, 255, 255}},
-            {.colors = {255, 255, 255, 255}},
-            {.colors = {255, 255, 255, 255}},
-            {.colors = {255, 255, 255, 255}},
-            {.colors = {255, 255, 255, 255}},
-            {.colors = {255, 255, 255, 255}},
-            {.colors = {255, 255, 255, 255}}
+        // Create a 1x1 white pixel sprite (will be scaled when rendering)
+        CF_Pixel pixel       = {
+                  .colors = {255, 255, 255, 255}
         };
-        particle->sprite = cf_make_easy_sprite_from_pixels(pixels, size, size);
+        particle->sprite = cf_make_easy_sprite_from_pixels(&pixel, 1, 1);
     }
 }

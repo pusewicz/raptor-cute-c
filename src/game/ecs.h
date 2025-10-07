@@ -235,6 +235,7 @@ typedef struct ParticleComponent {
     float     lifetime;    // Total lifetime in seconds
     float     time_alive;  // Time alive in seconds
     CF_Sprite sprite;      // Particle sprite
+    float     size;        // Particle size scale
 } ParticleComponent;
 
 /*
