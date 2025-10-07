@@ -1158,7 +1158,9 @@ static void ecs_destruct(ecs_t* ecs, ecs_id_t entity_id)
 
             if (comp->destructor)
             {
-                void* ptr = ecs_get(ecs, entity_id, comp_id);
+                // TODO: Remove after https://github.com/empyreanx/pico_headers/pull/22 gets merged
+                ecs_array_t* comp_array = &ecs->comp_arrays[comp_id];
+                void* ptr = (char*)comp_array->data + (comp_array->size * entity_id);
                 comp->destructor(ecs, entity_id, ptr);
             }
         }

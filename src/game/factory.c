@@ -1,5 +1,6 @@
 #include "factory.h"
 
+#include <cute_color.h>
 #include <cute_math.h>
 #include <cute_result.h>
 #include <cute_rnd.h>
@@ -264,4 +265,36 @@ ecs_id_t make_explosion(float x, float y) {
     cf_sprite_set_loop(&sprite->sprite, false);
 
     return id;
+}
+
+/*
+ * Hit Particles
+ */
+
+void make_hit_particles(float x, float y, CF_V2 direction, int count) {
+    // Calculate the base angle from the direction vector
+    float base_angle = CF_ATAN2F(direction.y, direction.x);
+
+    for (int i = 0; i < count; ++i) {
+        auto id              = make_entity();
+
+        // Add position
+        auto pos             = ECS_ADD_COMPONENT(id, PositionComponent);
+        pos->x               = x;
+        pos->y               = y;
+
+        // Add particle component with velocity in the bullet's direction with some spread
+        auto  particle       = ECS_ADD_COMPONENT(id, ParticleComponent);
+        float spread         = cf_rnd_range_float(&g_state->rnd, -0.5f, 0.5f);  // ±0.5 radians spread
+        float angle          = base_angle + spread;
+        float speed          = cf_rnd_range_float(&g_state->rnd, 0.5f, 2.0f);
+        particle->velocity.x = CF_COSF(angle) * speed;
+        particle->velocity.y = CF_SINF(angle) * speed;
+        particle->lifetime   = cf_rnd_range_float(&g_state->rnd, 0.2f, 0.5f);
+        particle->time_alive = 0.0f;
+        particle->size       = (float)cf_rnd_range_int(&g_state->rnd, 1, 3);
+
+        // Use the shared particle sprite (no allocation needed)
+        particle->sprite     = g_state->sprites.particle;
+    }
 }

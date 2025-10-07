@@ -4,7 +4,6 @@
 
 #include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
-#include "asset/audio.h"
 #include "asset/sprite.h"
 #include "factory.h"
 
@@ -114,17 +113,21 @@ static ecs_ret_t collision_system(
                     ecs_id_t enemy_id  = (*tag_a == TAG_ENEMY) ? entities[i] : entities[j];
                     ecs_id_t bullet_id = (*tag_a == TAG_PLAYER_BULLET) ? entities[i] : entities[j];
 
-                    // Destroy the bullet
-                    ECS_QUEUE_DESTROY(bullet_id);
+                    // Get bullet direction from velocity and reverse it
+                    auto  bullet_vel   = ECS_GET(bullet_id, VelocityComponent);
+                    CF_V2 bullet_dir   = cf_mul_v2_f(cf_norm(*bullet_vel), -1.0f);
 
                     // Damage the enemy
-                    auto health = ECS_GET(enemy_id, HealthComponent);
+                    auto health        = ECS_GET(enemy_id, HealthComponent);
                     health->current -= 1;
 
-                    // If enemy survives, push it upwards
+                    // If enemy survives, push it upwards and spawn particles
                     if (health->current > 0) {
                         auto enemy_pos = ECS_GET(enemy_id, PositionComponent);
                         enemy_pos->y += 5.0f;  // Push upwards by 5 pixels
+
+                        // Spawn white debris particles opposite to the bullet's direction
+                        make_hit_particles(enemy_pos->x, enemy_pos->y, bullet_dir, 5);
                     }
                     // Destroy enemy if health reaches 0
                     else {
@@ -137,9 +140,15 @@ static ecs_ret_t collision_system(
                         make_explosion(explosion_pos->x, explosion_pos->y);
                         cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
 
+                        // Spawn white debris particles opposite to the bullet's direction
+                        make_hit_particles(explosion_pos->x, explosion_pos->y, bullet_dir, 5);
+
                         // Destroy enemy
                         ECS_QUEUE_DESTROY(enemy_id);
                     }
+
+                    // Destroy the bullet
+                    ECS_QUEUE_DESTROY(bullet_id);
                 }
                 // Player vs Enemy collision
                 else if ((*tag_a == TAG_PLAYER && *tag_b == TAG_ENEMY) ||
@@ -419,6 +428,43 @@ static ecs_ret_t player_render_system(
     return 0;
 }
 
+static ecs_ret_t particle_system(
+    ecs_t* ecs [[maybe_unused]], ecs_id_t* entities, int entity_count, ecs_dt_t dt, void* udata [[maybe_unused]]
+) {
+    for (int i = 0; i < entity_count; ++i) {
+        auto particle = ECS_GET(entities[i], ParticleComponent);
+        auto pos      = ECS_GET(entities[i], PositionComponent);
+
+        // Update particle lifetime
+        particle->time_alive += (float)dt;
+
+        // Destroy particle if lifetime exceeded
+        if (particle->time_alive >= particle->lifetime) {
+            ECS_QUEUE_DESTROY(entities[i]);
+            continue;
+        }
+
+        // Update position based on velocity
+        pos->x += particle->velocity.x;
+        pos->y += particle->velocity.y;
+
+        // Calculate fade based on lifetime and update sprite opacity (fade to 50%, not 0%)
+        particle->sprite.opacity = 1.0f - (particle->time_alive / particle->lifetime) * 0.5f;
+
+        // Update sprite and render particle with scaling
+        cf_sprite_update(&particle->sprite);
+        cf_draw() {
+            cf_draw_layer(Z_PARTICLES) {
+                cf_draw_translate_v2(*pos);
+                cf_draw_scale(particle->size, particle->size);
+                cf_draw_sprite(&particle->sprite);
+            }
+        }
+    }
+
+    return 0;
+}
+
 static ecs_ret_t render_system(
     ecs_t*    ecs [[maybe_unused]],
     ecs_id_t* entities,
@@ -529,6 +575,7 @@ void init_ecs() {
     ECS_REGISTER_COMPONENT(EnemyWeaponComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(HealthComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(InputComponent, nullptr, nullptr);
+    ECS_REGISTER_COMPONENT(ParticleComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PlayerSpriteComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PlayerStateComponent, nullptr, nullptr);
     ECS_REGISTER_COMPONENT(PositionComponent, nullptr, nullptr);
@@ -558,6 +605,9 @@ void init_ecs() {
     ECS_REGISTER_SYSTEM(movement, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(movement, PositionComponent, VelocityComponent);
 
+    ECS_REGISTER_SYSTEM(particle, nullptr, nullptr, nullptr);
+    ECS_REQUIRE_COMPONENT(particle, ParticleComponent, PositionComponent);
+
     ECS_REGISTER_SYSTEM(weapon, nullptr, nullptr, nullptr);
     ECS_REQUIRE_COMPONENT(weapon, WeaponComponent, InputComponent, PositionComponent);
 
@@ -586,6 +636,7 @@ void update_ecs_system_callbacks(void) {
     ECS_SET_SYSTEM_CALLBACKS(debug_bounding_boxes);
     ECS_SET_SYSTEM_CALLBACKS(input);
     ECS_SET_SYSTEM_CALLBACKS(movement);
+    ECS_SET_SYSTEM_CALLBACKS(particle);
     ECS_SET_SYSTEM_CALLBACKS(player_state);
     ECS_SET_SYSTEM_CALLBACKS(render);
     ECS_SET_SYSTEM_CALLBACKS(player_render);

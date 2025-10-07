@@ -16,3 +16,4 @@ ecs_id_t make_enemy(float x, float y);
 ecs_id_t make_enemy_of_type(float x, float y, EnemyType type);
 ecs_id_t make_player(float x, float y);
 ecs_id_t make_explosion(float x, float y);
+void     make_hit_particles(float x, float y, CF_V2 direction, int count);

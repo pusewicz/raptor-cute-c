@@ -49,6 +49,7 @@ typedef struct GameState {
 
     struct {
         CF_Sprite life_icon;
+        CF_Sprite particle;
     } sprites;
 
     bool debug_bounding_boxes;
