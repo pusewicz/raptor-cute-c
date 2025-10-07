@@ -121,8 +121,13 @@ static ecs_ret_t collision_system(
                     auto health = ECS_GET(enemy_id, HealthComponent);
                     health->current -= 1;
 
+                    // If enemy survives, push it upwards
+                    if (health->current > 0) {
+                        auto enemy_pos = ECS_GET(enemy_id, PositionComponent);
+                        enemy_pos->y += 5.0f;  // Push upwards by 5 pixels
+                    }
                     // Destroy enemy if health reaches 0
-                    if (health->current <= 0) {
+                    else {
                         // Add score
                         auto score = ECS_GET(enemy_id, ScoreComponent);
                         g_state->score += *score;
