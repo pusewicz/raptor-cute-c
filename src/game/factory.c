@@ -294,10 +294,7 @@ void make_hit_particles(float x, float y, CF_V2 direction, int count) {
         particle->time_alive = 0.0f;
         particle->size       = (float)cf_rnd_range_int(&g_state->rnd, 1, 3);
 
-        // Create a 1x1 white pixel sprite (will be scaled when rendering)
-        CF_Pixel pixel       = {
-                  .colors = {255, 255, 255, 255}
-        };
-        particle->sprite = cf_make_easy_sprite_from_pixels(&pixel, 1, 1);
+        // Use the shared particle sprite (no allocation needed)
+        particle->sprite     = g_state->sprites.particle;
     }
 }

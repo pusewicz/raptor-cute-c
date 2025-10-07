@@ -85,6 +85,13 @@ EXPORT void game_init(Platform* platform) {
     load_audio(&g_state->audio.laser_shoot, "assets/laser-shoot.ogg");
     load_audio(&g_state->audio.explosion, "assets/explosion.ogg");
     load_sprite(&g_state->sprites.life_icon, "assets/life_icon.png");
+
+    // Initialize shared particle sprite (1x1 white pixel)
+    CF_Pixel particle_pixel = {
+        .colors = {255, 255, 255, 255}
+    };
+    g_state->sprites.particle = cf_make_easy_sprite_from_pixels(&particle_pixel, 1, 1);
+
     cf_music_play(g_state->audio.music, 0.5f);
 }
 
