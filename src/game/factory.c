@@ -268,6 +268,41 @@ ecs_id_t make_explosion(float x, float y) {
 }
 
 /*
+ * Shooting Star
+ */
+
+constexpr float SHOOTING_STAR_SPEED = 2.0f;
+
+ecs_id_t make_shooting_star(float y) {
+    auto id     = make_entity();
+
+    // Add sprite
+    auto sprite = ECS_ADD_COMPONENT(id, SpriteComponent);
+    load_sprite(&sprite->sprite, "assets/sparkle.ase");
+    sprite->z_index        = Z_BACKGROUND_EFFECTS;
+
+    // Start from left edge of screen
+    auto pos               = ECS_ADD_COMPONENT(id, PositionComponent);
+    pos->x                 = -g_state->canvas_size.x / 2.0f + sprite->sprite.w / 2.0f;
+    pos->y                 = y;
+
+    // Add velocity (move right with slight downward diagonal)
+    auto vel               = ECS_ADD_COMPONENT(id, VelocityComponent);
+    vel->x                 = SHOOTING_STAR_SPEED;
+    vel->y                 = cf_rnd_range_float(&g_state->rnd, -0.3f, -0.1f);  // Slight downward angle
+
+    // Add collider for boundary checking
+    auto collider          = ECS_ADD_COMPONENT(id, ColliderComponent);
+    collider->half_extents = cf_v2(sprite->sprite.w / 2.0f, sprite->sprite.h / 2.0f);
+
+    // Add tag
+    auto tag               = ECS_ADD_COMPONENT(id, TagComponent);
+    *tag                   = TAG_PLAYER_BULLET;  // Reuse bullet tag for boundary cleanup
+
+    return id;
+}
+
+/*
  * Hit Particles
  */
 
