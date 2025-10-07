@@ -4,6 +4,7 @@
 #include <cute_result.h>
 #include <cute_rnd.h>
 #include <cute_sprite.h>
+#include <math.h>
 #include <pico_ecs.h>
 #include <stddef.h>
 
@@ -264,4 +265,47 @@ ecs_id_t make_explosion(float x, float y) {
     cf_sprite_set_loop(&sprite->sprite, false);
 
     return id;
+}
+
+/*
+ * Hit Particles
+ */
+
+void make_hit_particles(float x, float y, CF_V2 direction, int count) {
+    // Calculate the base angle from the direction vector
+    float base_angle = atan2f(direction.y, direction.x);
+
+    for (int i = 0; i < count; ++i) {
+        auto id              = make_entity();
+
+        // Add position
+        auto pos             = ECS_ADD_COMPONENT(id, PositionComponent);
+        pos->x               = x;
+        pos->y               = y;
+
+        // Add particle component with velocity in the bullet's direction with some spread
+        auto  particle       = ECS_ADD_COMPONENT(id, ParticleComponent);
+        float spread         = cf_rnd_range_float(&g_state->rnd, -0.5f, 0.5f);  // ±0.5 radians spread
+        float angle          = base_angle + spread;
+        float speed          = cf_rnd_range_float(&g_state->rnd, 0.5f, 2.0f);
+        particle->velocity.x = cosf(angle) * speed;
+        particle->velocity.y = sinf(angle) * speed;
+        particle->lifetime   = cf_rnd_range_float(&g_state->rnd, 0.2f, 0.5f);
+        particle->time_alive = 0.0f;
+
+        // Create a small pixel sprite with random size (1x1, 2x2, or 3x3 white pixels)
+        int      size        = cf_rnd_range_int(&g_state->rnd, 1, 3);
+        CF_Pixel pixels[9]   = {
+            {.colors = {255, 255, 255, 255}},
+            {.colors = {255, 255, 255, 255}},
+            {.colors = {255, 255, 255, 255}},
+            {.colors = {255, 255, 255, 255}},
+            {.colors = {255, 255, 255, 255}},
+            {.colors = {255, 255, 255, 255}},
+            {.colors = {255, 255, 255, 255}},
+            {.colors = {255, 255, 255, 255}},
+            {.colors = {255, 255, 255, 255}}
+        };
+        particle->sprite = cf_make_easy_sprite_from_pixels(pixels, size, size);
+    }
 }

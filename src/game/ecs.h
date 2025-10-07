@@ -54,6 +54,7 @@
 #define UNDERSCORE_EnemyWeaponComponent      enemy_weapon
 #define UNDERSCORE_HealthComponent           health
 #define UNDERSCORE_InputComponent            input
+#define UNDERSCORE_ParticleComponent         particle
 #define UNDERSCORE_PlayerSpriteComponent     player_sprite
 #define UNDERSCORE_PlayerStateComponent      player_state
 #define UNDERSCORE_PositionComponent         position
@@ -83,6 +84,7 @@ typedef struct Components {
     ecs_id_t enemy_weapon;
     ecs_id_t health;
     ecs_id_t input;
+    ecs_id_t particle;
     ecs_id_t player_sprite;
     ecs_id_t player_state;
     ecs_id_t position;
@@ -103,6 +105,7 @@ typedef struct Systems {
     ecs_id_t enemy_weapon;
     ecs_id_t input;
     ecs_id_t movement;
+    ecs_id_t particle;
     ecs_id_t player_render;
     ecs_id_t player_state;
     ecs_id_t render;
@@ -222,6 +225,17 @@ typedef struct HealthComponent {
     int current;  // Current health
     int maximum;  // Maximum health
 } HealthComponent;
+
+/*
+ * Particle Component
+ */
+
+typedef struct ParticleComponent {
+    CF_V2     velocity;
+    float     lifetime;    // Total lifetime in seconds
+    float     time_alive;  // Time alive in seconds
+    CF_Sprite sprite;      // Particle sprite
+} ParticleComponent;
 
 /*
  * Player State Component
