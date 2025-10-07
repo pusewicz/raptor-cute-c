@@ -67,6 +67,49 @@
 #define make_entity() ecs_create(g_state->ecs)
 
 /*
+ * ECS Structs that the game state uses
+ */
+
+// g_state->entities
+typedef struct Entities {
+    ecs_id_t background_scroll;
+    ecs_id_t player;
+} Entities;
+
+// g_state->components
+typedef struct Components {
+    ecs_id_t background_scroll;
+    ecs_id_t collider;
+    ecs_id_t enemy_weapon;
+    ecs_id_t health;
+    ecs_id_t input;
+    ecs_id_t player_sprite;
+    ecs_id_t player_state;
+    ecs_id_t position;
+    ecs_id_t score;
+    ecs_id_t sprite;
+    ecs_id_t tag;
+    ecs_id_t velocity;
+    ecs_id_t weapon;
+} Components;
+
+// g_state->systems
+typedef struct Systems {
+    ecs_id_t background_scroll;
+    ecs_id_t boundary;
+    ecs_id_t collision;
+    ecs_id_t coroutine;
+    ecs_id_t debug_bounding_boxes;
+    ecs_id_t enemy_weapon;
+    ecs_id_t input;
+    ecs_id_t movement;
+    ecs_id_t player_render;
+    ecs_id_t player_state;
+    ecs_id_t render;
+    ecs_id_t weapon;
+} Systems;
+
+/*
  * Background Scroll Component
  */
 

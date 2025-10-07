@@ -33,41 +33,9 @@ typedef struct GameState {
     int          score;
     int          lives;
 
-    struct {
-        ecs_id_t background_scroll;
-        ecs_id_t player;
-    } entities;
-
-    struct {
-        ecs_id_t background_scroll;
-        ecs_id_t collider;
-        ecs_id_t enemy_weapon;
-        ecs_id_t health;
-        ecs_id_t input;
-        ecs_id_t player_sprite;
-        ecs_id_t player_state;
-        ecs_id_t position;
-        ecs_id_t score;
-        ecs_id_t sprite;
-        ecs_id_t tag;
-        ecs_id_t velocity;
-        ecs_id_t weapon;
-    } components;
-
-    struct {
-        ecs_id_t background_scroll;
-        ecs_id_t boundary;
-        ecs_id_t collision;
-        ecs_id_t coroutine;
-        ecs_id_t debug_bounding_boxes;
-        ecs_id_t enemy_weapon;
-        ecs_id_t input;
-        ecs_id_t movement;
-        ecs_id_t player_render;
-        ecs_id_t player_state;
-        ecs_id_t render;
-        ecs_id_t weapon;
-    } systems;
+    Entities   entities;
+    Components components;
+    Systems    systems;
 
     struct {
         CF_Coroutine spawner;
