@@ -1,5 +1,6 @@
 #include "factory.h"
 
+#include <cute_color.h>
 #include <cute_math.h>
 #include <cute_result.h>
 #include <cute_rnd.h>
@@ -272,7 +273,7 @@ ecs_id_t make_explosion(float x, float y) {
 
 void make_hit_particles(float x, float y, CF_V2 direction, int count) {
     // Calculate the base angle from the direction vector
-    float base_angle = atan2f(direction.y, direction.x);
+    float base_angle = CF_ATAN2F(direction.y, direction.x);
 
     for (int i = 0; i < count; ++i) {
         auto id              = make_entity();
