@@ -1,10 +1,15 @@
 BUILD_DIR = File.join(__dir__, 'build', 'debug')
+WEB_BUILD_DIR = File.join(__dir__, 'build', 'web')
 PWD = File.expand_path(__dir__)
 PID_FILE = File.join(BUILD_DIR, 'raptor.pid')
 EXE_FILE = File.join(BUILD_DIR, 'Raptor')
 
 directory BUILD_DIR do
   sh "cmake -S #{PWD} -B #{BUILD_DIR} -G Ninja -DCMAKE_BUILD_TYPE=Debug"
+end
+
+directory WEB_BUILD_DIR do
+  sh "emcmake cmake -S #{PWD} -B #{WEB_BUILD_DIR} -DCMAKE_BUILD_TYPE=Release"
 end
 
 desc 'Compile the project'
@@ -25,6 +30,11 @@ end
 desc 'Run the project'
 task run: :compile do
   run EXE_FILE
+end
+
+desc 'Compile for web'
+task web: WEB_BUILD_DIR do
+
 end
 
 namespace :run do
