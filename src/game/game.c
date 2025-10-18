@@ -120,7 +120,7 @@ EXPORT void game_init(Platform* platform) {
     const int MAX_EXPLOSIONS         = 32;
     g_state->explosions              = cf_arena_alloc(&g_state->stage_arena, MAX_EXPLOSIONS * sizeof(Explosion));
     g_state->explosions_count        = 0;
-    g_state->explosions_capacity     = MAX_HIT_PARTICLES;
+    g_state->explosions_capacity     = MAX_EXPLOSIONS;
 
     // Initialize shared particle sprite (1x1 white pixel)
     CF_Pixel particle_pixel          = {
