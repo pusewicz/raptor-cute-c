@@ -291,6 +291,7 @@ static void game_render_debug(void) {
 }
 
 EXPORT void game_render(void) {
+    render_background_scroll();
     render_player(&g_state->player);
     for (size_t i = 0; i < g_state->player_bullets_count; i++) {
         render_sprite(

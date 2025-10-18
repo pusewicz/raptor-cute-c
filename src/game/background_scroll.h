@@ -18,3 +18,4 @@ typedef struct BackgroundScroll {
 
 BackgroundScroll make_background_scroll(void);
 void             update_background_scroll(void);
+void             render_background_scroll(void);
