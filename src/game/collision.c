@@ -12,23 +12,24 @@
 
 static void player_bullets_vs_enemies(
     size_t       player_bullets_count,
-    PlayerBullet player_bullets[static player_bullets_count],
+    PlayerBullet player_bullets[static restrict player_bullets_count],
     size_t       enemies_count,
-    Enemy        enemies[static enemies_count]
+    Enemy        enemies[static restrict enemies_count]
 ) {
     if (player_bullets_count == 0 || enemies_count == 0) { return; }
 
     for (size_t i = 0; i < player_bullets_count; ++i) {
-        if (!player_bullets[i].is_alive) { continue; }
+        auto bullet = &player_bullets[i];
+        if (!bullet->is_alive) { continue; }
+
+        // Calculate bullet AABB once per bullet (not per enemy)
+        auto bullet_aabb = cf_make_aabb_center_half_extents(bullet->position, bullet->collider.half_extents);
 
         for (size_t j = 0; j < enemies_count; ++j) {
             if (!enemies[j].is_alive) { continue; }
 
-            auto bullet      = &player_bullets[i];
-            auto enemy       = &enemies[j];
-
-            auto bullet_aabb = cf_make_aabb_center_half_extents(bullet->position, bullet->collider.half_extents);
-            auto enemy_aabb  = cf_make_aabb_center_half_extents(enemy->position, enemy->collider.half_extents);
+            auto enemy      = &enemies[j];
+            auto enemy_aabb = cf_make_aabb_center_half_extents(enemy->position, enemy->collider.half_extents);
 
             if (cf_aabb_to_aabb(bullet_aabb, enemy_aabb)) {
                 // Damage the enemy
@@ -63,11 +64,11 @@ static void player_bullets_vs_enemies(
 }
 
 static void player_vs_threats(
-    const Player* player,
-    size_t        enemies_count,
-    Enemy         enemies[static enemies_count],
-    size_t        enemy_bullets_count,
-    EnemyBullet   enemy_bullets[static enemy_bullets_count]
+    const Player* restrict player,
+    size_t      enemies_count,
+    Enemy       enemies[static restrict enemies_count],
+    size_t      enemy_bullets_count,
+    EnemyBullet enemy_bullets[static restrict enemy_bullets_count]
 ) {
     if (enemies_count == 0 && enemy_bullets_count == 0) { return; }
     if (!player->is_alive || player->is_invincible) { return; }
@@ -84,6 +85,7 @@ static void player_vs_threats(
         if (cf_aabb_to_aabb(player_aabb, enemy_aabb)) {
             enemy->is_alive = false;
             damage_player();
+            return;  // Player is dead, no need to check more collisions
         }
     }
 
@@ -97,6 +99,7 @@ static void player_vs_threats(
         if (cf_aabb_to_aabb(player_aabb, enemy_aabb)) {
             enemy_bullet->is_alive = false;
             damage_player();
+            return;  // Player is dead, no need to check more collisions
         }
     }
 }
