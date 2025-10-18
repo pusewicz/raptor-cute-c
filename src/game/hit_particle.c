@@ -7,9 +7,7 @@
 #include <cute_sprite.h>
 #include <stddef.h>
 
-#include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
-#include "component.h"
 #include "cute_time.h"
 
 HitParticle make_hit_particle(float x, float y, CF_V2 direction) {
