@@ -48,8 +48,7 @@ static void player_bullets_vs_enemies(
                 }
 
                 // Get bullet direction from velocity and reverse it
-                // TODO: Update cute_math to use _Generic for cf_mul
-                auto bullet_dir = cf_mul_v2_f(cf_norm(bullet->velocity), -1.0f);
+                auto bullet_dir = cf_mul(cf_norm(bullet->velocity), -1.0f);
 
                 // Spawn white debris particles opposite to the bullet's direction
                 spawn_hit_particle_burst(5, enemy->position, bullet_dir);
