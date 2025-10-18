@@ -7,9 +7,16 @@ add_library(
     asset/font.c
     asset/sprite.c
     coroutine.c
+    input.c
+    movement.c
+    player.c
+    enemy.c
+    explosion.c
+    collision.c
+    hit_particle.c
+    sprite.c
+    background_scroll.c
     game.c
-    ecs.c
-    factory.c
 )
 target_link_libraries(${NAME}
   PRIVATE project_warnings

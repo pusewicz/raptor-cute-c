@@ -3,3 +3,4 @@
 
 void init_coroutines(void);
 void cleanup_coroutines(void);
+void update_coroutine(void);

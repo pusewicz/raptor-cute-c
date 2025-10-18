@@ -7,12 +7,12 @@
 #include <cute_color.h>
 #include <cute_defines.h>
 #include <cute_draw.h>
+#include <cute_input.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
 #include <cute_sprite.h>
 #include <cute_time.h>
 #include <dcimgui.h>
-#include <pico_ecs.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,9 +24,17 @@
 #include "asset/audio.h"
 #include "asset/font.h"
 #include "asset/sprite.h"
+#include "background_scroll.h"
+#include "collision.h"
+#include "component.h"
 #include "coroutine.h"
-#include "ecs.h"
-#include "factory.h"
+#include "enemy.h"
+#include "explosion.h"
+#include "hit_particle.h"
+#include "input.h"
+#include "movement.h"
+#include "player.h"
+#include "sprite.h"
 
 GameState* g_state = nullptr;
 
@@ -59,11 +67,8 @@ EXPORT void game_init(Platform* platform) {
     g_state->debug_bounding_boxes = false;
     g_state->lives                = 3;
 
-    // Initialize ECS
-    g_state->ecs                  = ecs_new(96, nullptr);
-    init_ecs();
-    g_state->entities.background_scroll = make_background_scroll();
-    g_state->entities.player            = make_player(0.0f, -g_state->canvas_size.y / 3);
+    g_state->background_scroll    = make_background_scroll();
+    g_state->player               = make_player(0.0f, -g_state->canvas_size.y / 3);
 
     init_coroutines();
 
@@ -86,9 +91,39 @@ EXPORT void game_init(Platform* platform) {
     load_audio(&g_state->audio.explosion, "assets/explosion.ogg");
     load_sprite(&g_state->sprites.life_icon, "assets/life_icon.png");
 
+    // Prepare the storage for player bullets
+    const int MAX_PLAYER_BULLETS     = 32;
+    g_state->player_bullets          = cf_arena_alloc(&g_state->stage_arena, MAX_PLAYER_BULLETS * sizeof(PlayerBullet));
+    g_state->player_bullets_count    = 0;
+    g_state->player_bullets_capacity = MAX_PLAYER_BULLETS;
+
+    // Prepare the storage for enemies
+    const int MAX_ENEMIES            = 32;
+    g_state->enemies                 = cf_arena_alloc(&g_state->stage_arena, MAX_ENEMIES * sizeof(Enemy));
+    g_state->enemies_count           = 0;
+    g_state->enemies_capacity        = MAX_ENEMIES;
+
+    // Prepare the storage for enemy bullets
+    const int MAX_ENEMY_BULLETS      = 32;
+    g_state->enemy_bullets           = cf_arena_alloc(&g_state->stage_arena, MAX_ENEMY_BULLETS * sizeof(EnemyBullet));
+    g_state->enemy_bullets_count     = 0;
+    g_state->enemy_bullets_capacity  = MAX_ENEMY_BULLETS;
+
+    // Prepare the storage for hit particles
+    const int MAX_HIT_PARTICLES      = 240;
+    g_state->hit_particles           = cf_arena_alloc(&g_state->stage_arena, MAX_HIT_PARTICLES * sizeof(HitParticle));
+    g_state->hit_particles_count     = 0;
+    g_state->hit_particles_capacity  = MAX_HIT_PARTICLES;
+
+    // Prepare the storage for explosions
+    const int MAX_EXPLOSIONS         = 32;
+    g_state->explosions              = cf_arena_alloc(&g_state->stage_arena, MAX_EXPLOSIONS * sizeof(Explosion));
+    g_state->explosions_count        = 0;
+    g_state->explosions_capacity     = MAX_HIT_PARTICLES;
+
     // Initialize shared particle sprite (1x1 white pixel)
-    CF_Pixel particle_pixel = {
-        .colors = {255, 255, 255, 255}
+    CF_Pixel particle_pixel          = {
+                 .colors = {255, 255, 255, 255}
     };
     g_state->sprites.particle = cf_make_easy_sprite_from_pixels(&particle_pixel, 1, 1);
 
@@ -98,45 +133,190 @@ EXPORT void game_init(Platform* platform) {
 EXPORT bool game_update(void) {
     cf_arena_reset(&g_state->scratch_arena);
 
-    auto ret = ecs_update_systems(g_state->ecs, CF_DELTA_TIME);
+    auto canvas_aabb = cf_make_aabb_center_half_extents(cf_v2(0, 0), cf_div_v2_f(g_state->canvas_size, 2.0f));
 
-    return ret == 0;
+    update_input(&g_state->player.input);
+    update_player(&g_state->player);
+    // Update player movement
+    update_movement(&g_state->player.position, &g_state->player.velocity);
+
+    // Update player bullets
+    for (size_t i = 0; i < g_state->player_bullets_count; i++) {
+        update_movement(&g_state->player_bullets[i].position, &g_state->player_bullets[i].velocity);
+
+        // Mark bullet as destroyed when out of screen bounds
+        if (g_state->player_bullets[i].position.y > g_state->canvas_size.y * 0.5f) {
+            g_state->player_bullets[i].is_alive = false;
+        }
+    }
+    // Update enemies
+    for (size_t i = 0; i < g_state->enemies_count; i++) {
+        update_movement(&g_state->enemies[i].position, &g_state->enemies[i].velocity);
+        update_enemy(&g_state->enemies[i]);  // TODO: Rename to update_enemy_weapon
+
+        // Mark enemy as destroyed when out of scree bounds
+        auto enemy_aabb =
+            cf_make_aabb_center_half_extents(g_state->enemies[i].position, g_state->enemies[i].collider.half_extents);
+        if (!cf_aabb_to_aabb(canvas_aabb, enemy_aabb)) { g_state->enemies[i].is_alive = false; }
+    }
+    // Update enemy bullets
+    for (size_t i = 0; i < g_state->enemy_bullets_count; i++) {
+        update_movement(&g_state->enemy_bullets[i].position, &g_state->enemy_bullets[i].velocity);
+
+        // Mark enemy as destroyed when out of scree bounds
+        auto bullet_aabb = cf_make_aabb_center_half_extents(
+            g_state->enemy_bullets[i].position, g_state->enemy_bullets[i].collider.half_extents
+        );
+        if (!cf_aabb_to_aabb(canvas_aabb, bullet_aabb)) { g_state->enemy_bullets[i].is_alive = false; }
+    }
+    // Update hit particles
+    for (size_t i = 0; i < g_state->hit_particles_count; i++) {
+        update_movement(&g_state->hit_particles[i].position, &g_state->hit_particles[i].velocity);
+
+        // Mark particle as destroyed when out of scree bounds
+        if (g_state->hit_particles[i].position.x < canvas_aabb.min.x ||
+            g_state->hit_particles[i].position.x > canvas_aabb.max.x ||
+            g_state->hit_particles[i].position.y < canvas_aabb.min.y ||
+            g_state->hit_particles[i].position.x > canvas_aabb.max.y) {
+            g_state->hit_particles[i].is_alive = false;
+        }
+    }
+    update_particles();
+
+    // TODO: Decide where to move this
+    // Clamp player position to canvas bounds
+    g_state->player.position.x =
+        cf_clamp(g_state->player.position.x, -g_state->canvas_size.x / 2.0f, g_state->canvas_size.x / 2.0f);
+    g_state->player.position.y =
+        cf_clamp(g_state->player.position.y, -g_state->canvas_size.y / 2.0f, g_state->canvas_size.y / 2.0f);
+
+    update_background_scroll();
+    update_collision();
+    update_coroutine();
+
+    cleanup_enemies();
+    cleanup_enemy_bullets();
+    cleanup_explosions();
+    cleanup_hit_particles();
+    cleanup_player_bullets();
+
+    return true;
 }
 
 static void game_render_debug(void) {
-    auto weapon = ECS_GET(g_state->entities.player, WeaponComponent);
-    auto pos    = ECS_GET(g_state->entities.player, PositionComponent);
-    auto vel    = ECS_GET(g_state->entities.player, VelocityComponent);
+    auto weapon = &g_state->player.weapon;
+    auto pos    = &g_state->player.position;
+    auto vel    = &g_state->player.velocity;
+    auto input  = &g_state->player.input;
 
     ImGui_Begin("Debug Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-    if (ImGui_CollapsingHeader("Debug", true)) {
-        ImGui_Checkbox("Draw Bounding Boxes", &g_state->debug_bounding_boxes);
-    }
+    {
+        if (ImGui_CollapsingHeader("Debug", true)) {
+            ImGui_Checkbox("Draw Bounding Boxes", &g_state->debug_bounding_boxes);
+        }
 
-    if (ImGui_CollapsingHeader("Player", true)) {
-        ImGui_Text("Position: (%.2f, %.2f)", pos->x, pos->y);
-        ImGui_Text("Velocity: (%.2f, %.2f)", vel->x, vel->y);
-    }
+        if (ImGui_CollapsingHeader("Player", true)) {
+            ImGui_Text("Position: (%.2f, %.2f)", pos->x, pos->y);
+            ImGui_Text("Velocity: (%.2f, %.2f)", vel->x, vel->y);
+            ImGui_Text("Up: %s", input->up ? "Y" : "N");
+            ImGui_Text("Down: %s", input->down ? "Y" : "N");
+            ImGui_Text("Left: %s", input->left ? "Y" : "N");
+            ImGui_Text("Right: %s", input->right ? "Y" : "N");
+            ImGui_Text("Shoot: %s", input->shoot ? "Y" : "N");
+        }
 
-    if (ImGui_CollapsingHeader("Weapon", true)) {
-        ImGui_DragFloat("Cooldown", &weapon->cooldown);
-        ImGui_Text("Time Since Last Shot: %.2f", weapon->time_since_shot);
-    }
+        if (ImGui_CollapsingHeader("Entity Counts", true)) {
+            ImGui_Text("Enemies: %zu", g_state->enemies_count);
+            ImGui_Text("EnemyBullets: %zu", g_state->enemy_bullets_count);
+            ImGui_Text("Explosions: %zu", g_state->explosions_count);
+            ImGui_Text("HitParticles: %zu", g_state->hit_particles_count);
+            ImGui_Text("PlayerBullets: %zu", g_state->player_bullets_count);
+        }
 
-    if (ImGui_CollapsingHeader("Performance", true)) { ImGui_Text("FPS: %.2f", 1.0f / CF_DELTA_TIME); }
+        if (ImGui_CollapsingHeader("Weapon", true)) {
+            ImGui_DragFloat("Cooldown", &weapon->cooldown);
+            ImGui_Text("Time Since Last Shot: %.2f", weapon->time_since_shot);
+        }
 
-    if (ImGui_CollapsingHeader("Window", true)) {
-        ImGui_Text("Screen: %dx%d", cf_display_width(g_state->display_id), cf_display_height(g_state->display_id));
-        ImGui_Text("Size: %dx%d", cf_app_get_width(), cf_app_get_height());
-        ImGui_Text("Canvas: %dx%d", cf_app_get_canvas_width(), cf_app_get_canvas_height());
-        ImGui_Text("Canvas(logical): %.0fx%.0f", g_state->canvas_size.x, g_state->canvas_size.y);
-        ImGui_Text("Game Scale: %.2f", g_state->scale);
-        ImGui_Text("DPI Scale: %.2f", cf_app_get_dpi_scale());
+        if (ImGui_CollapsingHeader("Performance", true)) { ImGui_Text("FPS: %.2f", cf_app_get_framerate()); }
+
+        if (ImGui_CollapsingHeader("Window", true)) {
+            ImGui_Text("Screen: %dx%d", cf_display_width(g_state->display_id), cf_display_height(g_state->display_id));
+            ImGui_Text("Size: %dx%d", cf_app_get_width(), cf_app_get_height());
+            ImGui_Text("Canvas: %dx%d", cf_app_get_canvas_width(), cf_app_get_canvas_height());
+            ImGui_Text("Canvas(logical): %.0fx%.0f", g_state->canvas_size.x, g_state->canvas_size.y);
+            ImGui_Text("Game Scale: %.2f", g_state->scale);
+            ImGui_Text("DPI Scale: %.2f", cf_app_get_dpi_scale());
+        }
     }
     ImGui_End();
+
+    if (g_state->debug_bounding_boxes) {
+        cf_draw_layer(1000) {
+            for (size_t i = 0; i < g_state->enemies_count; ++i) {
+                auto entity        = &g_state->enemies[i];
+                auto aabb_collider = cf_make_aabb_center_half_extents(entity->position, entity->collider.half_extents);
+
+                cf_draw() {
+                    cf_draw_color(cf_color_blue()) { cf_draw_quad(aabb_collider, 0, 0); }
+                }
+            }
+            for (size_t i = 0; i < g_state->player_bullets_count; ++i) {
+                auto entity        = &g_state->player_bullets[i];
+                auto aabb_collider = cf_make_aabb_center_half_extents(entity->position, entity->collider.half_extents);
+
+                cf_draw() {
+                    cf_draw_color(cf_color_blue()) { cf_draw_quad(aabb_collider, 0, 0); }
+                }
+            }
+            for (size_t i = 0; i < g_state->enemy_bullets_count; ++i) {
+                auto entity        = &g_state->enemy_bullets[i];
+                auto aabb_collider = cf_make_aabb_center_half_extents(entity->position, entity->collider.half_extents);
+
+                cf_draw() {
+                    cf_draw_color(cf_color_blue()) { cf_draw_quad(aabb_collider, 0, 0); }
+                }
+            }
+            {
+                auto entity        = &g_state->player;
+                auto aabb_collider = cf_make_aabb_center_half_extents(entity->position, entity->collider.half_extents);
+
+                cf_draw() {
+                    cf_draw_color(cf_color_blue()) { cf_draw_quad(aabb_collider, 0, 0); }
+                }
+            }
+        }
+    }
 }
 
 EXPORT void game_render(void) {
+    render_player(&g_state->player);
+    for (size_t i = 0; i < g_state->player_bullets_count; i++) {
+        render_sprite(
+            &g_state->player_bullets[i].sprite, g_state->player_bullets[i].position, g_state->player_bullets[i].z_index
+        );
+    }
+    for (size_t i = 0; i < g_state->enemies_count; i++) {
+        render_sprite(&g_state->enemies[i].sprite, g_state->enemies[i].position, g_state->enemies[i].z_index);
+    }
+    for (size_t i = 0; i < g_state->enemy_bullets_count; i++) {
+        render_sprite(
+            &g_state->enemy_bullets[i].sprite, g_state->enemy_bullets[i].position, g_state->enemy_bullets[i].z_index
+        );
+    }
+    for (size_t i = 0; i < g_state->hit_particles_count; i++) {
+        cf_draw() {
+            cf_draw_layer(Z_PARTICLES) {
+                cf_draw_translate_v2(g_state->hit_particles[i].position);
+                cf_draw_scale(g_state->hit_particles[i].size, g_state->hit_particles[i].size);
+                cf_draw_sprite(&g_state->hit_particles[i].sprite);
+            }
+        }
+    }
+    for (size_t i = 0; i < g_state->explosions_count; i++) {
+        render_sprite(&g_state->explosions[i].sprite, g_state->explosions[i].position, g_state->explosions[i].z_index);
+    }
+
     // Render UI
     char score_text[6 + 1];
 
@@ -186,7 +366,6 @@ EXPORT void game_shutdown(void) {
     cf_destroy_arena(&g_state->scratch_arena);
     cf_destroy_arena(&g_state->stage_arena);
     cf_destroy_arena(&g_state->permanent_arena);
-    ecs_free(g_state->ecs);
     platform->free_memory(g_state);
 }
 
@@ -195,9 +374,6 @@ EXPORT void* game_state(void) { return g_state; }
 EXPORT void game_hot_reload(void* game_state) {
     // Update global game state pointer
     g_state = (GameState*)game_state;
-
-    // Update system callbacks to new function addresses
-    update_ecs_system_callbacks();
 
     // Re-initialize coroutines
     cleanup_coroutines();

@@ -19,9 +19,5 @@ bool validate_game_state(void) {
         APP_WARN("g_state->scale is invalid: (%.2f)", g_state->scale);
         return false;
     }
-    if (g_state->ecs == nullptr) {
-        APP_WARN("g_state->ecs is null");
-        return false;
-    }
     return true;
 }

@@ -9,9 +9,13 @@
 #include <cute_math.h>
 #include <cute_rnd.h>
 #include <cute_sprite.h>
+#include <stddef.h>
 
-#include "../game/ecs.h"
-#include "pico_ecs.h"
+#include "../game/background_scroll.h"
+#include "../game/enemy.h"
+#include "../game/explosion.h"
+#include "../game/hit_particle.h"
+#include "../game/player.h"
 
 typedef struct Platform Platform;
 
@@ -29,13 +33,31 @@ typedef struct GameState {
     CF_Arena     scratch_arena;
     CF_DisplayID display_id;
     CF_Rnd       rnd;
-    ecs_t*       ecs;
     int          score;
     int          lives;
 
-    Entities   entities;
-    Components components;
-    Systems    systems;
+    BackgroundScroll background_scroll;
+
+    Player        player;
+    PlayerBullet* player_bullets;
+    size_t        player_bullets_count;
+    size_t        player_bullets_capacity;
+
+    Enemy* enemies;
+    size_t enemies_count;
+    size_t enemies_capacity;
+
+    EnemyBullet* enemy_bullets;
+    size_t       enemy_bullets_count;
+    size_t       enemy_bullets_capacity;
+
+    Explosion* explosions;
+    size_t     explosions_count;
+    size_t     explosions_capacity;
+
+    HitParticle* hit_particles;
+    size_t       hit_particles_count;
+    size_t       hit_particles_capacity;
 
     struct {
         CF_Coroutine spawner;
