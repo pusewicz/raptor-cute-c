@@ -77,6 +77,7 @@ EXPORT void game_init(Platform* platform) {
     g_state->scratch_arena        = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
     g_state->rnd                  = cf_rnd_seed((uint32_t)time(nullptr));
     g_state->debug_bounding_boxes = false;
+    g_state->is_game_over         = false;
     g_state->lives                = 3;
 
     g_state->background_scroll    = make_background_scroll();
@@ -102,6 +103,7 @@ EXPORT void game_init(Platform* platform) {
     load_audio(&g_state->audio.laser_shoot, "assets/laser-shoot.ogg");
     load_audio(&g_state->audio.explosion, "assets/explosion.ogg");
     load_sprite(&g_state->sprites.life_icon, "assets/life_icon.png");
+    load_sprite(&g_state->sprites.game_over, "assets/gameover.png");
 
     // Prepare the storage for player bullets
     INIT_ENTITY_STORAGE(PlayerBullet, player_bullets, MAX_PLAYER_BULLETS);
@@ -125,6 +127,31 @@ EXPORT bool game_update(void) {
     auto canvas_aabb = cf_make_aabb_center_half_extents(cf_v2(0, 0), cf_div_v2_f(g_state->canvas_size, 2.0f));
 
     update_input(&g_state->player.input);
+
+    // Handle game over state
+    if (g_state->is_game_over) {
+        // Check for restart input (shoot button)
+        if (g_state->player.input.shoot) {
+            // TODO: Extract a generic init/reset function
+            // Reset game state
+            g_state->is_game_over         = false;
+            g_state->lives                = 3;
+            g_state->score                = 0;
+
+            // Reset player
+            g_state->player               = make_player(0.0f, -g_state->canvas_size.y / 3);
+            g_state->player_bullets_count = 0;
+            g_state->enemies_count        = 0;
+            g_state->enemy_bullets_count  = 0;
+            g_state->explosions_count     = 0;
+            g_state->hit_particles_count  = 0;
+
+            // Restart coroutines
+            cleanup_coroutines();
+            init_coroutines();
+        }
+        return true;
+    }
     update_player(&g_state->player);
     // Update player movement
     update_movement(&g_state->player.position, &g_state->player.velocity);
@@ -259,7 +286,24 @@ static void game_render_debug(void) {
 }
 
 EXPORT void game_render(void) {
+#ifdef DEBUG
+    game_render_debug();
+#endif
+
     render_background_scroll();
+
+    // Show game over screen
+    if (g_state->is_game_over) {
+        cf_draw() {
+            cf_draw_layer(Z_UI) {
+                // Draw game over sprite centered
+                cf_draw_sprite(&g_state->sprites.game_over);
+            }
+        }
+
+        return;
+    }
+
     render_player(&g_state->player);
     RENDER_ENTITY_ARRAY(g_state->enemies, g_state->enemies_count, sprite, position, z_index);
     RENDER_ENTITY_ARRAY(g_state->enemy_bullets, g_state->enemy_bullets_count, sprite, position, z_index);
@@ -316,9 +360,6 @@ EXPORT void game_render(void) {
             }
         }
     }
-#ifdef DEBUG
-    game_render_debug();
-#endif
 }
 
 EXPORT void game_shutdown(void) {

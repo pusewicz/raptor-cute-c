@@ -112,6 +112,9 @@ void damage_player(void) {
     // Set respawn delay if player has lives remaining
     if (g_state->lives > 0) {
         player->respawn_delay = 2.0f;  // 2 second respawn delay
+    } else {
+        // Game over
+        g_state->is_game_over = true;
     }
 }
 
