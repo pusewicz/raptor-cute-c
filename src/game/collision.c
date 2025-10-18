@@ -12,9 +12,9 @@
 
 static void player_bullets_vs_enemies(
     size_t       player_bullets_count,
-    PlayerBullet player_bullets[player_bullets_count],
+    PlayerBullet player_bullets[static player_bullets_count],
     size_t       enemies_count,
-    Enemy        enemies[enemies_count]
+    Enemy        enemies[static enemies_count]
 ) {
     for (size_t i = 0; i < player_bullets_count; ++i) {
         if (!player_bullets[i].is_alive) { continue; }
@@ -58,7 +58,7 @@ static void player_bullets_vs_enemies(
     }
 }
 
-static void player_vs_enemies(Player* player, size_t enemies_count, Enemy enemies[static enemies_count]) {
+static void player_vs_enemies(const Player* player, size_t enemies_count, Enemy enemies[static enemies_count]) {
     if (player->is_alive && !player->is_invincible) {
         auto player_aabb = cf_make_aabb_center_half_extents(player->position, player->collider.half_extents);
 
@@ -77,7 +77,7 @@ static void player_vs_enemies(Player* player, size_t enemies_count, Enemy enemie
 }
 
 static void player_vs_enemy_bullets(
-    Player* player, size_t enemy_bullets_count, EnemyBullet enemy_bullets[static enemy_bullets_count]
+    const Player* player, size_t enemy_bullets_count, EnemyBullet enemy_bullets[static enemy_bullets_count]
 ) {
     if (player->is_alive && !player->is_invincible) {
         auto player_aabb = cf_make_aabb_center_half_extents(player->position, player->collider.half_extents);
