@@ -42,7 +42,7 @@ void spawn_hit_particle(HitParticle particle) {
 void spawn_hit_particles(size_t count, const HitParticle particles[static restrict count]) {
     CF_ASSERT(g_state->hit_particles_count + count <= g_state->hit_particles_capacity);
 
-    memcpy(&g_state->hit_particles[g_state->hit_particles_count], particles, count * sizeof(*particles));
+    CF_MEMCPY(&g_state->hit_particles[g_state->hit_particles_count], particles, count * sizeof(*particles));
 
     g_state->hit_particles_count += count;
 }
