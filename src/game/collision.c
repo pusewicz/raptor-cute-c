@@ -16,6 +16,8 @@ static void player_bullets_vs_enemies(
     size_t       enemies_count,
     Enemy        enemies[static enemies_count]
 ) {
+    if (player_bullets_count == 0 || enemies_count == 0) { return; }
+
     for (size_t i = 0; i < player_bullets_count; ++i) {
         if (!player_bullets[i].is_alive) { continue; }
 
@@ -52,6 +54,9 @@ static void player_bullets_vs_enemies(
 
                 // Spawn white debris particles opposite to the bullet's direction
                 spawn_hit_particle_burst(5, enemy->position, bullet_dir);
+
+                // Bullet is destroyed, no need to check against more enemies
+                break;
             }
         }
     }
