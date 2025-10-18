@@ -6,6 +6,7 @@
 #include <cute_rnd.h>
 #include <cute_sprite.h>
 #include <stddef.h>
+#include <string.h>
 
 #include "../engine/game_state.h"
 #include "cute_time.h"
@@ -34,10 +35,11 @@ HitParticle make_hit_particle(float x, float y, CF_V2 direction) {
 void spawn_hit_particle(HitParticle particle) {
     CF_ASSERT(g_state->hit_particles);
     CF_ASSERT(g_state->hit_particles_count < g_state->hit_particles_capacity);
+
     g_state->hit_particles[g_state->hit_particles_count++] = particle;
 }
 
-void spawn_hit_particles(size_t count, const HitParticle particles[static count]) {
+void spawn_hit_particles(size_t count, const HitParticle particles[static restrict count]) {
     CF_ASSERT(g_state->hit_particles_count + count <= g_state->hit_particles_capacity);
 
     memcpy(&g_state->hit_particles[g_state->hit_particles_count], particles, count * sizeof(*particles));
@@ -47,21 +49,27 @@ void spawn_hit_particles(size_t count, const HitParticle particles[static count]
 
 void spawn_hit_particle_burst(size_t count, CF_V2 pos, CF_V2 dir) {
     HitParticle burst[count];
+
     for (size_t i = 0; i < count; ++i) { burst[i] = make_hit_particle(pos.x, pos.y, dir); }
+
     spawn_hit_particles(count, burst);
 }
 
 void cleanup_hit_particles() {
-    int write_idx = 0;
+    size_t write_idx = 0;
+
     for (size_t i = 0; i < g_state->hit_particles_count; i++) {
         if (g_state->hit_particles[i].is_alive) { g_state->hit_particles[write_idx++] = g_state->hit_particles[i]; }
     }
+
     g_state->hit_particles_count = write_idx;
 }
 
 void update_particles() {
     for (size_t i = 0; i < g_state->hit_particles_count; ++i) {
         auto particle = &g_state->hit_particles[i];
+
+        if (!particle->is_alive) { continue; }
 
         // Update particle lifetime
         particle->time_alive += CF_DELTA_TIME;
