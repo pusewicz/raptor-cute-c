@@ -34,6 +34,7 @@
 #include "input.h"
 #include "movement.h"
 #include "player.h"
+#include "render.h"
 #include "sprite.h"
 
 GameState* g_state = nullptr;
@@ -154,7 +155,7 @@ EXPORT bool game_update(void) {
         update_movement(&g_state->enemies[i].position, &g_state->enemies[i].velocity);
         update_enemy(&g_state->enemies[i]);  // TODO: Rename to update_enemy_weapon
 
-        // Mark enemy as destroyed when out of scree bounds
+        // Mark enemy as destroyed when out of screen bounds
         auto enemy_aabb =
             cf_make_aabb_center_half_extents(g_state->enemies[i].position, g_state->enemies[i].collider.half_extents);
         if (!cf_aabb_to_aabb(canvas_aabb, enemy_aabb)) { g_state->enemies[i].is_alive = false; }
@@ -163,7 +164,7 @@ EXPORT bool game_update(void) {
     for (size_t i = 0; i < g_state->enemy_bullets_count; i++) {
         update_movement(&g_state->enemy_bullets[i].position, &g_state->enemy_bullets[i].velocity);
 
-        // Mark enemy as destroyed when out of scree bounds
+        // Mark bullet as destroyed when out of screen bounds
         auto bullet_aabb = cf_make_aabb_center_half_extents(
             g_state->enemy_bullets[i].position, g_state->enemy_bullets[i].collider.half_extents
         );
@@ -173,11 +174,11 @@ EXPORT bool game_update(void) {
     for (size_t i = 0; i < g_state->hit_particles_count; i++) {
         update_movement(&g_state->hit_particles[i].position, &g_state->hit_particles[i].velocity);
 
-        // Mark particle as destroyed when out of scree bounds
+        // Mark particle as destroyed when out of screen bounds
         if (g_state->hit_particles[i].position.x < canvas_aabb.min.x ||
             g_state->hit_particles[i].position.x > canvas_aabb.max.x ||
             g_state->hit_particles[i].position.y < canvas_aabb.min.y ||
-            g_state->hit_particles[i].position.x > canvas_aabb.max.y) {
+            g_state->hit_particles[i].position.y > canvas_aabb.max.y) {
             g_state->hit_particles[i].is_alive = false;
         }
     }
@@ -254,30 +255,9 @@ static void game_render_debug(void) {
     if (g_state->debug_bounding_boxes) {
         // Draw on top of everything
         cf_draw_layer(Z_MAX) {
-            for (size_t i = 0; i < g_state->enemies_count; ++i) {
-                auto entity        = &g_state->enemies[i];
-                auto aabb_collider = cf_make_aabb_center_half_extents(entity->position, entity->collider.half_extents);
-
-                cf_draw() {
-                    cf_draw_color(cf_color_blue()) { cf_draw_quad(aabb_collider, 0, 0); }
-                }
-            }
-            for (size_t i = 0; i < g_state->player_bullets_count; ++i) {
-                auto entity        = &g_state->player_bullets[i];
-                auto aabb_collider = cf_make_aabb_center_half_extents(entity->position, entity->collider.half_extents);
-
-                cf_draw() {
-                    cf_draw_color(cf_color_blue()) { cf_draw_quad(aabb_collider, 0, 0); }
-                }
-            }
-            for (size_t i = 0; i < g_state->enemy_bullets_count; ++i) {
-                auto entity        = &g_state->enemy_bullets[i];
-                auto aabb_collider = cf_make_aabb_center_half_extents(entity->position, entity->collider.half_extents);
-
-                cf_draw() {
-                    cf_draw_color(cf_color_blue()) { cf_draw_quad(aabb_collider, 0, 0); }
-                }
-            }
+            RENDER_DEBUG_BBOXES(g_state->enemies, g_state->enemies_count, position, collider);
+            RENDER_DEBUG_BBOXES(g_state->player_bullets, g_state->player_bullets_count, position, collider);
+            RENDER_DEBUG_BBOXES(g_state->enemy_bullets, g_state->enemy_bullets_count, position, collider);
             {
                 auto entity        = &g_state->player;
                 auto aabb_collider = cf_make_aabb_center_half_extents(entity->position, entity->collider.half_extents);
@@ -293,19 +273,12 @@ static void game_render_debug(void) {
 EXPORT void game_render(void) {
     render_background_scroll();
     render_player(&g_state->player);
-    for (size_t i = 0; i < g_state->player_bullets_count; i++) {
-        render_sprite(
-            &g_state->player_bullets[i].sprite, g_state->player_bullets[i].position, g_state->player_bullets[i].z_index
-        );
-    }
-    for (size_t i = 0; i < g_state->enemies_count; i++) {
-        render_sprite(&g_state->enemies[i].sprite, g_state->enemies[i].position, g_state->enemies[i].z_index);
-    }
-    for (size_t i = 0; i < g_state->enemy_bullets_count; i++) {
-        render_sprite(
-            &g_state->enemy_bullets[i].sprite, g_state->enemy_bullets[i].position, g_state->enemy_bullets[i].z_index
-        );
-    }
+    RENDER_ENTITY_ARRAY(g_state->enemies, g_state->enemies_count, sprite, position, z_index);
+    RENDER_ENTITY_ARRAY(g_state->enemy_bullets, g_state->enemy_bullets_count, sprite, position, z_index);
+    RENDER_ENTITY_ARRAY(g_state->explosions, g_state->explosions_count, sprite, position, z_index);
+    RENDER_ENTITY_ARRAY(g_state->player_bullets, g_state->player_bullets_count, sprite, position, z_index);
+
+    // Custom code for particles draw
     for (size_t i = 0; i < g_state->hit_particles_count; i++) {
         cf_draw() {
             cf_draw_layer(Z_PARTICLES) {
@@ -314,9 +287,6 @@ EXPORT void game_render(void) {
                 cf_draw_sprite(&g_state->hit_particles[i].sprite);
             }
         }
-    }
-    for (size_t i = 0; i < g_state->explosions_count; i++) {
-        render_sprite(&g_state->explosions[i].sprite, g_state->explosions[i].position, g_state->explosions[i].z_index);
     }
 
     // Render UI
