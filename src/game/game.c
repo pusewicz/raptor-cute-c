@@ -252,7 +252,8 @@ static void game_render_debug(void) {
     ImGui_End();
 
     if (g_state->debug_bounding_boxes) {
-        cf_draw_layer(1000) {
+        // Draw on top of everything
+        cf_draw_layer(Z_MAX) {
             for (size_t i = 0; i < g_state->enemies_count; ++i) {
                 auto entity        = &g_state->enemies[i];
                 auto aabb_collider = cf_make_aabb_center_half_extents(entity->position, entity->collider.half_extents);

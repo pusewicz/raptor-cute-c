@@ -12,4 +12,5 @@ typedef enum ZIndex {
     Z_PLAYER_SPRITE,
     Z_PARTICLES,
     Z_UI,
+    Z_MAX,
 } ZIndex;
