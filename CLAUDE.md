@@ -55,6 +55,15 @@ The project uses a **hot-reloadable game library architecture**:
    - Game library loading/reloading/unloading
    - Frame timing (begin/end frame)
 
+4. **Coordinate System**: Uses a centered Cartesian coordinate system:
+   - Origin `(0, 0)` is at the **center** of the screen
+   - Positive X goes **right**, negative X goes **left**
+   - Positive Y goes **up**, negative Y goes **down**
+   - X range: `[-canvas_width/2, +canvas_width/2]`
+   - Y range: `[-canvas_height/2, +canvas_height/2]`
+   - Default canvas size: 180×320 (portrait orientation)
+   - Example: Top-right corner is at `(90, 160)`, bottom-left is at `(-90, -160)`
+
 ### Dependencies
 
 - **Cute Framework**: Main framework dependency, fetched automatically via CMake FetchContent
