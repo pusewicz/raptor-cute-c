@@ -79,7 +79,7 @@ PlayerBullet make_player_bullet(float x, float y, CF_V2 direction) {
 }
 
 void spawn_player_bullet(PlayerBullet player_bullet) {
-    // TODO: Handle scenario when bullet array at capacity
+    CF_ASSERT(g_state->player_bullets);
     CF_ASSERT(g_state->player_bullets_count < g_state->player_bullets_capacity);
     g_state->player_bullets[g_state->player_bullets_count++] = player_bullet;
 }

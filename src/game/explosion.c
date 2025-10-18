@@ -20,7 +20,7 @@ Explosion make_explosion(float x, float y) {
 }
 
 void spawn_explosion(Explosion explosion) {
-    // TODO: Handle scenario when bullet array at capacity
+    CF_ASSERT(g_state->explosions);
     CF_ASSERT(g_state->explosions_count < g_state->explosions_capacity - 1);
     g_state->explosions[g_state->explosions_count++] = explosion;
 }

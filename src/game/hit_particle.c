@@ -34,7 +34,7 @@ HitParticle make_hit_particle(float x, float y, CF_V2 direction) {
 }
 
 void spawn_hit_particle(HitParticle particle) {
-    // TODO: Handle scenario when array at capacity
+    CF_ASSERT(g_state->hit_particles);
     CF_ASSERT(g_state->hit_particles_count < g_state->hit_particles_capacity);
     g_state->hit_particles[g_state->hit_particles_count++] = particle;
 }
@@ -55,7 +55,6 @@ void cleanup_hit_particles() {
 void update_particles() {
     for (size_t i = 0; i < g_state->hit_particles_count; ++i) {
         auto particle = &g_state->hit_particles[i];
-        auto pos      = &particle->position;
 
         // Update particle lifetime
         particle->time_alive += CF_DELTA_TIME;

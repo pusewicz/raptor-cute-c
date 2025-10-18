@@ -99,15 +99,13 @@ EnemyBullet make_enemy_bullet(float x, float y, CF_V2 direction) {
 }
 
 void spawn_enemy_bullet(EnemyBullet bullet) {
-    CF_ASSERT(g_state->enemy_bullets != nullptr);
-    // TODO: Handle scenario when bullet array at capacity
+    CF_ASSERT(g_state->enemy_bullets);
     CF_ASSERT(g_state->enemy_bullets_count < g_state->enemy_bullets_capacity);
     g_state->enemy_bullets[g_state->enemy_bullets_count++] = bullet;
 }
 
 void spawn_enemy(Enemy enemy) {
-    CF_ASSERT(g_state->enemies != nullptr);
-    // TODO: Handle scenario when bullet array at capacity
+    CF_ASSERT(g_state->enemies);
     CF_ASSERT(g_state->enemies_count < g_state->enemies_capacity - 1);
     g_state->enemies[g_state->enemies_count++] = enemy;
 }
