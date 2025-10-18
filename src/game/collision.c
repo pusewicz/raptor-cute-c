@@ -62,41 +62,41 @@ static void player_bullets_vs_enemies(
     }
 }
 
-static void player_vs_enemies(const Player* player, size_t enemies_count, Enemy enemies[static enemies_count]) {
-    if (player->is_alive && !player->is_invincible) {
-        auto player_aabb = cf_make_aabb_center_half_extents(player->position, player->collider.half_extents);
+static void player_vs_threats(
+    const Player* player,
+    size_t        enemies_count,
+    Enemy         enemies[static enemies_count],
+    size_t        enemy_bullets_count,
+    EnemyBullet   enemy_bullets[static enemy_bullets_count]
+) {
+    if (enemies_count == 0 && enemy_bullets_count == 0) { return; }
+    if (!player->is_alive || player->is_invincible) { return; }
 
-        for (size_t i = 0; i < enemies_count; ++i) {
-            if (!enemies[i].is_alive) { continue; }
+    auto player_aabb = cf_make_aabb_center_half_extents(player->position, player->collider.half_extents);
 
-            auto enemy      = &enemies[i];
-            auto enemy_aabb = cf_make_aabb_center_half_extents(enemy->position, enemy->collider.half_extents);
+    // Check collisions with enemies
+    for (size_t i = 0; i < enemies_count; ++i) {
+        if (!enemies[i].is_alive) { continue; }
 
-            if (cf_aabb_to_aabb(player_aabb, enemy_aabb)) {
-                enemy->is_alive = false;
-                damage_player();
-            }
+        auto enemy      = &enemies[i];
+        auto enemy_aabb = cf_make_aabb_center_half_extents(enemy->position, enemy->collider.half_extents);
+
+        if (cf_aabb_to_aabb(player_aabb, enemy_aabb)) {
+            enemy->is_alive = false;
+            damage_player();
         }
     }
-}
 
-static void player_vs_enemy_bullets(
-    const Player* player, size_t enemy_bullets_count, EnemyBullet enemy_bullets[static enemy_bullets_count]
-) {
-    if (player->is_alive && !player->is_invincible) {
-        auto player_aabb = cf_make_aabb_center_half_extents(player->position, player->collider.half_extents);
+    // Check collisions with enemy bullets
+    for (size_t i = 0; i < enemy_bullets_count; ++i) {
+        if (!enemy_bullets[i].is_alive) { continue; }
 
-        for (size_t i = 0; i < enemy_bullets_count; ++i) {
-            if (!enemy_bullets[i].is_alive) { continue; }
+        auto enemy_bullet = &enemy_bullets[i];
+        auto enemy_aabb = cf_make_aabb_center_half_extents(enemy_bullet->position, enemy_bullet->collider.half_extents);
 
-            auto enemy_bullet = &enemy_bullets[i];
-            auto enemy_aabb =
-                cf_make_aabb_center_half_extents(enemy_bullet->position, enemy_bullet->collider.half_extents);
-
-            if (cf_aabb_to_aabb(player_aabb, enemy_aabb)) {
-                enemy_bullet->is_alive = false;
-                damage_player();
-            }
+        if (cf_aabb_to_aabb(player_aabb, enemy_aabb)) {
+            enemy_bullet->is_alive = false;
+            damage_player();
         }
     }
 }
@@ -105,8 +105,7 @@ void update_collision(void) {
     player_bullets_vs_enemies(
         g_state->player_bullets_count, g_state->player_bullets, g_state->enemies_count, g_state->enemies
     );
-    // Player vs Enemies
-    player_vs_enemies(&g_state->player, g_state->enemies_count, g_state->enemies);
-    // Enemy bullet vs Player collision
-    player_vs_enemy_bullets(&g_state->player, g_state->enemy_bullets_count, g_state->enemy_bullets);
+    player_vs_threats(
+        &g_state->player, g_state->enemies_count, g_state->enemies, g_state->enemy_bullets_count, g_state->enemy_bullets
+    );
 }
