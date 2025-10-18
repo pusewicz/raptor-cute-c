@@ -39,7 +39,10 @@ void spawn_hit_particle(HitParticle particle) {
 
 void spawn_hit_particles(size_t count, const HitParticle particles[static count]) {
     CF_ASSERT(g_state->hit_particles_count + count <= g_state->hit_particles_capacity);
-    for (size_t i = 0; i < count; i++) { g_state->hit_particles[g_state->hit_particles_count++] = particles[i]; }
+
+    memcpy(&g_state->hit_particles[g_state->hit_particles_count], particles, count * sizeof(*particles));
+
+    g_state->hit_particles_count += count;
 }
 
 void spawn_hit_particle_burst(size_t count, CF_V2 pos, CF_V2 dir) {
