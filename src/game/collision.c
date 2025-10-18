@@ -58,7 +58,7 @@ static void player_bullets_vs_enemies(
     }
 }
 
-static void player_vs_enemies(Player* player, size_t enemies_count, Enemy enemies[enemies_count]) {
+static void player_vs_enemies(Player* player, size_t enemies_count, Enemy enemies[static enemies_count]) {
     if (player->is_alive && !player->is_invincible) {
         auto player_aabb = cf_make_aabb_center_half_extents(player->position, player->collider.half_extents);
 
@@ -77,7 +77,7 @@ static void player_vs_enemies(Player* player, size_t enemies_count, Enemy enemie
 }
 
 static void player_vs_enemy_bullets(
-    Player* player, size_t enemy_bullets_count, EnemyBullet enemy_bullets[enemy_bullets_count]
+    Player* player, size_t enemy_bullets_count, EnemyBullet enemy_bullets[static enemy_bullets_count]
 ) {
     if (player->is_alive && !player->is_invincible) {
         auto player_aabb = cf_make_aabb_center_half_extents(player->position, player->collider.half_extents);
