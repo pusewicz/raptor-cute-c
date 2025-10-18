@@ -2,18 +2,26 @@
 #include <cute_color.h>
 #include <cute_graphics.h>
 #include <cute_time.h>
+#include <debugbreak.h>
 #include <signal.h>
+#include <stdio.h>
 #include <sys/signal.h>
 
 #include "engine/log.h"
 #include "engine/platform.h"
 #include "platform/platform_cute.h"
-
 volatile sig_atomic_t reload_flag = 0;
 
 static void sighup_handler(int sig) {
     (void)sig;
     reload_flag = 1;
+}
+
+static void debug_handler(bool expr, const char* message, const char* file, int line) {
+    if (!expr) {
+        fprintf(stderr, "CF_ASSERT(%s) : %s, line %d\n", message, file, line);
+        debug_break();
+    }
 }
 
 typedef struct UpdateData {
@@ -50,6 +58,7 @@ int main(int argc, char* argv[]) {
     cf_set_fixed_timestep(60);
     cf_app_set_vsync(true);
     cf_set_update_udata(&update_data);
+    cf_set_assert_handler(debug_handler);
 
     while (cf_app_is_running()) {
         cf_app_update(&update);
