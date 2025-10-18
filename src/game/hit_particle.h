@@ -2,6 +2,7 @@
 
 #include <cute_math.h>
 #include <cute_sprite.h>
+#include <stddef.h>
 
 typedef struct HitParticle {
     CF_V2     position;
@@ -15,6 +16,7 @@ typedef struct HitParticle {
 
 HitParticle make_hit_particle(float x, float y, CF_V2 direction);
 void        spawn_hit_particle(HitParticle hit_particle);
-void        spawn_hit_particles(const HitParticle* particles, int count);
+void        spawn_hit_particles(size_t count, const HitParticle particles[static count]);
+void        spawn_hit_particle_burst(size_t count, CF_V2 pos, CF_V2 dir);
 void        cleanup_hit_particles(void);
 void        update_particles(void);
