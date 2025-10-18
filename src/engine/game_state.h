@@ -72,8 +72,10 @@ typedef struct GameState {
     struct {
         CF_Sprite life_icon;
         CF_Sprite particle;
+        CF_Sprite game_over;
     } sprites;
 
+    bool is_game_over;
     bool debug_bounding_boxes;
 } GameState;
 
