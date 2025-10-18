@@ -45,6 +45,11 @@ GameState* g_state = nullptr;
     #define EXPORT
 #endif
 
+#define INIT_ENTITY_STORAGE(type, field, max)                                                \
+    g_state->field            = cf_arena_alloc(&g_state->stage_arena, (max) * sizeof(type)); \
+    g_state->field##_count    = 0;                                                           \
+    g_state->field##_capacity = (max)
+
 constexpr int PERMANENT_ARENA_SIZE    = CF_MB * 64;
 constexpr int STAGE_ARENA_SIZE        = CF_MB * 64;
 constexpr int SCRATCH_ARENA_SIZE      = CF_MB * 64;
@@ -52,6 +57,12 @@ constexpr int DEFAULT_ARENA_ALIGNMENT = 16;
 
 constexpr int CANVAS_WIDTH            = 180;
 constexpr int CANVAS_HEIGHT           = 320;
+
+const int MAX_PLAYER_BULLETS          = 32;
+const int MAX_ENEMIES                 = 32;
+const int MAX_ENEMY_BULLETS           = 32;
+const int MAX_HIT_PARTICLES           = 240;
+const int MAX_EXPLOSIONS              = 32;
 
 EXPORT void game_init(Platform* platform) {
     g_state                       = platform->allocate_memory(sizeof(GameState));
@@ -93,38 +104,15 @@ EXPORT void game_init(Platform* platform) {
     load_sprite(&g_state->sprites.life_icon, "assets/life_icon.png");
 
     // Prepare the storage for player bullets
-    const int MAX_PLAYER_BULLETS     = 32;
-    g_state->player_bullets          = cf_arena_alloc(&g_state->stage_arena, MAX_PLAYER_BULLETS * sizeof(PlayerBullet));
-    g_state->player_bullets_count    = 0;
-    g_state->player_bullets_capacity = MAX_PLAYER_BULLETS;
-
-    // Prepare the storage for enemies
-    const int MAX_ENEMIES            = 32;
-    g_state->enemies                 = cf_arena_alloc(&g_state->stage_arena, MAX_ENEMIES * sizeof(Enemy));
-    g_state->enemies_count           = 0;
-    g_state->enemies_capacity        = MAX_ENEMIES;
-
-    // Prepare the storage for enemy bullets
-    const int MAX_ENEMY_BULLETS      = 32;
-    g_state->enemy_bullets           = cf_arena_alloc(&g_state->stage_arena, MAX_ENEMY_BULLETS * sizeof(EnemyBullet));
-    g_state->enemy_bullets_count     = 0;
-    g_state->enemy_bullets_capacity  = MAX_ENEMY_BULLETS;
-
-    // Prepare the storage for hit particles
-    const int MAX_HIT_PARTICLES      = 240;
-    g_state->hit_particles           = cf_arena_alloc(&g_state->stage_arena, MAX_HIT_PARTICLES * sizeof(HitParticle));
-    g_state->hit_particles_count     = 0;
-    g_state->hit_particles_capacity  = MAX_HIT_PARTICLES;
-
-    // Prepare the storage for explosions
-    const int MAX_EXPLOSIONS         = 32;
-    g_state->explosions              = cf_arena_alloc(&g_state->stage_arena, MAX_EXPLOSIONS * sizeof(Explosion));
-    g_state->explosions_count        = 0;
-    g_state->explosions_capacity     = MAX_EXPLOSIONS;
+    INIT_ENTITY_STORAGE(PlayerBullet, player_bullets, MAX_PLAYER_BULLETS);
+    INIT_ENTITY_STORAGE(Enemy, enemies, MAX_ENEMIES);
+    INIT_ENTITY_STORAGE(EnemyBullet, enemy_bullets, MAX_ENEMY_BULLETS);
+    INIT_ENTITY_STORAGE(HitParticle, hit_particles, MAX_HIT_PARTICLES);
+    INIT_ENTITY_STORAGE(Explosion, explosions, MAX_EXPLOSIONS);
 
     // Initialize shared particle sprite (1x1 white pixel)
-    CF_Pixel particle_pixel          = {
-                 .colors = {255, 255, 255, 255}
+    CF_Pixel particle_pixel = {
+        .colors = {255, 255, 255, 255}
     };
     g_state->sprites.particle = cf_make_easy_sprite_from_pixels(&particle_pixel, 1, 1);
 
