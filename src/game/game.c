@@ -126,6 +126,11 @@ EXPORT bool game_update(void) {
 
     auto canvas_aabb = cf_make_aabb_center_half_extents(cf_v2(0, 0), cf_div_v2_f(g_state->canvas_size, 2.0f));
 
+#ifdef DEBUG
+    // Toggle debug mode
+    if (cf_key_just_pressed(CF_KEY_G)) g_state->debug = !g_state->debug;
+#endif
+
     update_input(&g_state->player.input);
 
     // Handle game over state
@@ -287,7 +292,7 @@ static void game_render_debug(void) {
 
 EXPORT void game_render(void) {
 #ifdef DEBUG
-    game_render_debug();
+    if (g_state->debug) game_render_debug();
 #endif
 
     render_background_scroll();

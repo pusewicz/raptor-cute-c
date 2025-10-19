@@ -76,6 +76,7 @@ typedef struct GameState {
     } sprites;
 
     bool is_game_over;
+    bool debug;  // Enable ImGUI debug pane
     bool debug_bounding_boxes;
 } GameState;
 
