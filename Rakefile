@@ -9,7 +9,7 @@ directory BUILD_DIR do
 end
 
 directory WEB_BUILD_DIR do
-  sh "emcmake cmake -S #{PWD} -B #{WEB_BUILD_DIR} -DCMAKE_BUILD_TYPE=Release"
+  sh "emcmake cmake -S #{PWD} -B #{WEB_BUILD_DIR} -G Ninja -DCMAKE_BUILD_TYPE=Release"
 end
 
 desc 'Compile the project'
@@ -34,7 +34,7 @@ end
 
 desc 'Compile for web'
 task web: WEB_BUILD_DIR do
-
+  sh "cmake --build #{WEB_BUILD_DIR} --parallel"
 end
 
 namespace :run do
