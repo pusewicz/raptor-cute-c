@@ -12,11 +12,17 @@ add_executable(
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
-    set_target_properties(${NAME} PROPERTIES OUTPUT_NAME "${NAME}" SUFFIX ".html")
+    set_target_properties(${NAME} PROPERTIES OUTPUT_NAME "index" SUFFIX ".html")
     target_compile_options(${NAME} PRIVATE -O1 -fno-rtti -fno-exceptions -gsplit-dwarf)
-    target_link_options(${NAME} PRIVATE -o ${NAME}.html -sASYNCIFY=1 -O1 -gseparate-dwarf)
-    # target_link_libraries(${NAME} PRIVATE cute-emscripten-shell)
+    target_link_options(${NAME} PRIVATE -o index.html -sASYNCIFY=1 -O1 -gseparate-dwarf)
     target_link_options(${NAME} PRIVATE --preload-file "${PROJECT_SOURCE_DIR}/assets@/assets")
+    add_custom_target(copy-emscripten-shell
+  COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${PROJECT_SOURCE_DIR}/assets/emscripten ${CMAKE_BINARY_DIR}/emscripten
+ )
+    add_library(cute-emscripten-shell INTERFACE)
+    add_dependencies(cute-emscripten-shell copy-emscripten-shell)
+    target_link_options(cute-emscripten-shell INTERFACE --shell-file "${PROJECT_SOURCE_DIR}/assets/emscripten/shell.html")
+    target_link_libraries(${NAME} PRIVATE cute-emscripten-shell)
 endif()
 
 target_include_directories(${NAME} PUBLIC
@@ -38,7 +44,7 @@ include(CheckPIESupported)
 check_pie_supported(OUTPUT_VARIABLE output LANGUAGES C)
 set_property(TARGET ${NAME} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
 if(NOT CMAKE_C_LINK_PIE_SUPPORTED)
-  message(WARNING "PIE is not supported at link time:\n${output}"
+    message(WARNING "PIE is not supported at link time:\n${output}"
                   "PIE link options will not be passed to linker.")
 endif()
 
@@ -54,7 +60,7 @@ endif()
 
 # Copy the generated DLL for SDL to the built binary’s folder
 if(WIN32)
-  add_custom_command(
+    add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$" "$"
         VERBATIM
