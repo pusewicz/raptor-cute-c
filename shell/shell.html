@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>Cute Framework</title>
-        <link rel="stylesheet" href="./emscripten/shell.css" />
+        <link rel="stylesheet" href="./shell/shell.css" />
     </head>
     <body>
         <div id="container">
@@ -20,7 +20,7 @@
                 <canvas id="canvas" tabindex="-1"></canvas>
             </div>
         </div>
-        <script type="text/javascript" src="./emscripten/shell.js"></script>
-        {{{ SCRIPT }}}
+        <script type="text/javascript" src="./shell/shell.js"></script>
+        <script async type='text/javascript' src="{{SCRIPT_NAME}}"></script>
     </body>
 </html>
