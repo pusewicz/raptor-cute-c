@@ -37,13 +37,12 @@ typedef struct UpdateData {
     GameLibrary* game_library;
 } UpdateData;
 
-static void on_update(void* udata) {
+static void on_update(void* udata [[maybe_unused]]) {
 #ifndef CF_EMSCRIPTEN
     UpdateData*  update_data  = (UpdateData*)udata;
     GameLibrary* game_library = update_data->game_library;
     game_library->update();
 #else
-    (void)udata;
     game_update();
 #endif
 }
