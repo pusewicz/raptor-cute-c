@@ -15,6 +15,8 @@
 #include "game/game.h"
 #include "platform/platform_cute.h"
 
+constexpr const int UPDATE_INTERVAL = 60;
+
 #ifndef CF_EMSCRIPTEN
 volatile sig_atomic_t reload_flag = 0;
 
@@ -103,14 +105,14 @@ int main(int argc, char *argv[]) {
 
   CF_Color bg = cf_make_color_rgb(0, 0, 0);
   cf_clear_color(bg.r, bg.g, bg.b, bg.a);
-  cf_set_target_framerate(60);
-  cf_set_fixed_timestep(60);
+  cf_set_target_framerate(UPDATE_INTERVAL);
+  cf_set_fixed_timestep(UPDATE_INTERVAL);
   cf_app_set_vsync(true);
   cf_set_update_udata(&update_data);
   cf_set_assert_handler(debug_handler);
 
 #ifdef CF_EMSCRIPTEN
-  emscripten_set_main_loop_arg(update, nullptr, 60, true);
+  emscripten_set_main_loop_arg(update, nullptr, UPDATE_INTERVAL, true);
 #else
   while (cf_app_is_running()) {
     update(&game_library);
