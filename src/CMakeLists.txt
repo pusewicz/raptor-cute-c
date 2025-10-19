@@ -16,13 +16,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     target_compile_options(${NAME} PRIVATE -O1 -fno-rtti -fno-exceptions -gsplit-dwarf)
     target_link_options(${NAME} PRIVATE -o ${NAME}.html -sASYNCIFY=1 -O1 -gseparate-dwarf)
     target_link_options(${NAME} PRIVATE --preload-file "${PROJECT_SOURCE_DIR}/assets@/assets")
-    # add_custom_target(copy-emscripten-shell
-  # COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different ${PROJECT_SOURCE_DIR}/shell ${CMAKE_BINARY_DIR}/shell
- # )
-    # add_library(cute-emscripten-shell INTERFACE)
-    # add_dependencies(cute-emscripten-shell copy-emscripten-shell)
-    # target_link_options(cute-emscripten-shell INTERFACE --shell-file "${PROJECT_SOURCE_DIR}/shell/shell.html")
-    # target_link_libraries(${NAME} PRIVATE cute-emscripten-shell)
 endif()
 
 target_include_directories(${NAME} PUBLIC
