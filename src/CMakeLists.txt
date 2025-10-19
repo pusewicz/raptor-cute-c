@@ -24,8 +24,12 @@ target_include_directories(${NAME} PUBLIC
 target_compile_features(${NAME} PRIVATE c_std_23)
 target_link_libraries(${NAME}
   PRIVATE project_warnings
-  PRIVATE gamelib
   PUBLIC cute)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+target_link_libraries(${NAME}
+  PRIVATE gamelib
+  )
+endif()
 target_compile_definitions(
     ${NAME} PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
