@@ -4,9 +4,7 @@
 #include <cute_graphics.h>
 #include <cute_time.h>
 #include <debugbreak.h>
-#include <signal.h>
 #include <stdio.h>
-#include <sys/signal.h>
 #ifndef CF_EMSCRIPTEN
 #include <signal.h>
 #include <sys/signal.h>
@@ -49,7 +47,7 @@ static void on_update(void *udata) {
 #endif
 }
 
-static void update(void *gl) {
+static void update(void *gl [[maybe_unused]]) {
   cf_app_update(&on_update);
 
 #ifndef CF_EMSCRIPTEN
@@ -112,7 +110,7 @@ int main(int argc, char *argv[]) {
   cf_set_assert_handler(debug_handler);
 
 #ifdef CF_EMSCRIPTEN
-  emscripten_set_main_loop(update, 60, true);
+  emscripten_set_main_loop_arg(update, nullptr, 60, true);
 #else
   while (cf_app_is_running()) {
     update(&game_library);
