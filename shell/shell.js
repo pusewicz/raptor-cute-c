@@ -55,7 +55,12 @@ async function fetchAndInstantiateWasm(
     const response = await fetch(wasmUrl);
     if (!response.ok) throw new Error(`Failed to fetch ${wasmUrl}`);
 
-    const contentLength = +response.headers.get("Content-Length") || 0;
+    let contentLength = +response.headers.get("Content-Length") || 0;
+    const gzipEncoded = response.headers.get("Content-Encoding") == "gzip";
+    if (gzipEncoded) {
+        contentLength = parseInt("{{UNPACKED_WASM_SIZE}}") || contentLength;
+    }
+
     const reader = response.body.getReader();
     let loaded = 0;
 
@@ -77,9 +82,16 @@ async function fetchAndInstantiateWasm(
     });
 
     // Construct a new Response from the tracked stream
-    const trackedResponse = new Response(stream, {
-        headers: response.headers,
-    });
+    const headers = new Headers(response.headers);
+    headers.set("Content-Type", "application/wasm");
+    const trackedResponse = new Response(
+        gzipEncoded
+            ? stream // itch.io will append this header so browsers will expand by default
+            : stream.pipeThrough(new DecompressionStream("gzip")),
+        {
+            headers: headers,
+        },
+    );
 
     // Instantiate WASM using streaming API
     const result = await WebAssembly.instantiateStreaming(
@@ -100,6 +112,15 @@ window.Module = {
     canvas: canvasElement,
     onAbort() {
         Module.setStatus("Program aborted");
+    },
+    locateFile(file, prefix) {
+        if (file.endsWith(".wasm")) {
+            return prefix + file + "z";
+        } else if (file.endsWith(".data")) {
+            return prefix + file + ".pck";
+        } else {
+            return prefix + file;
+        }
     },
     setStatus(text) {
         console.log(text);
