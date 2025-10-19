@@ -51,25 +51,25 @@ static void update(void* gl [[maybe_unused]]) {
     cf_app_update(&on_update);
 
 #ifndef CF_EMSCRIPTEN
-    GameLibrary game_library = *(GameLibrary*)gl;
+    GameLibrary* game_library = (GameLibrary*)gl;
     if (reload_flag == 1) {
         reload_flag = 0;
-        APP_DEBUG("Reloading library %s\n", game_library.path);
+        APP_DEBUG("Reloading library %s\n", game_library->path);
 
-        void* state = game_library.state();
-        platform_unload_game_library(&game_library);
+        void* state = game_library->state();
+        platform_unload_game_library(game_library);
 
         GameLibrary new_game_library = platform_load_game_library();
         if (new_game_library.ok) {
-            game_library = new_game_library;
-            game_library.hot_reload(state);
+            *game_library = new_game_library;
+            game_library->hot_reload(state);
         }
     }
 #endif
 
     platform_begin_frame();
 #ifndef CF_EMSCRIPTEN
-    game_library.render();
+    game_library->render();
 #else
     game_render();
 #endif
