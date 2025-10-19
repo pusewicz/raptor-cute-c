@@ -37,6 +37,85 @@ task web: WEB_BUILD_DIR do
   sh "cmake --build #{WEB_BUILD_DIR} --parallel"
 end
 
+SHELL_STATIC_FILES = [
+  'shell/logo.svg',
+  'shell/shell.css',
+].freeze
+
+namespace :web do
+  desc 'Package the web build into a zip file'
+  task pack: :web do
+    require 'zip'
+    require 'zlib'
+    require 'stringio'
+
+    basename = File.join(WEB_BUILD_DIR, 'Raptor')
+    project_name = 'Raptor'
+    output_file = File.join(WEB_BUILD_DIR, "#{project_name}.zip")
+
+    File.delete(output_file) if File.exist?(output_file)
+
+    Zip::File.open(output_file, create: true) do |zipfile|
+      # Pack .js file
+      js_file = "#{basename}.js"
+      puts "Packing #{js_file}"
+      zipfile.add("#{project_name}.js", js_file)
+
+      # Pack .wasm file (gzip compressed as .wasmz, stored without additional zip compression)
+      wasm_file = "#{basename}.wasm"
+      puts "Packing #{wasm_file}"
+      wasm_data = File.binread(wasm_file)
+
+      # Gzip compress the wasm data
+      sio = StringIO.new
+      Zlib::GzipWriter.wrap(sio) { |gz| gz.write(wasm_data) }
+      gzipped_wasm = sio.string
+
+      # Store in zip without additional compression (like Python's ZIP_STORED)
+      zipfile.get_output_stream("#{project_name}.wasmz") do |stream|
+        stream.write(gzipped_wasm)
+      end
+
+      # Pack .data file if it exists
+      data_file = "#{basename}.data"
+      if File.exist?(data_file)
+        puts "Packing #{data_file}"
+        zipfile.add("#{project_name}.data.pck", data_file)
+      end
+
+      # Pack debug wasm if it exists
+      debug_wasm = "#{basename}.wasm.debug.wasm"
+      if File.exist?(debug_wasm)
+        puts "Packing #{debug_wasm}"
+        zipfile.add("#{project_name}.wasm.debug.wasm", debug_wasm)
+      end
+
+      # Pack shell static files
+      SHELL_STATIC_FILES.each do |file|
+        file_path = File.join(PWD, file)
+        puts "Packing #{file_path}"
+        zipfile.add(file, file_path)
+      end
+
+      # Pack templated index.html
+      template_file = File.join(PWD, 'shell/shell.html')
+      puts "Packing #{template_file}"
+      template = File.read(template_file)
+      template.gsub!('{{SCRIPT_NAME}}', "#{project_name}.js")
+      zipfile.get_output_stream('index.html') { |s| s.write(template) }
+
+      # Pack templated shell.js
+      shell_template = File.join(PWD, 'shell/shell.js')
+      puts "Packing #{shell_template}"
+      shell_js = File.read(shell_template)
+      shell_js.gsub!('{{UNPACKED_WASM_SIZE}}', wasm_data.bytesize.to_s)
+      zipfile.get_output_stream('shell/shell.js') { |s| s.write(shell_js) }
+    end
+
+    puts "Created #{output_file}"
+  end
+end
+
 namespace :run do
   desc 'Run the project with debugger attached'
   task :debugger do
