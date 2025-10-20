@@ -67,6 +67,10 @@ typedef struct GameState {
         CF_Audio music;
         CF_Audio laser_shoot;
         CF_Audio explosion;
+        CF_Audio hit_hurt;
+        CF_Audio reveal;
+        CF_Audio game_over;
+        CF_Audio death;
     } audio;
 
     struct {

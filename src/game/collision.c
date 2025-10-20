@@ -41,6 +41,7 @@ static void player_bullets_vs_enemies(
                 // If enemy survives, push it upwards and spawn particles
                 if (enemy->health.current > 0) {
                     enemy->position.y += 5.0f;  // Push upwards by 5 pixels
+                    cf_play_sound(g_state->audio.hit_hurt, cf_sound_params_defaults());
                 } else {
                     g_state->score += enemy->score;
                     // Destroy enemy

@@ -104,6 +104,7 @@ void damage_player(void) {
     // Create explosion at player position
     spawn_explosion(make_explosion(player->position.x, player->position.y));
     cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
+    cf_play_sound(g_state->audio.death, cf_sound_params_defaults());
 
     // Mark player as dead
     player->is_alive      = false;
@@ -115,6 +116,7 @@ void damage_player(void) {
     } else {
         // Game over
         g_state->is_game_over = true;
+        cf_play_sound(g_state->audio.game_over, cf_sound_params_defaults());
     }
 }
 
@@ -132,6 +134,8 @@ void update_player(Player* player) {
             // Reset player position
             player->position.x          = 0.0f;
             player->position.y          = -g_state->canvas_size.y / 3;
+
+            cf_play_sound(g_state->audio.reveal, cf_sound_params_defaults());
         }
 
         return;

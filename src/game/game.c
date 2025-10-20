@@ -100,10 +100,16 @@ EXPORT void game_init(Platform* platform) {
     load_font("assets/tiny-and-chunky.ttf", "TinyAndChunky");
 
     load_audio(&g_state->audio.music, "assets/music.ogg");
+    load_audio(&g_state->audio.reveal, "assets/reveal.ogg");
+    load_audio(&g_state->audio.game_over, "assets/game-over.ogg");
+    load_audio(&g_state->audio.death, "assets/death.ogg");
     load_audio(&g_state->audio.laser_shoot, "assets/laser-shoot.ogg");
     load_audio(&g_state->audio.explosion, "assets/explosion.ogg");
+    load_audio(&g_state->audio.hit_hurt, "assets/hit-hurt.ogg");
     load_sprite(&g_state->sprites.life_icon, "assets/life_icon.png");
     load_sprite(&g_state->sprites.game_over, "assets/gameover.png");
+
+    cf_play_sound(g_state->audio.reveal, cf_sound_params_defaults());
 
     // Prepare the storage for player bullets
     INIT_ENTITY_STORAGE(PlayerBullet, player_bullets, MAX_PLAYER_BULLETS);
