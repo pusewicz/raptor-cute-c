@@ -59,6 +59,10 @@ typedef struct GameState {
     size_t       hit_particles_count;
     size_t       hit_particles_capacity;
 
+    HitParticle* parallax_particles;
+    size_t       parallax_particles_count;
+    size_t       parallax_particles_capacity;
+
     struct {
         CF_Coroutine spawner;
     } coroutines;
