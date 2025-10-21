@@ -64,7 +64,7 @@ const int MAX_ENEMIES                 = 32;
 const int MAX_ENEMY_BULLETS           = 32;
 const int MAX_HIT_PARTICLES           = 240;
 const int MAX_EXPLOSIONS              = 32;
-const int MAX_STAR_PARTICLES          = 60;
+const int MAX_STAR_PARTICLES          = 4 * 4;  // 4 stars per 4 layers
 
 EXPORT void game_init(Platform* platform) {
     g_state                       = platform->allocate_memory(sizeof(GameState));
