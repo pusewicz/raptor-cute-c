@@ -313,20 +313,7 @@ EXPORT void game_render(void) {
 #endif
 
     render_background_scroll();
-
-    // Render star particles
-    for (size_t i = 0; i < g_state->star_particles_count; ++i) {
-        auto particle = &g_state->star_particles[i];
-
-        cf_draw() {
-            cf_draw_layer(particle->z_index) {
-                // Apply parallax offset
-                cf_draw_translate_v2(cf_v2(particle->position.x + particle->parallax_offset, particle->position.y));
-                cf_draw_scale(particle->size, particle->size);
-                cf_draw_sprite(&particle->sprite);
-            }
-        }
-    }
+    render_star_particles();
 
     // Show game over screen
     if (g_state->is_game_over) {

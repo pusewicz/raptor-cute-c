@@ -8,6 +8,7 @@
 #include <cute_time.h>
 #include <stddef.h>
 
+#include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
 #include "component.h"
 
@@ -68,5 +69,21 @@ void update_star_particles(void) {
         }
 
         cf_sprite_update(&particle->sprite);
+    }
+}
+
+void render_star_particles() {
+    // Render star particles
+    for (size_t i = 0; i < g_state->star_particles_count; ++i) {
+        auto particle = &g_state->star_particles[i];
+
+        cf_draw() {
+            cf_draw_layer(particle->z_index) {
+                // Apply parallax offset
+                cf_draw_translate(particle->position.x + particle->parallax_offset, particle->position.y);
+                cf_draw_scale(particle->size, particle->size);
+                cf_draw_sprite(&particle->sprite);
+            }
+        }
     }
 }

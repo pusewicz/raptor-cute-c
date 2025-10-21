@@ -17,3 +17,4 @@ typedef struct StarParticle {
 
 void init_star_particles(void);
 void update_star_particles(void);
+void render_star_particles(void);
