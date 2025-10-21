@@ -20,7 +20,9 @@ static const float LAYER_SIZES[STAR_LAYER_COUNT]  = {1.0f, 1.5f, 2.0f, 2.5f};
 
 void init_star_particles(void) {
     CF_ASSERT(g_state->star_particles);
-    CF_ASSERT(g_state->star_particles_count + PARTICLES_PER_LAYER <= g_state->star_particles_capacity);
+    CF_ASSERT(
+        g_state->star_particles_count + (PARTICLES_PER_LAYER * STAR_LAYER_COUNT) <= g_state->star_particles_capacity
+    );
 
     const float canvas_width  = g_state->canvas_size.x;
     const float canvas_height = g_state->canvas_size.y;
