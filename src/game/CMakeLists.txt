@@ -9,6 +9,7 @@ add_library(
     coroutine.c
     input.c
     movement.c
+    movement_pattern.c
     player.c
     enemy.c
     explosion.c

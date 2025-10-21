@@ -12,6 +12,7 @@
 #include "../engine/game_state.h"
 #include "asset/sprite.h"
 #include "component.h"
+#include "movement_pattern.h"
 
 constexpr float ENEMY_DEFAULT_SPEED = 0.5f;
 
@@ -45,11 +46,13 @@ Enemy make_enemy_of_type(float x, float y, EnemyType type) {
     }
 
     Enemy enemy = (Enemy){
-        .position = cf_v2(x, y),
-        .velocity = cf_v2(0, -ENEMY_DEFAULT_SPEED),
-        .z_index  = Z_SPRITES,
-        .score    = score_value,
-        .is_alive = true,
+        .position        = cf_v2(x, y),
+        .velocity        = cf_v2(0, -ENEMY_DEFAULT_SPEED),
+        .z_index         = Z_SPRITES,
+        .score           = score_value,
+        .is_alive        = true,
+        .movement_pattern = nullptr,
+        .use_pattern     = false,
     };
 
     // Sprite
@@ -66,6 +69,13 @@ Enemy make_enemy_of_type(float x, float y, EnemyType type) {
     enemy.time_since_shot                       = cf_rnd_range_float(&g_state->rnd, 0.0f, enemy.cooldown);
     enemy.shoot_chance                          = 0.3f;  // 30% chance to shoot when cooldown ready
 
+    return enemy;
+}
+
+Enemy make_enemy_with_pattern(float x, float y, EnemyType type, MovementPatternConfig* pattern) {
+    Enemy enemy         = make_enemy_of_type(x, y, type);
+    enemy.movement_pattern = pattern;
+    enemy.use_pattern   = true;
     return enemy;
 }
 
@@ -108,6 +118,14 @@ void spawn_enemy(Enemy enemy) {
     CF_ASSERT(g_state->enemies);
     CF_ASSERT(g_state->enemies_count < g_state->enemies_capacity - 1);
     g_state->enemies[g_state->enemies_count++] = enemy;
+}
+
+void update_enemy_movement(Enemy* enemy, CF_V2 player_position) {
+    // Update movement pattern if enabled
+    if (enemy->use_pattern && enemy->movement_pattern != nullptr) {
+        update_movement_pattern(enemy->movement_pattern, &enemy->position, &enemy->velocity, player_position);
+    }
+    // Otherwise, velocity is set directly (existing behavior)
 }
 
 void update_enemy(Enemy* enemy) {

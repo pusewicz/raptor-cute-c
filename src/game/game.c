@@ -188,6 +188,7 @@ EXPORT bool game_update(void) {
     }
     // Update enemies
     for (size_t i = 0; i < g_state->enemies_count; i++) {
+        update_enemy_movement(&g_state->enemies[i], g_state->player.position);
         update_movement(&g_state->enemies[i].position, &g_state->enemies[i].velocity);
         update_enemy(&g_state->enemies[i]);  // TODO: Rename to update_enemy_weapon
 
