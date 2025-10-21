@@ -4,6 +4,10 @@ A classic arcade-style shoot 'em up that brings retro gaming action to modern sy
 
 ![Screenshot](./assets/screenshot.gif)
 
+## 🕹️ Play on Itch.io
+
+You can play the game directly on [itch.io](https://itch.io/embed-upload/15297409?color=333333).
+
 ## ✨ Features
 
 - **Fast-paced arcade action** with smooth scrolling and responsive controls
