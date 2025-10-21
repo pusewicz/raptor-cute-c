@@ -114,6 +114,11 @@ namespace :web do
 
     puts "Created #{output_file}"
   end
+
+  desc "Publish to itch.io"
+  task :publish do
+    sh "butler push build/web/Raptor.zip pusewicz/raptor-cute-c:html5"
+  end
 end
 
 namespace :run do
