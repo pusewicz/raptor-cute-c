@@ -12,11 +12,10 @@
 #include "component.h"
 
 // Star particle constants
-constexpr int      STAR_LAYER_COUNT                 = 4;
-constexpr int      PARTICLES_PER_LAYER              = 4;
-static const float LAYER_SPEEDS[STAR_LAYER_COUNT]   = {8.0f, 12.0f, 16.0f, 24.0f};
-static const float LAYER_SIZES[STAR_LAYER_COUNT]    = {1.0f, 1.5f, 2.0f, 2.5f};
-static const int   LAYER_ZINDICES[STAR_LAYER_COUNT] = {Z_PARALLAX, Z_PARALLAX, Z_PARALLAX, Z_PARALLAX};
+constexpr int      STAR_LAYER_COUNT               = 4;
+constexpr int      PARTICLES_PER_LAYER            = 4;
+static const float LAYER_SPEEDS[STAR_LAYER_COUNT] = {8.0f, 12.0f, 16.0f, 24.0f};
+static const float LAYER_SIZES[STAR_LAYER_COUNT]  = {1.0f, 1.5f, 2.0f, 2.5f};
 
 void init_star_particles(void) {
     CF_ASSERT(g_state->star_particles);
@@ -36,7 +35,7 @@ void init_star_particles(void) {
                 .velocity        = cf_v2(0.0f, -LAYER_SPEEDS[layer]),  // Move downward
                 .size            = LAYER_SIZES[layer],
                 .sprite          = g_state->sprites.particle,
-                .z_index         = LAYER_ZINDICES[layer],
+                .z_index         = Z_PARALLAX,
                 .layer           = layer,
                 .parallax_offset = 0.0f,
             };
