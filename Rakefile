@@ -38,7 +38,7 @@ task web: WEB_BUILD_DIR do
 end
 
 SHELL_STATIC_FILES = [
-  'shell/logo.svg',
+  'shell/logo.png',
   'shell/shell.css',
 ].freeze
 
@@ -109,7 +109,7 @@ namespace :web do
       puts "Packing #{shell_template}"
       shell_js = File.read(shell_template)
       shell_js.gsub!('{{UNPACKED_WASM_SIZE}}', wasm_data.bytesize.to_s)
-      zipfile.get_output_stream('shell/shell.js') { |s| s.write(shell_js) }
+      zipfile.get_output_stream('shell.js') { |s| s.write(shell_js) }
     end
 
     puts "Created #{output_file}"

@@ -18,7 +18,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: black;
+    background-color: #000010;
 }
 
 #wrapper {
@@ -38,7 +38,7 @@ body {
 
 #overlay {
     padding: 10px 10px 10px 10px;
-    background-color: #fea3a8ff;
+    background-color: #000010;
     border-radius: 10px;
     flex: 0 0 auto;
     width: auto;
@@ -50,25 +50,25 @@ body {
 
 #canvas {
     border: 0px none; /* Border will result in wrong mouse position */
-    background-color: black;
+    background-color: #000010;
 }
 
 #title {
     text-align: center;
-    color: white;
+    color: #f77f4d;
     font-weight: bold;
 }
 
 #status {
     text-align: center;
-    color: white;
+    color: #f77f4d;
 }
 
 #logo {
     height: 50px;
-    width: 50px;
+    width: 150px;
     margin: 0px auto;
-    background-image: url("./logo.svg");
+    background-image: url("./logo.png");
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
