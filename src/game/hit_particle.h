@@ -4,8 +4,6 @@
 #include <cute_sprite.h>
 #include <stddef.h>
 
-#include "component.h"
-
 typedef struct HitParticle {
     CF_V2     position;
     CF_V2     velocity;
@@ -14,7 +12,6 @@ typedef struct HitParticle {
     float     time_alive;  // Time alive in seconds
     float     size;        // Particle size scale
     bool      is_alive;
-    ZIndex    z_index;
 } HitParticle;
 
 HitParticle make_hit_particle(float x, float y, CF_V2 direction);
