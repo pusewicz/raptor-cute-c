@@ -10,6 +10,10 @@
     #include <sys/signal.h>
 #endif
 
+#ifdef CF_EMSCRIPTEN
+    #include <emscripten.h>
+#endif
+
 #include "engine/log.h"
 #include "engine/platform.h"
 #include "game/game.h"
