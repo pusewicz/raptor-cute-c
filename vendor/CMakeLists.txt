@@ -10,7 +10,13 @@ FetchContent_Declare(
 
 set(CF_FRAMEWORK_BUILD_SAMPLES OFF)
 set(CF_FRAMEWORK_BUILD_TESTS OFF)
-set(CF_FRAMEWORK_STATIC OFF)
+
+# Build Cute Framework statically in Release mode
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(CF_FRAMEWORK_STATIC ON)
+else()
+    set(CF_FRAMEWORK_STATIC OFF)
+endif()
 
 FetchContent_MakeAvailable(cute)
 

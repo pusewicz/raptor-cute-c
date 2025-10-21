@@ -1,7 +1,14 @@
 set(NAME "gamelib")
 
+# Build as static library in Release mode, shared library in Debug mode
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    set(LIBRARY_TYPE STATIC)
+else()
+    set(LIBRARY_TYPE SHARED)
+endif()
+
 add_library(
-    ${NAME} SHARED
+    ${NAME} ${LIBRARY_TYPE}
     ../engine/game_state.c
     asset/audio.c
     asset/font.c

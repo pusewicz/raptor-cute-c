@@ -15,14 +15,24 @@ target_include_directories(${NAME} PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 target_compile_features(${NAME} PRIVATE c_std_23)
-target_link_libraries(${NAME}
-  PRIVATE project_warnings
-  PUBLIC cute)
+
+# In Release mode, link gamelib statically; in Debug mode, load it dynamically
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    target_link_libraries(${NAME}
+      PRIVATE project_warnings gamelib
+      PUBLIC cute)
+else()
+    target_link_libraries(${NAME}
+      PRIVATE project_warnings
+      PUBLIC cute)
+endif()
+
 target_compile_definitions(
     ${NAME} PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
+    $<$<CONFIG:Debug>:HOT_RELOAD_ENABLED>
     $<$<CONFIG:Release>:RELEASE>
-    GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>"
+    $<$<CONFIG:Debug>:GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>">
 )
 
 include(CheckPIESupported)
