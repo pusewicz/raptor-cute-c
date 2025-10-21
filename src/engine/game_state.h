@@ -19,7 +19,8 @@
 #include "../game/player.h"
 #include "../game/star_particle.h"
 
-typedef struct Platform Platform;
+typedef struct Platform  Platform;
+typedef enum   SceneType SceneType;
 
 /*
  * Game State
@@ -35,6 +36,7 @@ typedef struct GameState {
     CF_Arena     scratch_arena;
     CF_DisplayID display_id;
     CF_Rnd       rnd;
+    SceneType    current_scene;
     int          score;
     int          lives;
 

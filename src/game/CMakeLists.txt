@@ -18,6 +18,9 @@ add_library(
     star_particle.c
     sprite.c
     background_scroll.c
+    scene.c
+    scene/intro.c
+    scene/gameplay.c
     game.c
 )
 target_link_libraries(${NAME}
