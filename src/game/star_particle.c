@@ -1,3 +1,9 @@
+/**
+ * Parallax star field system
+ * Creates depth illusion with 4 layers of scrolling stars
+ * that respond to player horizontal movement
+ */
+
 #include "star_particle.h"
 
 #include <cute_c_runtime.h>
