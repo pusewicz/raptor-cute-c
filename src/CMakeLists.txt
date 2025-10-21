@@ -4,10 +4,17 @@ add_subdirectory(game)
 
 include(${PROJECT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)
 
+# Select the appropriate target file based on the platform
+if(EMSCRIPTEN)
+  set(TARGET_SOURCE target_emscripten.c)
+else()
+  set(TARGET_SOURCE target_desktop.c)
+endif()
+
 add_executable(
   ${NAME}
   # WIN32 MACOSX_BUNDLE
-  main.c
+  ${TARGET_SOURCE}
   platform/platform_cute.c
 )
 
@@ -15,15 +22,30 @@ target_include_directories(${NAME} PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 target_compile_features(${NAME} PRIVATE c_std_23)
-target_link_libraries(${NAME}
-  PRIVATE project_warnings
-  PUBLIC cute)
-target_compile_definitions(
+
+# Link libraries based on platform
+if(EMSCRIPTEN)
+  # For Emscripten, statically link the game library
+  target_link_libraries(${NAME}
+    PRIVATE project_warnings gamelib
+    PUBLIC cute)
+  target_compile_definitions(
+    ${NAME} PRIVATE
+    $<$<CONFIG:Debug>:DEBUG>
+    $<$<CONFIG:Release>:RELEASE>
+  )
+else()
+  # For desktop, use dynamic loading
+  target_link_libraries(${NAME}
+    PRIVATE project_warnings
+    PUBLIC cute)
+  target_compile_definitions(
     ${NAME} PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
     $<$<CONFIG:Release>:RELEASE>
     GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>"
-)
+  )
+endif()
 
 include(CheckPIESupported)
 check_pie_supported(OUTPUT_VARIABLE output LANGUAGES C)
