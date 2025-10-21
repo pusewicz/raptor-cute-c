@@ -21,7 +21,7 @@ Explosion make_explosion(float x, float y) {
 
 void spawn_explosion(Explosion explosion) {
     CF_ASSERT(g_state->explosions);
-    CF_ASSERT(g_state->explosions_count < g_state->explosions_capacity - 1);
+    CF_ASSERT(g_state->explosions_count <= g_state->explosions_capacity);
     g_state->explosions[g_state->explosions_count++] = explosion;
 }
 
