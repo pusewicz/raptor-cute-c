@@ -93,8 +93,9 @@ namespace :web do
       # Pack shell static files
       SHELL_STATIC_FILES.each do |file|
         file_path = File.join(PWD, file)
-        puts "Packing #{file_path}"
-        zipfile.add(file, file_path)
+        dest_path = File.basename(file_path)
+        puts "Packing #{file_path} as #{dest_path}"
+        zipfile.add(file, dest_path)
       end
 
       # Pack templated index.html
