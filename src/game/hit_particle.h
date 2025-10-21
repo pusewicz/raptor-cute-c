@@ -23,7 +23,3 @@ void        spawn_hit_particles(size_t count, const HitParticle particles[static
 void        spawn_hit_particle_burst(size_t count, CF_V2 pos, CF_V2 dir);
 void        cleanup_hit_particles(void);
 void        update_particles(void);
-
-// Parallax particle functions
-void init_parallax_particles(void);
-void update_parallax_particles(void);

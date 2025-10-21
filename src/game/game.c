@@ -36,6 +36,7 @@
 #include "player.h"
 #include "render.h"
 #include "sprite.h"
+#include "star_particle.h"
 
 GameState* g_state = nullptr;
 
@@ -63,7 +64,7 @@ const int MAX_ENEMIES                 = 32;
 const int MAX_ENEMY_BULLETS           = 32;
 const int MAX_HIT_PARTICLES           = 240;
 const int MAX_EXPLOSIONS              = 32;
-const int MAX_PARALLAX_PARTICLES      = 60;
+const int MAX_STAR_PARTICLES          = 60;
 
 EXPORT void game_init(Platform* platform) {
     g_state                       = platform->allocate_memory(sizeof(GameState));
@@ -118,7 +119,7 @@ EXPORT void game_init(Platform* platform) {
     INIT_ENTITY_STORAGE(EnemyBullet, enemy_bullets, MAX_ENEMY_BULLETS);
     INIT_ENTITY_STORAGE(HitParticle, hit_particles, MAX_HIT_PARTICLES);
     INIT_ENTITY_STORAGE(Explosion, explosions, MAX_EXPLOSIONS);
-    INIT_ENTITY_STORAGE(HitParticle, parallax_particles, MAX_PARALLAX_PARTICLES);
+    INIT_ENTITY_STORAGE(StarParticle, star_particles, MAX_STAR_PARTICLES);
 
     // Initialize shared particle sprite (1x1 white pixel)
     CF_Pixel particle_pixel = {
@@ -126,8 +127,8 @@ EXPORT void game_init(Platform* platform) {
     };
     g_state->sprites.particle = cf_make_easy_sprite_from_pixels(&particle_pixel, 1, 1);
 
-    // Initialize parallax particles
-    init_parallax_particles();
+    // Initialize star particles
+    init_star_particles();
 
     cf_music_play(g_state->audio.music, 0.5f);
 }
@@ -150,21 +151,21 @@ EXPORT bool game_update(void) {
         if (g_state->player.input.shoot) {
             // TODO: Extract a generic init/reset function
             // Reset game state
-            g_state->is_game_over             = false;
-            g_state->lives                    = 3;
-            g_state->score                    = 0;
+            g_state->is_game_over         = false;
+            g_state->lives                = 3;
+            g_state->score                = 0;
 
             // Reset player
-            g_state->player                   = make_player(0.0f, -g_state->canvas_size.y / 3);
-            g_state->player_bullets_count     = 0;
-            g_state->enemies_count            = 0;
-            g_state->enemy_bullets_count      = 0;
-            g_state->explosions_count         = 0;
-            g_state->hit_particles_count      = 0;
-            g_state->parallax_particles_count = 0;
+            g_state->player               = make_player(0.0f, -g_state->canvas_size.y / 3);
+            g_state->player_bullets_count = 0;
+            g_state->enemies_count        = 0;
+            g_state->enemy_bullets_count  = 0;
+            g_state->explosions_count     = 0;
+            g_state->hit_particles_count  = 0;
+            g_state->star_particles_count = 0;
 
-            // Re-initialize parallax particles
-            init_parallax_particles();
+            // Re-initialize star particles
+            init_star_particles();
 
             // Restart coroutines
             cleanup_coroutines();
@@ -218,7 +219,7 @@ EXPORT bool game_update(void) {
         }
     }
     update_particles();
-    update_parallax_particles();
+    update_star_particles();
 
     // TODO: Decide where to move this
     // Clamp player position to canvas bounds
@@ -313,14 +314,14 @@ EXPORT void game_render(void) {
 
     render_background_scroll();
 
-    // Render parallax particles
-    for (size_t i = 0; i < g_state->parallax_particles_count; ++i) {
-        auto particle = &g_state->parallax_particles[i];
+    // Render star particles
+    for (size_t i = 0; i < g_state->star_particles_count; ++i) {
+        auto particle = &g_state->star_particles[i];
 
         cf_draw() {
             cf_draw_layer(particle->z_index) {
-                // Apply parallax offset stored in velocity.x
-                cf_draw_translate_v2(cf_v2(particle->position.x + particle->velocity.x, particle->position.y));
+                // Apply parallax offset
+                cf_draw_translate_v2(cf_v2(particle->position.x + particle->parallax_offset, particle->position.y));
                 cf_draw_scale(particle->size, particle->size);
                 cf_draw_sprite(&particle->sprite);
             }
