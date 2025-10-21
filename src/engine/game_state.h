@@ -14,6 +14,7 @@
 #include "../game/background_scroll.h"
 #include "../game/enemy.h"
 #include "../game/explosion.h"
+#include "../game/floating_score.h"
 #include "../game/hit_particle.h"
 #include "../game/player.h"
 #include "../game/star_particle.h"
@@ -63,6 +64,10 @@ typedef struct GameState {
     StarParticle* star_particles;
     size_t        star_particles_count;
     size_t        star_particles_capacity;
+
+    FloatingScore* floating_scores;
+    size_t         floating_scores_count;
+    size_t         floating_scores_capacity;
 
     struct {
         CF_Coroutine spawner;

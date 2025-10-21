@@ -79,3 +79,4 @@ The project uses a **hot-reloadable game library architecture**:
 ### Instructions
 
 - Always format and compile after changes: `rake format compile`.
+- When using `cf_draw()` macro, ensure to include `engine/cute_macros.h`.
