@@ -16,6 +16,7 @@
 #include "../game/explosion.h"
 #include "../game/hit_particle.h"
 #include "../game/player.h"
+#include "../game/star_particle.h"
 
 typedef struct Platform Platform;
 
@@ -58,6 +59,10 @@ typedef struct GameState {
     HitParticle* hit_particles;
     size_t       hit_particles_count;
     size_t       hit_particles_capacity;
+
+    StarParticle* star_particles;
+    size_t        star_particles_count;
+    size_t        star_particles_capacity;
 
     struct {
         CF_Coroutine spawner;

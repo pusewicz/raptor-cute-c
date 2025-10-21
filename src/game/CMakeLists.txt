@@ -14,6 +14,7 @@ add_library(
     explosion.c
     collision.c
     hit_particle.c
+    star_particle.c
     sprite.c
     background_scroll.c
     game.c

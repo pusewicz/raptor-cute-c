@@ -5,11 +5,11 @@
 #include <cute_math.h>
 #include <cute_rnd.h>
 #include <cute_sprite.h>
+#include <cute_time.h>
 #include <stddef.h>
 #include <string.h>
 
 #include "../engine/game_state.h"
-#include "cute_time.h"
 
 HitParticle make_hit_particle(float x, float y, CF_V2 direction) {
     // Calculate the base angle from the direction vector
