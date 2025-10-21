@@ -30,6 +30,7 @@
 #include "coroutine.h"
 #include "enemy.h"
 #include "explosion.h"
+#include "floating_score.h"
 #include "hit_particle.h"
 #include "input.h"
 #include "movement.h"
@@ -65,6 +66,7 @@ const int MAX_ENEMY_BULLETS           = 32;
 const int MAX_HIT_PARTICLES           = 240;
 const int MAX_EXPLOSIONS              = 32;
 const int MAX_STAR_PARTICLES          = 4 * 4;  // 4 stars per 4 layers
+const int MAX_FLOATING_SCORES         = 16;
 
 EXPORT void game_init(Platform* platform) {
     g_state                       = platform->allocate_memory(sizeof(GameState));
@@ -120,6 +122,7 @@ EXPORT void game_init(Platform* platform) {
     INIT_ENTITY_STORAGE(HitParticle, hit_particles, MAX_HIT_PARTICLES);
     INIT_ENTITY_STORAGE(Explosion, explosions, MAX_EXPLOSIONS);
     INIT_ENTITY_STORAGE(StarParticle, star_particles, MAX_STAR_PARTICLES);
+    INIT_ENTITY_STORAGE(FloatingScore, floating_scores, MAX_FLOATING_SCORES);
 
     // Initialize shared particle sprite (1x1 white pixel)
     CF_Pixel particle_pixel = {
@@ -151,18 +154,19 @@ EXPORT bool game_update(void) {
         if (g_state->player.input.shoot) {
             // TODO: Extract a generic init/reset function
             // Reset game state
-            g_state->is_game_over         = false;
-            g_state->lives                = 3;
-            g_state->score                = 0;
+            g_state->is_game_over          = false;
+            g_state->lives                 = 3;
+            g_state->score                 = 0;
 
             // Reset player
-            g_state->player               = make_player(0.0f, -g_state->canvas_size.y / 3);
-            g_state->player_bullets_count = 0;
-            g_state->enemies_count        = 0;
-            g_state->enemy_bullets_count  = 0;
-            g_state->explosions_count     = 0;
-            g_state->hit_particles_count  = 0;
-            g_state->star_particles_count = 0;
+            g_state->player                = make_player(0.0f, -g_state->canvas_size.y / 3);
+            g_state->player_bullets_count  = 0;
+            g_state->enemies_count         = 0;
+            g_state->enemy_bullets_count   = 0;
+            g_state->explosions_count      = 0;
+            g_state->hit_particles_count   = 0;
+            g_state->star_particles_count  = 0;
+            g_state->floating_scores_count = 0;
 
             // Re-initialize star particles
             init_star_particles();
@@ -220,6 +224,7 @@ EXPORT bool game_update(void) {
     }
     update_particles();
     update_star_particles();
+    update_floating_scores();
 
     // TODO: Decide where to move this
     // Clamp player position to canvas bounds
@@ -237,6 +242,7 @@ EXPORT bool game_update(void) {
     cleanup_explosions();
     cleanup_hit_particles();
     cleanup_player_bullets();
+    cleanup_floating_scores();
 
     return true;
 }
@@ -343,6 +349,8 @@ EXPORT void game_render(void) {
             }
         }
     }
+
+    render_floating_scores();
 
     // Render UI
     char score_text[6 + 1];

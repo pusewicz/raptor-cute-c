@@ -13,6 +13,7 @@ add_library(
     enemy.c
     explosion.c
     collision.c
+    floating_score.c
     hit_particle.c
     star_particle.c
     sprite.c
