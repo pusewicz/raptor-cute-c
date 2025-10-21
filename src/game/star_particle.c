@@ -20,6 +20,7 @@ static const int   LAYER_ZINDICES[STAR_LAYER_COUNT] = {Z_PARALLAX, Z_PARALLAX, Z
 
 void init_star_particles(void) {
     CF_ASSERT(g_state->star_particles);
+    CF_ASSERT(g_state->star_particles_count + PARTICLES_PER_LAYER <= g_state->star_particles_capacity);
 
     const float canvas_width  = g_state->canvas_size.x;
     const float canvas_height = g_state->canvas_size.y;
