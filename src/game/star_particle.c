@@ -15,6 +15,8 @@
 // Star particle constants
 constexpr int      STAR_LAYER_COUNT               = 4;
 constexpr int      PARTICLES_PER_LAYER            = 4;
+constexpr float    PARALLAX_STRENGTH              = 0.05f;
+constexpr float    WRAP_MARGIN                    = 10.0f;
 static const float LAYER_SPEEDS[STAR_LAYER_COUNT] = {8.0f, 12.0f, 16.0f, 24.0f};
 static const float LAYER_SIZES[STAR_LAYER_COUNT]  = {1.0f, 1.5f, 2.0f, 2.5f};
 
@@ -59,14 +61,14 @@ void update_star_particles(void) {
         float parallax_scale      = (float)(particle->layer + 1) / STAR_LAYER_COUNT;
 
         // Apply horizontal parallax based on player position
-        particle->parallax_offset = -player_x * parallax_scale * 0.05f;
+        particle->parallax_offset = -player_x * parallax_scale * PARALLAX_STRENGTH;
 
         // Update vertical position
         particle->position.y += particle->velocity.y * CF_DELTA_TIME;
 
         // Wrap around when going off the bottom
-        if (particle->position.y < -canvas_height / 2 - 10.0f) {
-            particle->position.y = canvas_height / 2 + 10.0f;
+        if (particle->position.y < -canvas_height / 2 - WRAP_MARGIN) {
+            particle->position.y = canvas_height / 2 + WRAP_MARGIN;
             particle->position.x = cf_rnd_range_float(&g_state->rnd, -canvas_width / 2, canvas_width / 2);
         }
 
