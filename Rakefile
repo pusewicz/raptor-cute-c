@@ -95,7 +95,7 @@ namespace :web do
         file_path = File.join(PWD, file)
         dest_path = File.basename(file_path)
         puts "Packing #{file_path} as #{dest_path}"
-        zipfile.add(file, dest_path)
+        zipfile.add(dest_path, file)
       end
 
       # Pack templated index.html
