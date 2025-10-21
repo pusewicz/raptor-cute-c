@@ -12,7 +12,8 @@
 #include "component.h"
 
 // Star particle constants
-#define STAR_LAYER_COUNT 4
+constexpr int      STAR_LAYER_COUNT                 = 4;
+constexpr int      PARTICLES_PER_LAYER              = 4;
 static const float LAYER_SPEEDS[STAR_LAYER_COUNT]   = {8.0f, 12.0f, 16.0f, 24.0f};
 static const float LAYER_SIZES[STAR_LAYER_COUNT]    = {1.0f, 1.5f, 2.0f, 2.5f};
 static const int   LAYER_ZINDICES[STAR_LAYER_COUNT] = {Z_PARALLAX, Z_PARALLAX, Z_PARALLAX, Z_PARALLAX};
