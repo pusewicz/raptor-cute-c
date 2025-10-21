@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Raptor</title>
+        <link rel="stylesheet" href="shell.css" />
+    </head>
+    <body>
+        <div id="container">
+            <div id="wrapper">
+                <div id="overlay-wrapper">
+                    <div id="overlay">
+                        <div id="logo"></div>
+                        <div id="status">Loading...</div>
+                        <progress id="progress-bar" max="100"></progress>
+                    </div>
+                </div>
+                <canvas id="canvas" tabindex="-1"></canvas>
+            </div>
+        </div>
+        <script type="text/javascript" src="shell.js"></script>
+        <script async type='text/javascript' src="{{SCRIPT_NAME}}"></script>
+    </body>
+</html>

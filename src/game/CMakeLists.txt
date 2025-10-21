@@ -1,7 +1,13 @@
 set(NAME "gamelib")
 
+if(EMSCRIPTEN)
+    set(LIB_TYPE STATIC)
+else()
+    set(LIB_TYPE SHARED)
+endif()
+
 add_library(
-    ${NAME} SHARED
+    ${NAME} ${LIB_TYPE}
     ../engine/game_state.c
     asset/audio.c
     asset/font.c

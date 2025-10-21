@@ -10,7 +10,11 @@ FetchContent_Declare(
 
 set(CF_FRAMEWORK_BUILD_SAMPLES OFF)
 set(CF_FRAMEWORK_BUILD_TESTS OFF)
-set(CF_FRAMEWORK_STATIC OFF)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
+    set(CF_FRAMEWORK_STATIC ON)
+else ()
+    set(CF_FRAMEWORK_STATIC OFF)
+endif()
 
 FetchContent_MakeAvailable(cute)
 
