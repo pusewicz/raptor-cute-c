@@ -1,20 +1,39 @@
-BUILD_DIR = File.join(__dir__, 'build', 'debug')
-PWD = File.expand_path(__dir__)
-PID_FILE = File.join(BUILD_DIR, 'raptor.pid')
-EXE_FILE = File.join(BUILD_DIR, 'Raptor')
+# frozen_string_literals: true
 
-directory BUILD_DIR do
-  sh "cmake -S #{PWD} -B #{BUILD_DIR} -G Ninja -DCMAKE_BUILD_TYPE=Debug"
+def build_type
+  ENV.fetch("BUILD_TYPE", "Debug").tap do |type|
+    unless VALID_BUILD_TYPES.include?(type)
+      abort "Invalid BUILD_TYPE: #{type}, expected one of #{VALID_BUILD_TYPESS}"
+    end
+  end
+end
+
+def build_dir
+  File.join(__dir__, 'build', build_type.downcase)
+end
+
+VALID_BUILD_TYPES = %w[Debug Release].freeze
+PWD = File.expand_path(__dir__)
+PID_FILE = File.join(build_dir, 'raptor.pid')
+EXE_FILE = File.join(build_dir, 'Raptor') # For development
+
+directory build_dir do
+  sh "cmake -S #{PWD} -B #{build_dir} -G Ninja -DCMAKE_BUILD_TYPE=#{build_type}"
+end
+
+desc "Set mode to release"
+task :release do
+  ENV["BUILD_TYPE"] = "Release"
 end
 
 desc 'Compile the project'
-task compile: BUILD_DIR do
-  sh "cmake --build #{BUILD_DIR} --parallel"
+task compile: build_dir do
+  sh "cmake --build #{build_dir} --parallel"
 end
 
 def run(cmd)
   puts "Executing: #{cmd}"
-  pid = Process.spawn(cmd, chdir: BUILD_DIR)
+  pid = Process.spawn(cmd, chdir: build_dir)
   File.write(PID_FILE, pid)
   puts "Started process #{pid} with PID file at #{PID_FILE}"
 ensure
@@ -24,7 +43,11 @@ end
 
 desc 'Run the project'
 task run: :compile do
-  run EXE_FILE
+  if File.exist?(EXE_FILE)
+    run EXE_FILE
+  else
+    abort "#{EXE_FILE} does not exist, aborting..."
+  end
 end
 
 namespace :run do

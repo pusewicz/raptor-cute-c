@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
+include(cmake/UniversalAppleBuild.cmake)
+
 project(Raptor
   VERSION 0.1
   LANGUAGES C CXX
@@ -19,5 +21,6 @@ add_library(project_warnings INTERFACE)
 include(cmake/CompilerWarnings.cmake)
 set_project_warnings(project_warnings)
 
+add_subdirectory(packaging)
 add_subdirectory(vendor)
 add_subdirectory(src)

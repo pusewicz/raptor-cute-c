@@ -21,16 +21,16 @@
 constexpr int MAX_PATH_LENGTH = 1024;
 
 #ifdef HOT_RELOAD_ENABLED
-#ifndef GAME_LIBRARY_NAME
-    #error "GAME_LIBRARY_NAME must be defined"
-#endif
+    #ifndef GAME_LIBRARY_NAME
+        #error "GAME_LIBRARY_NAME must be defined"
+    #endif
 
 char         game_library_path[MAX_PATH_LENGTH] = {0};
 SDL_PathInfo path_info;
 #endif
 
 static void mount_content_directory_as(const char* dir) {
-    const char* path = cf_fs_get_base_directory();
+    const char* path = SDL_GetBasePath();
     cf_path_normalize(path);
     char full_path[MAX_PATH_LENGTH];
     SDL_snprintf(full_path, MAX_PATH_LENGTH, "%s%s", path, "assets");
@@ -146,7 +146,7 @@ void platform_unload_game_library(GameLibrary* game_library) {
     game_library->library    = nullptr;
     game_library->ok         = false;
 }
-#endif // HOT_RELOAD_ENABLED
+#endif  // HOT_RELOAD_ENABLED
 
 uint64_t platform_get_performance_counter(void) { return SDL_GetPerformanceCounter(); }
 uint64_t platform_get_performance_frequency(void) { return SDL_GetPerformanceFrequency(); }
