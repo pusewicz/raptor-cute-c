@@ -10,6 +10,12 @@
 #include "engine/log.h"
 #include "engine/platform.h"
 #include "platform/platform_cute.h"
+
+#ifndef ENGINE_ENABLE_HOT_RELOAD
+    #define ENGINE_ENABLE_HOT_RELOAD 0
+#endif
+
+#if ENGINE_ENABLE_HOT_RELOAD
 volatile sig_atomic_t reload_flag = 0;
 
 static void sighup_handler(int sig) {
@@ -23,6 +29,7 @@ static void debug_handler(bool expr, const char* message, const char* file, int 
         debug_break();
     }
 }
+#endif  // ENGINE_ENABLE_HOT_RELOAD
 
 typedef struct UpdateData {
     GameLibrary* game_library;
@@ -37,7 +44,9 @@ static void update(void* udata) {
 int main(int argc, char* argv[]) {
     (void)argc;
 
+#if ENGINE_ENABLE_HOT_RELOAD
     signal(SIGHUP, sighup_handler);
+#endif  // ENGINE_ENABLE_HOT_RELOAD
 
     platform_init(argv[0]);
 
@@ -58,11 +67,15 @@ int main(int argc, char* argv[]) {
     cf_set_fixed_timestep(60);
     cf_app_set_vsync(true);
     cf_set_update_udata(&update_data);
+
+#if ENGINE_ENABLE_HOT_RELOAD
     cf_set_assert_handler(debug_handler);
+#endif  // ENGINE_ENABLE_HOT_RELOAD
 
     while (cf_app_is_running()) {
         cf_app_update(&update);
 
+#if ENGINE_ENABLE_HOT_RELOAD
         if (reload_flag == 1) {
             reload_flag = 0;
             APP_DEBUG("Reloading library %s\n", game_library.path);
@@ -76,6 +89,7 @@ int main(int argc, char* argv[]) {
                 game_library.hot_reload(state);
             }
         }
+#endif  // ENGINE_ENABLE_HOT_RELOAD
 
         platform_begin_frame();
         game_library.render();

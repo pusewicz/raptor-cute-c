@@ -23,6 +23,7 @@ target_compile_definitions(
     $<$<CONFIG:Debug>:DEBUG>
     $<$<CONFIG:Release>:RELEASE>
     GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>"
+    ENGINE_ENABLE_HOT_RELOAD=$<IF:$<BOOL:${RELOADABLE}>,1,0>
 )
 
 include(CheckPIESupported)

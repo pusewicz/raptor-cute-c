@@ -65,6 +65,8 @@ void  platform_free_memory(void* p) { cf_free(p); }
 void platform_begin_frame(void) {}
 void platform_end_frame(void) { cf_app_draw_onto_screen(true); }
 
+#if ENGINE_ENABLE_HOT_RELOAD
+
 GameLibrary platform_load_game_library(void) {
     GameLibrary game_library = {0};
 
@@ -143,6 +145,36 @@ void platform_unload_game_library(GameLibrary* game_library) {
     game_library->library    = nullptr;
     game_library->ok         = false;
 }
+
+#else   // ENGINE_ENABLE_HOT_RELOAD
+
+// Declare game functions as extern (linked statically)
+extern void  game_init(Platform* platform);
+extern bool  game_update(void);
+extern void  game_render(void);
+extern void* game_state(void);
+extern void  game_hot_reload(void* state);
+extern void  game_shutdown(void);
+
+GameLibrary platform_load_game_library(void) {
+    GameLibrary game_library = {0};
+    game_library.init        = game_init;
+    game_library.update      = game_update;
+    game_library.render      = game_render;
+    game_library.shutdown    = game_shutdown;
+    game_library.state       = game_state;
+    game_library.hot_reload  = game_hot_reload;
+    game_library.ok          = true;
+    game_library.path        = "built-in";
+    game_library.library     = NULL;
+    return game_library;
+}
+
+void platform_unload_game_library(GameLibrary* game_library) {
+    (void)game_library;  // No-op when static
+}
+
+#endif  // ENGINE_ENABLE_HOT_RELOAD
 
 uint64_t platform_get_performance_counter(void) { return SDL_GetPerformanceCounter(); }
 uint64_t platform_get_performance_frequency(void) { return SDL_GetPerformanceFrequency(); }

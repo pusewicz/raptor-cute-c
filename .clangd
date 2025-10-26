@@ -1,10 +1,11 @@
 CompileFlags:
-  Add: [-std=c23]
+    Add: [-std=c23]
+    CompilationDatabase: .build/Debug-reloadable
 
 Diagnostics:
-  MissingIncludes: Strict
-  UnusedIncludes: Strict
+    MissingIncludes: Strict
+    UnusedIncludes: Strict
 
 Style:
-  QuotedHeaders: "src/.*"
-  AngledHeaders: ["include/.*"]
+    QuotedHeaders: "src/.*"
+    AngledHeaders: ["include/.*"]

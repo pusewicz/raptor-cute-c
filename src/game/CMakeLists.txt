@@ -1,7 +1,13 @@
 set(NAME "gamelib")
 
+if (${RELOADABLE})
+    set(LIBRARY_TYPE SHARED)
+else()
+    set(LIBRARY_TYPE STATIC)
+endif()
+
 add_library(
-    ${NAME} SHARED
+    ${NAME} ${LIBRARY_TYPE}
     ../engine/game_state.c
     asset/audio.c
     asset/font.c

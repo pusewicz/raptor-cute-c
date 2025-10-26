@@ -1,14 +1,23 @@
-BUILD_DIR = File.join(__dir__, 'build', 'debug')
+RELOADABLE = ENV.fetch('RELOADABLE', "ON").upcase
+BUILD_TYPE = ENV.fetch('BUILD_TYPE', 'Debug')
+BUILD_DIR = File.join(__dir__, '.build', "#{BUILD_TYPE}-#{RELOADABLE == "ON" ? "reloadable" : "static"}")
 PWD = File.expand_path(__dir__)
 PID_FILE = File.join(BUILD_DIR, 'raptor.pid')
 EXE_FILE = File.join(BUILD_DIR, 'Raptor')
 
 directory BUILD_DIR do
-  sh "cmake -S #{PWD} -B #{BUILD_DIR} -G Ninja -DCMAKE_BUILD_TYPE=Debug"
+  flags = %W[
+    -S#{PWD}
+    -B#{BUILD_DIR}
+    -GNinja
+    -DCMAKE_BUILD_TYPE=#{BUILD_TYPE}
+    -DRELOADABLE=#{RELOADABLE}
+  ]
+  sh "cmake #{flags.join(' ')}"
 end
 
-desc 'Compile the project'
-task compile: BUILD_DIR do
+desc 'Build the project'
+task build: BUILD_DIR do
   sh "cmake --build #{BUILD_DIR} --parallel"
 end
 
@@ -23,7 +32,7 @@ ensure
 end
 
 desc 'Run the project'
-task run: :compile do
+task run: :build do
   run EXE_FILE
 end
 
@@ -34,7 +43,7 @@ namespace :run do
   end
 end
 
-desc 'Watch for changes and recompile'
+desc 'Watch for changes and rebuild'
 task :watch do
   require 'listen'
   listener = Listen.to('src', 'include') do |_modified, _added, _removed|
@@ -43,7 +52,7 @@ task :watch do
 
       begin
         Process.kill(0, pid)
-        Rake::Task[:compile].execute
+        Rake::Task[:build].execute
         puts "Sending SIGHUP to process #{pid}"
         Process.kill('SIGHUP', pid)
       rescue Errno::ESRCH
@@ -74,4 +83,4 @@ task :format do
   sh %(fd --full-path src/ -e "c" -e "h" | xargs clang-format -i)
 end
 
-task default: :compile
+task default: :build
