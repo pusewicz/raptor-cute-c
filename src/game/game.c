@@ -40,6 +40,11 @@
 #include "sprite.h"
 #include "star_particle.h"
 
+const char s_recolor[] = {
+#embed "recolor.glsl"
+    , '\0'  // null terminator
+};
+
 GameState* g_state = nullptr;
 
 #ifdef _WIN32
@@ -88,6 +93,9 @@ EXPORT void game_init(Platform* platform) {
 
     g_state->background_scroll    = make_background_scroll();
     g_state->player               = make_player(0.0f, -g_state->canvas_size.y / 3);
+
+    // Shaders
+    g_state->recolor              = cf_make_draw_shader_from_source(s_recolor);
 
     init_coroutines();
 
@@ -348,13 +356,18 @@ EXPORT void game_render(void) {
     for (size_t i = 0; i < g_state->explosion_particles_count; i++) {
         cf_draw() {
             cf_draw_layer(Z_PARTICLES) {
+                cf_draw_push_shader(g_state->recolor);
+                cf_draw_push_vertex_attributes(
+                    g_state->explosion_particles[i].color.r,
+                    g_state->explosion_particles[i].color.g,
+                    g_state->explosion_particles[i].color.b,
+                    1.0f
+                );
                 cf_draw_translate_v2(g_state->explosion_particles[i].position);
                 cf_draw_scale(g_state->explosion_particles[i].size, g_state->explosion_particles[i].size);
                 // Apply color to the sprite
-                CF_Color color = g_state->explosion_particles[i].color;
-                cf_draw_push_color(color);
                 cf_draw_sprite(&g_state->explosion_particles[i].sprite);
-                cf_draw_pop_color();
+                cf_draw_pop_shader();
             }
         }
     }

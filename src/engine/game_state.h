@@ -6,6 +6,7 @@
 #include <cute_color.h>
 #include <cute_coroutine.h>
 #include <cute_draw.h>
+#include <cute_graphics.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
 #include <cute_sprite.h>
@@ -38,6 +39,8 @@ typedef struct GameState {
     CF_Rnd       rnd;
     int          score;
     int          lives;
+
+    CF_Shader recolor;
 
     BackgroundScroll background_scroll;
 
