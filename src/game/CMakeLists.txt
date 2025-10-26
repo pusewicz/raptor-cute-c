@@ -18,6 +18,7 @@ add_library(
     player.c
     enemy.c
     explosion.c
+    explosion_particle.c
     collision.c
     floating_score.c
     hit_particle.c

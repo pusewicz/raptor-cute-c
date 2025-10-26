@@ -7,6 +7,7 @@
 #include "../engine/game_state.h"
 #include "enemy.h"
 #include "explosion.h"
+#include "explosion_particle.h"
 #include "floating_score.h"
 #include "hit_particle.h"
 #include "player.h"
@@ -49,6 +50,7 @@ static void player_bullets_vs_enemies(
                     enemy->is_alive = false;
 
                     spawn_explosion(make_explosion(enemy->position.x, enemy->position.y));
+                    spawn_explosion_particle_burst(enemy->position, &enemy->sprite);
                     spawn_floating_score(make_floating_score(enemy->position.x, enemy->position.y, enemy->score));
                     cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
                 }

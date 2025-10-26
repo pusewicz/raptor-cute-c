@@ -14,6 +14,7 @@
 #include "../game/background_scroll.h"
 #include "../game/enemy.h"
 #include "../game/explosion.h"
+#include "../game/explosion_particle.h"
 #include "../game/floating_score.h"
 #include "../game/hit_particle.h"
 #include "../game/player.h"
@@ -60,6 +61,10 @@ typedef struct GameState {
     HitParticle* hit_particles;
     size_t       hit_particles_count;
     size_t       hit_particles_capacity;
+
+    ExplosionParticle* explosion_particles;
+    size_t             explosion_particles_count;
+    size_t             explosion_particles_capacity;
 
     StarParticle* star_particles;
     size_t        star_particles_count;

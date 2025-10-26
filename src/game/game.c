@@ -30,6 +30,7 @@
 #include "coroutine.h"
 #include "enemy.h"
 #include "explosion.h"
+#include "explosion_particle.h"
 #include "floating_score.h"
 #include "hit_particle.h"
 #include "input.h"
@@ -64,6 +65,7 @@ const int MAX_PLAYER_BULLETS          = 32;
 const int MAX_ENEMIES                 = 32;
 const int MAX_ENEMY_BULLETS           = 32;
 const int MAX_HIT_PARTICLES           = 240;
+const int MAX_EXPLOSION_PARTICLES     = 320;  // More particles for colorful explosions
 const int MAX_EXPLOSIONS              = 32;
 const int MAX_STAR_PARTICLES          = 4 * 4;  // 4 stars per 4 layers
 const int MAX_FLOATING_SCORES         = 16;
@@ -120,6 +122,7 @@ EXPORT void game_init(Platform* platform) {
     INIT_ENTITY_STORAGE(Enemy, enemies, MAX_ENEMIES);
     INIT_ENTITY_STORAGE(EnemyBullet, enemy_bullets, MAX_ENEMY_BULLETS);
     INIT_ENTITY_STORAGE(HitParticle, hit_particles, MAX_HIT_PARTICLES);
+    INIT_ENTITY_STORAGE(ExplosionParticle, explosion_particles, MAX_EXPLOSION_PARTICLES);
     INIT_ENTITY_STORAGE(Explosion, explosions, MAX_EXPLOSIONS);
     INIT_ENTITY_STORAGE(StarParticle, star_particles, MAX_STAR_PARTICLES);
     INIT_ENTITY_STORAGE(FloatingScore, floating_scores, MAX_FLOATING_SCORES);
@@ -160,13 +163,14 @@ EXPORT bool game_update(void) {
 
             // Reset player
             g_state->player                = make_player(0.0f, -g_state->canvas_size.y / 3);
-            g_state->player_bullets_count  = 0;
-            g_state->enemies_count         = 0;
-            g_state->enemy_bullets_count   = 0;
-            g_state->explosions_count      = 0;
-            g_state->hit_particles_count   = 0;
-            g_state->star_particles_count  = 0;
-            g_state->floating_scores_count = 0;
+            g_state->player_bullets_count     = 0;
+            g_state->enemies_count            = 0;
+            g_state->enemy_bullets_count      = 0;
+            g_state->explosions_count         = 0;
+            g_state->hit_particles_count      = 0;
+            g_state->explosion_particles_count = 0;
+            g_state->star_particles_count     = 0;
+            g_state->floating_scores_count    = 0;
 
             // Re-initialize star particles
             init_star_particles();
@@ -223,6 +227,7 @@ EXPORT bool game_update(void) {
         }
     }
     update_particles();
+    update_explosion_particles();
     update_star_particles();
     update_floating_scores();
 
@@ -241,6 +246,7 @@ EXPORT bool game_update(void) {
     cleanup_enemy_bullets();
     cleanup_explosions();
     cleanup_hit_particles();
+    cleanup_explosion_particles();
     cleanup_player_bullets();
     cleanup_floating_scores();
 
@@ -346,6 +352,21 @@ EXPORT void game_render(void) {
                 cf_draw_translate_v2(g_state->hit_particles[i].position);
                 cf_draw_scale(g_state->hit_particles[i].size, g_state->hit_particles[i].size);
                 cf_draw_sprite(&g_state->hit_particles[i].sprite);
+            }
+        }
+    }
+
+    // Render explosion particles with colors
+    for (size_t i = 0; i < g_state->explosion_particles_count; i++) {
+        cf_draw() {
+            cf_draw_layer(Z_PARTICLES) {
+                cf_draw_translate_v2(g_state->explosion_particles[i].position);
+                cf_draw_scale(g_state->explosion_particles[i].size, g_state->explosion_particles[i].size);
+                // Apply color to the sprite
+                CF_Color color = g_state->explosion_particles[i].color;
+                cf_draw_push_color(color);
+                cf_draw_sprite(&g_state->explosion_particles[i].sprite);
+                cf_draw_pop_color();
             }
         }
     }
