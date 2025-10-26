@@ -10,6 +10,7 @@
 #include <string.h>
 
 #include "../engine/game_state.h"
+#include "movement.h"
 
 HitParticle make_hit_particle(float x, float y, CF_V2 direction) {
     // Calculate the base angle from the direction vector
@@ -65,7 +66,7 @@ void cleanup_hit_particles() {
     g_state->hit_particles_count = write_idx;
 }
 
-void update_particles() {
+void update_hit_particles() {
     for (size_t i = 0; i < g_state->hit_particles_count; ++i) {
         auto particle = &g_state->hit_particles[i];
 
@@ -79,6 +80,8 @@ void update_particles() {
             particle->is_alive = false;
             continue;
         }
+
+        update_movement(&particle->position, &particle->velocity);
 
         // Calculate fade based on lifetime and update sprite opacity (fade to 50%, not 0%)
         particle->sprite.opacity = 1.0f - (particle->time_alive / particle->lifetime) * 0.5f;

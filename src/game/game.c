@@ -65,7 +65,7 @@ const int MAX_PLAYER_BULLETS          = 32;
 const int MAX_ENEMIES                 = 32;
 const int MAX_ENEMY_BULLETS           = 32;
 const int MAX_HIT_PARTICLES           = 240;
-const int MAX_EXPLOSION_PARTICLES     = 320;  // More particles for colorful explosions
+const int MAX_EXPLOSION_PARTICLES     = 320;    // More particles for colorful explosions
 const int MAX_EXPLOSIONS              = 32;
 const int MAX_STAR_PARTICLES          = 4 * 4;  // 4 stars per 4 layers
 const int MAX_FLOATING_SCORES         = 16;
@@ -157,20 +157,20 @@ EXPORT bool game_update(void) {
         if (g_state->player.input.shoot) {
             // TODO: Extract a generic init/reset function
             // Reset game state
-            g_state->is_game_over          = false;
-            g_state->lives                 = 3;
-            g_state->score                 = 0;
+            g_state->is_game_over              = false;
+            g_state->lives                     = 3;
+            g_state->score                     = 0;
 
             // Reset player
-            g_state->player                = make_player(0.0f, -g_state->canvas_size.y / 3);
-            g_state->player_bullets_count     = 0;
-            g_state->enemies_count            = 0;
-            g_state->enemy_bullets_count      = 0;
-            g_state->explosions_count         = 0;
-            g_state->hit_particles_count      = 0;
+            g_state->player                    = make_player(0.0f, -g_state->canvas_size.y / 3);
+            g_state->player_bullets_count      = 0;
+            g_state->enemies_count             = 0;
+            g_state->enemy_bullets_count       = 0;
+            g_state->explosions_count          = 0;
+            g_state->hit_particles_count       = 0;
             g_state->explosion_particles_count = 0;
-            g_state->star_particles_count     = 0;
-            g_state->floating_scores_count    = 0;
+            g_state->star_particles_count      = 0;
+            g_state->floating_scores_count     = 0;
 
             // Re-initialize star particles
             init_star_particles();
@@ -214,19 +214,7 @@ EXPORT bool game_update(void) {
         );
         if (!cf_aabb_to_aabb(canvas_aabb, bullet_aabb)) { g_state->enemy_bullets[i].is_alive = false; }
     }
-    // Update hit particles
-    for (size_t i = 0; i < g_state->hit_particles_count; i++) {
-        update_movement(&g_state->hit_particles[i].position, &g_state->hit_particles[i].velocity);
-
-        // Mark particle as destroyed when out of screen bounds
-        if (g_state->hit_particles[i].position.x < canvas_aabb.min.x ||
-            g_state->hit_particles[i].position.x > canvas_aabb.max.x ||
-            g_state->hit_particles[i].position.y < canvas_aabb.min.y ||
-            g_state->hit_particles[i].position.y > canvas_aabb.max.y) {
-            g_state->hit_particles[i].is_alive = false;
-        }
-    }
-    update_particles();
+    update_hit_particles();
     update_explosion_particles();
     update_star_particles();
     update_floating_scores();

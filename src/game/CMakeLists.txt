@@ -14,7 +14,6 @@ add_library(
     asset/sprite.c
     coroutine.c
     input.c
-    movement.c
     player.c
     enemy.c
     explosion.c

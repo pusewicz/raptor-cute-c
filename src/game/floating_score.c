@@ -11,7 +11,7 @@
 #include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
 
-constexpr float FLOATING_SCORE_SPEED    = 0.3f;
+constexpr float FLOATING_SCORE_SPEED    = 0.85f;
 constexpr float FLOATING_SCORE_LIFETIME = 1.0f;
 
 FloatingScore make_floating_score(float x, float y, int score) {

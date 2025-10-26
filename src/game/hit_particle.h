@@ -19,4 +19,4 @@ void        spawn_hit_particle(HitParticle hit_particle);
 void        spawn_hit_particles(size_t count, const HitParticle particles[static restrict count]);
 void        spawn_hit_particle_burst(size_t count, CF_V2 pos, CF_V2 dir);
 void        cleanup_hit_particles(void);
-void        update_particles(void);
+void        update_hit_particles(void);

@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "../engine/game_state.h"
+#include "movement.h"
 
 // Helper function to sample colors from sprite
 // For now, we'll sample from predefined color palettes based on sprite frame
@@ -35,7 +36,7 @@ static CF_Color sample_sprite_color(const CF_Sprite* sprite) {
 }
 
 ExplosionParticle make_explosion_particle(float x, float y, CF_Color color, float angle) {
-    float speed = cf_rnd_range_float(&g_state->rnd, 1.0f, 3.0f);
+    float speed                = cf_rnd_range_float(&g_state->rnd, 0.5f, 2.0f);
 
     ExplosionParticle particle = (ExplosionParticle){
         .is_alive   = true,
@@ -43,7 +44,7 @@ ExplosionParticle make_explosion_particle(float x, float y, CF_Color color, floa
         .velocity   = cf_v2(CF_COSF(angle) * speed, CF_SINF(angle) * speed),
         .lifetime   = cf_rnd_range_float(&g_state->rnd, 0.5f, 1.2f),
         .time_alive = 0.0f,
-        .size       = (float)cf_rnd_range_int(&g_state->rnd, 1, 3),
+        .size       = (float)cf_rnd_range_int(&g_state->rnd, 1, 2),
         .color      = color,
         // Use the shared particle sprite (no allocation needed)
         .sprite     = g_state->sprites.particle,
@@ -69,17 +70,17 @@ void spawn_explosion_particles(size_t count, const ExplosionParticle particles[s
 
 void spawn_explosion_particle_burst(CF_V2 pos, const CF_Sprite* sprite) {
     // Create radial burst of particles
-    const size_t particle_count = 20;  // Number of particles in explosion
+    constexpr size_t  particle_count = 20;  // Number of particles in explosion
     ExplosionParticle burst[particle_count];
 
     for (size_t i = 0; i < particle_count; ++i) {
         // Calculate angle for radial dispersion (360 degrees)
-        float angle = (float)i / (float)particle_count * CF_PI * 2.0f;
+        float angle    = (float)i / (float)particle_count * CF_PI * 2.0f;
 
         // Sample color from sprite
         CF_Color color = sample_sprite_color(sprite);
 
-        burst[i] = make_explosion_particle(pos.x, pos.y, color, angle);
+        burst[i]       = make_explosion_particle(pos.x, pos.y, color, angle);
     }
 
     spawn_explosion_particles(particle_count, burst);
@@ -112,8 +113,7 @@ void update_explosion_particles() {
             continue;
         }
 
-        // Update position based on velocity
-        particle->position = cf_add_v2(particle->position, cf_mul_v2_f(particle->velocity, CF_DELTA_TIME));
+        update_movement(&particle->position, &particle->velocity);
 
         // Calculate fade based on lifetime and update sprite opacity
         particle->sprite.opacity = 1.0f - (particle->time_alive / particle->lifetime);

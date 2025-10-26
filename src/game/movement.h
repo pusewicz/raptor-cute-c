@@ -1,5 +1,8 @@
 #pragma once
 
-typedef struct CF_V2 CF_V2;
+#include <cute_math.h>
 
-void update_movement(CF_V2* position, const CF_V2* velocity);
+static inline void update_movement(CF_V2* position, const CF_V2* velocity) {
+    position->x += velocity->x;
+    position->y += velocity->y;
+}
