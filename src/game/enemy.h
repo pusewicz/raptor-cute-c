@@ -9,6 +9,7 @@ typedef enum EnemyType {
     ENEMY_TYPE_ALAN,
     ENEMY_TYPE_BON_BON,
     ENEMY_TYPE_LIPS,
+    ENEMY_TYPE_COUNT,
 } EnemyType;
 
 typedef struct Health {
@@ -28,6 +29,7 @@ typedef struct Enemy {
     float     cooldown;         // Time between shots in seconds
     float     time_since_shot;  // Time since last shot in seconds
     float     shoot_chance;     // Probability of shooting when cooldown ready (0.0-1.0)
+    EnemyType type;
 } Enemy;
 
 typedef struct EnemyBullet {

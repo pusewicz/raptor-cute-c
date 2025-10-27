@@ -50,6 +50,7 @@ Enemy make_enemy_of_type(float x, float y, EnemyType type) {
         .z_index  = Z_SPRITES,
         .score    = score_value,
         .is_alive = true,
+        .type     = type,
     };
 
     // Sprite
