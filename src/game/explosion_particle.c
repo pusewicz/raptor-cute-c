@@ -39,7 +39,7 @@ static CF_Color sample_sprite_color(const EnemyType enemy_type) {
                                }
     };
 
-    int      index = cf_rnd_range_int(&g_state->rnd, 0, countof(colors[enemy_type]) - 1);
+    int      index = cf_rnd_range_int(&g_state->rnd, 0, lengthof(colors[enemy_type]));
     CF_Color color = colors[enemy_type][index];
 
     return color;
