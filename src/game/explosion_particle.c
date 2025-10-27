@@ -73,7 +73,7 @@ void spawn_explosion_particles(size_t count, const ExplosionParticle particles[s
     g_state->explosion_particles_count += count;
 }
 
-void spawn_explosion_particle_burst(CF_V2 pos, const CF_Sprite* sprite) {
+void spawn_explosion_particle_burst(CF_V2 pos, const EnemyType enemy_type) {
     // Create radial burst of particles
     constexpr size_t  particle_count = 20;  // Number of particles in explosion
     ExplosionParticle burst[particle_count];
@@ -83,7 +83,7 @@ void spawn_explosion_particle_burst(CF_V2 pos, const CF_Sprite* sprite) {
         float angle    = (float)i / (float)particle_count * CF_PI * 2.0f;
 
         // Sample color from sprite
-        CF_Color color = sample_sprite_color(sprite);
+        CF_Color color = sample_sprite_color(enemy_type);
 
         burst[i]       = make_explosion_particle(pos.x, pos.y, color, angle);
     }
