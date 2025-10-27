@@ -13,26 +13,31 @@
 #include "../engine/game_state.h"
 #include "movement.h"
 
-// Helper function to sample colors from sprite
-// For now, we'll sample from predefined color palettes based on sprite frame
-static CF_Color sample_sprite_color(const CF_Sprite* sprite) {
-    // Get the current frame's pixel data
-    // Note: This is a simplified approach - we'd ideally sample actual pixels
-    // but for now we'll use predefined colors that match the enemy sprites
-
-    // Sample some common colors from the sprite
-    // These are typical colors found in retro shooter sprites
-    CF_Color colors[] = {
-        cf_make_color_rgb(255, 100, 100),  // Red
-        cf_make_color_rgb(255, 150, 50),   // Orange
-        cf_make_color_rgb(255, 200, 100),  // Yellow
-        cf_make_color_rgb(100, 200, 255),  // Light blue
-        cf_make_color_rgb(150, 150, 255),  // Purple
-        cf_make_color_rgb(200, 200, 200),  // White/gray
+static CF_Color sample_sprite_color(const EnemyType enemy_type) {
+    CF_Color colors[ENEMY_TYPE_COUNT][3] = {
+        [ENEMY_TYPE_ALAN] =
+            {
+                               cf_make_color_hex(0x77cc2a),
+                               cf_make_color_hex(0x077d53),
+                               cf_make_color_hex(0xffc41f),
+                               },
+        [ENEMY_TYPE_BON_BON] =
+            {
+                               cf_make_color_hex(0xffc41f),
+                               cf_make_color_hex(0xe67300),
+                               cf_make_color_hex(0xf2f1f0),
+                               },
+        [ENEMY_TYPE_LIPS] = {
+                               cf_make_color_hex(0xea58ad),
+                               cf_make_color_hex(0x9e1328),
+                               cf_make_color_hex(0xffacbf),
+                               }
     };
 
-    int index = cf_rnd_range_int(&g_state->rnd, 0, (int)(sizeof(colors) / sizeof(colors[0]) - 1));
-    return colors[index];
+    int      index = cf_rnd_range_int(&g_state->rnd, 0, countof(colors[enemy_type]) - 1);
+    CF_Color color = colors[enemy_type][index];
+
+    return color;
 }
 
 ExplosionParticle make_explosion_particle(float x, float y, CF_Color color, float angle) {
