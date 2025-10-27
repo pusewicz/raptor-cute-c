@@ -10,7 +10,12 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "../engine/common.h"
+#include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
+#include "../engine/log.h"
+#include "component.h"
+#include "enemy.h"
 #include "movement.h"
 
 static CF_Color sample_sprite_color(const EnemyType enemy_type) {
