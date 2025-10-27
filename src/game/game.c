@@ -355,7 +355,9 @@ EXPORT void game_render(void) {
     render_explosion_particles();
     render_floating_scores();
 
-    // Render UI
+    /**
+     * Render UI
+     */
     char score_text[6 + 1];
 
     cf_draw() {
