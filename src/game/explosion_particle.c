@@ -46,17 +46,16 @@ static CF_Color sample_sprite_color(const EnemyType enemy_type) {
 }
 
 ExplosionParticle make_explosion_particle(float x, float y, CF_Color color, float angle) {
-    float speed                = cf_rnd_range_float(&g_state->rnd, 0.5f, 2.0f);
+    float speed                = cf_rnd_range_float(&g_state->rnd, 0.5f, 1.0f);
 
     ExplosionParticle particle = (ExplosionParticle){
         .is_alive   = true,
         .position   = cf_v2(x, y),
         .velocity   = cf_v2(CF_COSF(angle) * speed, CF_SINF(angle) * speed),
-        .lifetime   = cf_rnd_range_float(&g_state->rnd, 0.5f, 1.2f),
+        .lifetime   = cf_rnd_range_float(&g_state->rnd, 0.5f, 0.8f),
         .time_alive = 0.0f,
         .size       = (float)cf_rnd_range_int(&g_state->rnd, 1, 2),
         .color      = color,
-        // Use the shared particle sprite (no allocation needed)
         .sprite     = g_state->sprites.particle,
     };
 
@@ -80,7 +79,7 @@ void spawn_explosion_particles(size_t count, const ExplosionParticle particles[s
 
 void spawn_explosion_particle_burst(CF_V2 pos, const EnemyType enemy_type) {
     // Create radial burst of particles
-    constexpr size_t  particle_count = 20;  // Number of particles in explosion
+    constexpr size_t  particle_count = 10;  // Number of particles in explosion
     ExplosionParticle burst[particle_count];
 
     for (size_t i = 0; i < particle_count; ++i) {
