@@ -4,19 +4,12 @@
 #include <cute_sprite.h>
 
 #include "component.h"
+#include "input.h"
 
 typedef struct Weapon {
     float cooldown;         // Time between shots in seconds
     float time_since_shot;  // Time since last shot in seconds
 } Weapon;
-
-typedef struct Input {
-    bool up;
-    bool down;
-    bool left;
-    bool right;
-    bool shoot;
-} Input;
 
 typedef struct Player {
     CF_V2     position;

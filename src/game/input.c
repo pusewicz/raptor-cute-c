@@ -2,8 +2,6 @@
 
 #include <cute_input.h>
 
-#include "../engine/game_state.h"
-
 void update_input(Input* input) {
     input->up    = cf_key_down(CF_KEY_W) || cf_key_down(CF_KEY_UP);
     input->down  = cf_key_down(CF_KEY_S) || cf_key_down(CF_KEY_DOWN);
