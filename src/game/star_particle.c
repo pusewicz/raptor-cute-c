@@ -83,7 +83,6 @@ void update_star_particles(void) {
 }
 
 void render_star_particles() {
-    // Render star particles
     for (size_t i = 0; i < g_state->star_particles_count; ++i) {
         auto particle = &g_state->star_particles[i];
 
