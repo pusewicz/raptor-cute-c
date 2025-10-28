@@ -1,5 +1,6 @@
 #include <cute_app.h>
 #include <cute_color.h>
+#include <cute_defines.h>
 #include <cute_graphics.h>
 #include <cute_time.h>
 #include <debugbreak.h>
