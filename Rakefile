@@ -10,6 +10,20 @@ SHELL_STATIC_FILES = [
   'shell/shell.css',
 ].freeze
 
+SHADERS = FileList["src/game/*.glsl"]
+SHADER_HEADERS = SHADERS.map { |f| f.sub(/\.glsl$/, "_glsl.h") }
+
+rule %r{_glsl\.h$} => lambda { |t| t.sub(/_glsl\.h$/, ".glsl") } do |t|
+  puts "t.nameL #{t.name}"
+  name = File.basename(t.source, ".glsl")
+  dest = File.dirname(t.source)
+  sh File.join(BUILD_DIR, "cute-shaderc"),
+     "-type=draw",
+     "-varname=s_#{name}_bytecode",
+     "-oheader=#{t.name}",
+     t.source
+end
+
 directory BUILD_DIR do
   flags = %W[
     -S#{PWD}
@@ -33,7 +47,7 @@ directory WEB_BUILD_DIR do
 end
 
 desc 'Build the project'
-task build: BUILD_DIR do
+task build: [BUILD_DIR, *SHADER_HEADERS] do
   sh "cmake --build #{BUILD_DIR} --parallel"
 end
 
