@@ -16,7 +16,6 @@ SHADER_HEADERS = SHADERS.map { |f| f.sub(/\.glsl$/, "_glsl.h") }
 rule %r{_glsl\.h$} => lambda { |t| t.sub(/_glsl\.h$/, ".glsl") } do |t|
   puts "t.nameL #{t.name}"
   name = File.basename(t.source, ".glsl")
-  dest = File.dirname(t.source)
   sh File.join(BUILD_DIR, "cute-shaderc"),
      "-type=draw",
      "-varname=s_#{name}_bytecode",
