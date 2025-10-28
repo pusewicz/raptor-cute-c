@@ -1,3 +1,7 @@
+#ifndef ENGINE_ENABLE_HOT_RELOAD
+    #define ENGINE_ENABLE_HOT_RELOAD 0
+#endif
+
 #include <cute_app.h>
 #include <cute_color.h>
 #include <cute_defines.h>
@@ -11,10 +15,6 @@
 #include "engine/log.h"
 #include "engine/platform.h"
 #include "platform/platform_cute.h"
-
-#ifndef ENGINE_ENABLE_HOT_RELOAD
-    #define ENGINE_ENABLE_HOT_RELOAD 0
-#endif
 
 constexpr const int TARGET_FPS = 60;
 
