@@ -16,6 +16,8 @@
     #define ENGINE_ENABLE_HOT_RELOAD 0
 #endif
 
+constexpr const int TARGET_FPS = 60;
+
 #if ENGINE_ENABLE_HOT_RELOAD
 volatile sig_atomic_t reload_flag = 0;
 
@@ -64,8 +66,8 @@ int main(int argc, char* argv[]) {
 
     CF_Color bg = cf_make_color_rgb(0, 0, 0);
     cf_clear_color(bg.r, bg.g, bg.b, bg.a);
-    cf_set_target_framerate(60);
-    cf_set_fixed_timestep(60);
+    cf_set_target_framerate(TARGET_FPS);
+    cf_set_fixed_timestep(TARGET_FPS);
     cf_app_set_vsync(true);
     cf_set_update_udata(&update_data);
 
