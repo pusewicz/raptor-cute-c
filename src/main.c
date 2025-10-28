@@ -97,7 +97,11 @@ int main(int argc, char* argv[]) {
     cf_set_assert_handler(debug_handler);
 #endif  // ENGINE_ENABLE_HOT_RELOAD
 
+#ifdef CF_EMSCRIPTEN
+    emscripten_set_main_loop_arg(update, &game_library, TARGET_FPS, true);
+#else
     while (cf_app_is_running()) { update(&game_library); }
+#endif
 
     game_library.shutdown();
 
