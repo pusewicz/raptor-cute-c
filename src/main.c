@@ -8,9 +8,15 @@
 #include <cute_graphics.h>
 #include <cute_time.h>
 #include <debugbreak.h>
-#include <signal.h>
 #include <stdio.h>
-#include <sys/signal.h>
+#ifdef ENGINE_ENABLE_HOT_RELOAD
+    #include <signal.h>
+    #include <sys/signal.h>
+#endif
+
+#ifdef CF_EMSCRIPTEN
+    #include <emscripten.h>
+#endif
 
 #include "engine/log.h"
 #include "engine/platform.h"
