@@ -70,9 +70,7 @@ static void update(void* udata) {
     platform_end_frame();
 }
 
-int main(int argc, char* argv[]) {
-    (void)argc;
-
+int main(int argc [[maybe_unused]], char* argv[]) {
 #if ENGINE_ENABLE_HOT_RELOAD
     signal(SIGHUP, sighup_handler);
 #endif  // ENGINE_ENABLE_HOT_RELOAD
