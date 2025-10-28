@@ -40,17 +40,13 @@ static void debug_handler(bool expr, const char* message, const char* file, int 
 }
 #endif  // ENGINE_ENABLE_HOT_RELOAD
 
-typedef struct UpdateData {
-    GameLibrary* game_library;
-} UpdateData;
-
 static void on_cf_app_update(void* udata) {
-    UpdateData*  update_data  = (UpdateData*)udata;
-    GameLibrary* game_library = update_data->game_library;
+    GameLibrary* game_library = (GameLibrary*)udata;
     game_library->update();
 }
 
-static void update(GameLibrary* game_library) {
+static void update(void* udata) {
+    GameLibrary* game_library = (GameLibrary*)udata;
     cf_app_update(&on_cf_app_update);
 
 #if ENGINE_ENABLE_HOT_RELOAD
@@ -88,10 +84,6 @@ int main(int argc, char* argv[]) {
         .free_memory     = platform_free_memory,
     };
     GameLibrary game_library = platform_load_game_library();
-    UpdateData  update_data  = {
-          .game_library = &game_library,
-    };
-
     game_library.init(&platform);
 
     CF_Color bg = cf_make_color_rgb(0, 0, 0);
@@ -99,7 +91,7 @@ int main(int argc, char* argv[]) {
     cf_set_target_framerate(TARGET_FPS);
     cf_set_fixed_timestep(TARGET_FPS);
     cf_app_set_vsync(true);
-    cf_set_update_udata(&update_data);
+    cf_set_update_udata(&game_library);
 
 #if ENGINE_ENABLE_HOT_RELOAD
     cf_set_assert_handler(debug_handler);
