@@ -249,6 +249,7 @@ EXPORT bool game_update(void) {
     return true;
 }
 
+#if DEBUG
 static void game_render_debug(void) {
     auto weapon = &g_state->player.weapon;
     auto pos    = &g_state->player.position;
@@ -314,6 +315,7 @@ static void game_render_debug(void) {
         }
     }
 }
+#endif  // DEBUG
 
 EXPORT void game_render(void) {
 #ifdef DEBUG
