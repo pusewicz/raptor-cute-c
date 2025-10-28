@@ -44,7 +44,7 @@ typedef struct UpdateData {
     GameLibrary* game_library;
 } UpdateData;
 
-static void update(void* udata) {
+static void on_cf_app_update(void* udata) {
     UpdateData*  update_data  = (UpdateData*)udata;
     GameLibrary* game_library = update_data->game_library;
     game_library->update();
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 #endif  // ENGINE_ENABLE_HOT_RELOAD
 
     while (cf_app_is_running()) {
-        cf_app_update(&update);
+        cf_app_update(&on_cf_app_update);
 
 #if ENGINE_ENABLE_HOT_RELOAD
         if (reload_flag == 1) {
