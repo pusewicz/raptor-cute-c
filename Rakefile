@@ -147,7 +147,7 @@ namespace :web do
 
   desc "Publish to itch.io"
   task :publish do
-    sh "butler push build/web/Raptor.zip pusewicz/raptor-cute-c:html5"
+    sh "butler push #{WEB_BUILD_DIR}/Raptor.zip pusewicz/raptor-cute-c:html5"
   end
 end
 
