@@ -14,7 +14,8 @@
 #include "component.h"
 #include "explosion.h"
 
-constexpr float WEAPON_DEFAULT_COOLDOWN = 0.15f;
+constexpr float WEAPON_DEFAULT_COOLDOWN     = 0.15f;  // Time needed to let the player shoot again
+constexpr float PLAYER_BULLET_DEFAULT_SPEED = 3.0f;
 
 Player make_player(float x, float y) {
     Player player              = {0};
@@ -54,8 +55,6 @@ Player make_player(float x, float y) {
 
     return player;
 }
-
-constexpr float PLAYER_BULLET_DEFAULT_SPEED = 3.0f;
 
 PlayerBullet make_player_bullet(float x, float y, CF_V2 direction) {
     PlayerBullet bullet = (PlayerBullet){.is_alive = true};
@@ -169,7 +168,6 @@ void update_player(Player* player) {
 }
 
 void render_player(Player* player) {
-    // Don't render if player is dead
     if (!player->is_alive) { return; }
 
     if (player->velocity.x > 0) {
