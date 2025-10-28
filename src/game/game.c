@@ -36,6 +36,7 @@
 #include "input.h"
 #include "movement.h"
 #include "player.h"
+#include "player_bullet.h"
 #include "render.h"
 #include "sprite.h"
 #include "star_particle.h"

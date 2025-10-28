@@ -11,6 +11,7 @@
 #include "floating_score.h"
 #include "hit_particle.h"
 #include "player.h"
+#include "player_bullet.h"
 
 static void player_bullets_vs_enemies(
     size_t       player_bullets_count,
