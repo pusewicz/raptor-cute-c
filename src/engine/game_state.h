@@ -19,6 +19,7 @@
 #include "../game/floating_score.h"
 #include "../game/hit_particle.h"
 #include "../game/player.h"
+#include "../game/player_bullet.h"
 #include "../game/star_particle.h"
 
 typedef struct Platform Platform;

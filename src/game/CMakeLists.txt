@@ -15,6 +15,7 @@ add_library(
     coroutine.c
     input.c
     player.c
+    player_bullet.c
     enemy.c
     explosion.c
     explosion_particle.c

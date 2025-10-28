@@ -26,19 +26,7 @@ typedef struct Player {
     ZIndex    z_index;  // Rendering order
 } Player;
 
-typedef struct PlayerBullet {
-    CF_V2     position;
-    CF_V2     velocity;
-    CF_Sprite sprite;
-    Collider  collider;
-    bool      is_alive;
-    ZIndex    z_index;  // Rendering order
-} PlayerBullet;
-
-Player       make_player(float x, float y);
-PlayerBullet make_player_bullet(float x, float y, CF_V2 direction);
-void         spawn_player_bullet(PlayerBullet player_bullet);
-void         cleanup_player_bullets(void);
-void         damage_player(void);
-void         update_player(Player* player);
-void         render_player(Player* player);
+Player make_player(float x, float y);
+void   damage_player(void);
+void   update_player(Player* player);
+void   render_player(Player* player);
