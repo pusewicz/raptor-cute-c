@@ -40,10 +40,14 @@
 #include "sprite.h"
 #include "star_particle.h"
 
+#ifdef CF_RUNTIME_SHADER_COMPILATION
 const char s_recolor[] = {
-#embed "recolor.glsl"
+    #embed "recolor.glsl"
     , '\0'  // null terminator
 };
+#else
+    #include "recolor_glsl.h"
+#endif
 
 GameState* g_state = nullptr;
 
@@ -94,8 +98,14 @@ EXPORT void game_init(Platform* platform) {
     g_state->background_scroll    = make_background_scroll();
     g_state->player               = make_player(0.0f, -g_state->canvas_size.y / 3);
 
-    // Shaders
-    g_state->recolor              = cf_make_draw_shader_from_source(s_recolor);
+    /**
+     * Shaders
+     */
+#ifdef CF_RUNTIME_SHADER_COMPILATION
+    g_state->recolor = cf_make_draw_shader_from_source(s_recolor);
+#else
+    g_state->recolor = cf_make_draw_shader_from_bytecode(s_recolor_bytecode);
+#endif
 
     init_coroutines();
 
