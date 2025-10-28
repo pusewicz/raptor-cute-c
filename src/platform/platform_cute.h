@@ -7,7 +7,7 @@ typedef struct Platform Platform;
 
 typedef void (*GameInitFunction)(Platform* platform);
 typedef bool (*GameUpdateFunction)(void);
-typedef void* (*GameRenderFunction)(void);
+typedef void (*GameRenderFunction)(void);
 typedef void (*GameShutdownFunction)(void);
 typedef void* (*GameStateFunction)(void);
 typedef void (*GameHotReloadFunction)(void* game_state);

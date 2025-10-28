@@ -151,7 +151,7 @@ void platform_unload_game_library(GameLibrary* game_library) {
 // Declare game functions as extern (linked statically)
 extern void  game_init(Platform* platform);
 extern bool  game_update(void);
-extern void* game_render(void);
+extern void  game_render(void);
 extern void* game_state(void);
 extern void  game_hot_reload(void* state);
 extern void  game_shutdown(void);
@@ -166,7 +166,7 @@ GameLibrary platform_load_game_library(void) {
     game_library.hot_reload  = game_hot_reload;
     game_library.ok          = true;
     game_library.path        = "built-in";
-    game_library.library     = NULL;
+    game_library.library     = nullptr;
     return game_library;
 }
 
