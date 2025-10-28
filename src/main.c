@@ -50,6 +50,30 @@ static void on_cf_app_update(void* udata) {
     game_library->update();
 }
 
+static void update(GameLibrary* game_library) {
+    cf_app_update(&on_cf_app_update);
+
+#if ENGINE_ENABLE_HOT_RELOAD
+    if (reload_flag == 1) {
+        reload_flag = 0;
+        APP_DEBUG("Reloading library %s\n", game_library->path);
+
+        void* state = game_library->state();
+        platform_unload_game_library(game_library);
+
+        GameLibrary new_game_library = platform_load_game_library();
+        if (new_game_library.ok) {
+            *game_library = new_game_library;
+            game_library->hot_reload(state);
+        }
+    }
+#endif  // ENGINE_ENABLE_HOT_RELOAD
+
+    platform_begin_frame();
+    game_library->render();
+    platform_end_frame();
+}
+
 int main(int argc, char* argv[]) {
     (void)argc;
 
@@ -81,29 +105,7 @@ int main(int argc, char* argv[]) {
     cf_set_assert_handler(debug_handler);
 #endif  // ENGINE_ENABLE_HOT_RELOAD
 
-    while (cf_app_is_running()) {
-        cf_app_update(&on_cf_app_update);
-
-#if ENGINE_ENABLE_HOT_RELOAD
-        if (reload_flag == 1) {
-            reload_flag = 0;
-            APP_DEBUG("Reloading library %s\n", game_library.path);
-
-            void* state = game_library.state();
-            platform_unload_game_library(&game_library);
-
-            GameLibrary new_game_library = platform_load_game_library();
-            if (new_game_library.ok) {
-                game_library = new_game_library;
-                game_library.hot_reload(state);
-            }
-        }
-#endif  // ENGINE_ENABLE_HOT_RELOAD
-
-        platform_begin_frame();
-        game_library.render();
-        platform_end_frame();
-    }
+    while (cf_app_is_running()) { update(&game_library); }
 
     game_library.shutdown();
 
