@@ -48,7 +48,7 @@ end
 
 desc 'Build the project'
 task build: [BUILD_DIR, *SHADER_HEADERS] do
-  sh "cmake --build #{BUILD_DIR} --parallel"
+  sh "ninja -C #{BUILD_DIR}"
 end
 
 desc 'Build for web'
