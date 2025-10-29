@@ -13,7 +13,7 @@ Explosion make_explosion(float x, float y) {
     Explosion explosion = (Explosion){.position = cf_v2(x, y), .z_index = Z_SPRITES, .is_alive = true};
 
     // Sprite
-    load_sprite(&explosion.sprite, "assets/explosion.ase");
+    explosion.sprite    = get_sprite(SPRITE_EXPLOSION);
     cf_sprite_set_loop(&explosion.sprite, false);
 
     return explosion;

@@ -17,28 +17,28 @@ constexpr float ENEMY_DEFAULT_SPEED = 0.5f;
 
 Enemy make_enemy_of_type(float x, float y, EnemyType type) {
     // Sprite
-    const char* sprite_path;
-    int         score_value;
-    int         health_value;
+    Sprite sprite;
+    int    score_value;
+    int    health_value;
 
     switch (type) {
         case ENEMY_TYPE_ALAN:
-            sprite_path  = "assets/alan.ase";
+            sprite       = SPRITE_ALAN;
             score_value  = 100;
             health_value = 1;
             break;
         case ENEMY_TYPE_BON_BON:
-            sprite_path  = "assets/bon_bon.ase";
+            sprite       = SPRITE_BON_BON;
             score_value  = 150;
             health_value = 2;
             break;
         case ENEMY_TYPE_LIPS:
-            sprite_path  = "assets/lips.ase";
+            sprite       = SPRITE_LIPS;
             score_value  = 200;
             health_value = 3;
             break;
         default:
-            sprite_path  = "assets/alan.ase";
+            sprite       = SPRITE_ALAN;
             score_value  = 100;
             health_value = 1;
             break;
@@ -54,7 +54,7 @@ Enemy make_enemy_of_type(float x, float y, EnemyType type) {
     };
 
     // Sprite
-    load_sprite(&enemy.sprite, sprite_path);
+    enemy.sprite                = get_sprite(sprite);
 
     // Collider
     enemy.collider.half_extents = cf_v2(enemy.sprite.w / 3.0f, enemy.sprite.h / 3.0f);

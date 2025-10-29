@@ -18,29 +18,29 @@
 constexpr float WEAPON_DEFAULT_COOLDOWN = 0.15f;  // Time needed to let the player shoot again
 
 Player make_player(float x, float y) {
-    Player player              = {0};
-    player.is_alive            = true;
-    player.is_invincible       = false;
-    player.invincibility_timer = 0.0f;
-    player.respawn_delay       = 0.0f;
+    Player player                  = {0};
+    player.is_alive                = true;
+    player.is_invincible           = false;
+    player.invincibility_timer     = 0.0f;
+    player.respawn_delay           = 0.0f;
 
     // Position
-    player.position.x          = x;
-    player.position.y          = y;
+    player.position.x              = x;
+    player.position.y              = y;
 
     // Velocity
-    player.velocity.x          = 0.0f;
-    player.velocity.y          = 0.0f;
+    player.velocity.x              = 0.0f;
+    player.velocity.y              = 0.0f;
 
     // Input
-    player.input.up            = false;
-    player.input.down          = false;
-    player.input.left          = false;
-    player.input.right         = false;
+    player.input.up                = false;
+    player.input.down              = false;
+    player.input.left              = false;
+    player.input.right             = false;
 
     // Sprites
-    load_sprite(&player.sprite, "assets/player.ase");
-    load_sprite(&player.booster_sprite, "assets/boosters.ase");
+    player.sprite                  = get_sprite(SPRITE_PLAYER);  // TODO: Should this not store sprites?
+    player.booster_sprite          = get_sprite(SPRITE_BOOSTERS);
     player.booster_sprite.offset.y = -player.sprite.h;
     player.z_index                 = Z_PLAYER_SPRITE;
     cf_sprite_play(&player.sprite, "default");

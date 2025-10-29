@@ -38,7 +38,6 @@
 #include "player.h"
 #include "player_bullet.h"
 #include "render.h"
-#include "sprite.h"
 #include "star_particle.h"
 
 #ifdef CF_RUNTIME_SHADER_COMPILATION
@@ -81,7 +80,10 @@ const int MAX_STAR_PARTICLES          = 4 * 4;  // 4 stars per 4 layers
 const int MAX_FLOATING_SCORES         = 16;
 
 EXPORT void game_init(Platform* platform) {
-    g_state                       = platform->allocate_memory(sizeof(GameState));
+    g_state = platform->allocate_memory(sizeof(GameState));
+
+    load_sprites();
+    prefetch_sprites();
 
     const int scale               = 3;
     g_state->display_id           = cf_default_display();
@@ -131,8 +133,9 @@ EXPORT void game_init(Platform* platform) {
     load_audio(&g_state->audio.laser_shoot, "assets/laser-shoot.ogg");
     load_audio(&g_state->audio.explosion, "assets/explosion.ogg");
     load_audio(&g_state->audio.hit_hurt, "assets/hit-hurt.ogg");
-    load_sprite(&g_state->sprites.life_icon, "assets/life_icon.png");
-    load_sprite(&g_state->sprites.game_over, "assets/gameover.png");
+
+    g_state->sprites.life_icon = get_sprite(SPRITE_LIFE_ICON);
+    g_state->sprites.game_over = get_sprite(SPRITE_GAME_OVER);
 
     cf_play_sound(g_state->audio.reveal, cf_sound_params_defaults());
 
