@@ -374,12 +374,12 @@ EXPORT void game_render(void) {
         cf_font("TinyAndChunky") {
             cf_push_font_size(7);
             snprintf(score_text, 7, "%06d", g_state->score);
-            float     text_width   = cf_text_width(score_text, -1);
-            float     text_height  = cf_text_height(score_text, -1);
-            float     offset_x     = (float)cf_app_get_canvas_width() / 2 / g_state->scale - text_width;
-            float     offset_y     = (float)cf_app_get_canvas_height() / 2 / g_state->scale + text_height / 2;
-            const int margin_top   = 4;
-            const int margin_right = 4;
+            const float text_width   = cf_text_width(score_text, -1);
+            const float text_height  = cf_text_height(score_text, -1);
+            const float offset_x     = cf_app_get_canvas_width() / 2.0f / g_state->scale - text_width;
+            const float offset_y     = cf_app_get_canvas_height() / 2.0f / g_state->scale + text_height / 2;
+            const int   margin_top   = 4;
+            const int   margin_right = 4;
 
             cf_draw_color(cf_make_color_rgb(20, 91, 132)) {
                 cf_draw_text(score_text, cf_v2(offset_x + 1 - margin_right, offset_y - 1 - margin_top), -1);
@@ -390,11 +390,11 @@ EXPORT void game_render(void) {
         }
 
         // Render life icons
-        const int  icon_margin_right  = 4;
-        const int  icon_margin_bottom = 4;
-        CF_Sprite* icon               = get_sprite_ptr(SPRITE_LIFE_ICON);
-        float      canvas_half_width  = (float)cf_app_get_canvas_width() / 2 / g_state->scale;
-        float      canvas_half_height = (float)cf_app_get_canvas_height() / 2 / g_state->scale;
+        const int        icon_margin_right  = 4;
+        const int        icon_margin_bottom = 4;
+        const CF_Sprite* icon               = get_sprite_ptr(SPRITE_LIFE_ICON);
+        const float      canvas_half_width  = cf_app_get_canvas_width() / 2.0f / g_state->scale;
+        const float      canvas_half_height = cf_app_get_canvas_height() / 2.0f / g_state->scale;
 
         for (int i = 0; i < g_state->lives; i++) {
             float x = canvas_half_width - icon_margin_right - (i + 1) * (icon->w) + icon->w / 2.0f;
