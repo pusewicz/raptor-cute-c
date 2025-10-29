@@ -79,18 +79,18 @@ Enemy make_random_enemy(float x, float y) {
 constexpr float ENEMY_BULLET_DEFAULT_SPEED = 1.22f;
 
 EnemyBullet make_enemy_bullet(float x, float y, CF_V2 direction) {
-    EnemyBullet bullet = (EnemyBullet){.is_alive = true};
+    EnemyBullet bullet           = (EnemyBullet){.is_alive = true};
 
     // Position
-    bullet.position.x  = x;
-    bullet.position.y  = y;
+    bullet.position.x            = x;
+    bullet.position.y            = y;
 
     // Velocity
-    bullet.velocity.x  = ENEMY_BULLET_DEFAULT_SPEED * direction.x;
-    bullet.velocity.y  = ENEMY_BULLET_DEFAULT_SPEED * direction.y;
+    bullet.velocity.x            = ENEMY_BULLET_DEFAULT_SPEED * direction.x;
+    bullet.velocity.y            = ENEMY_BULLET_DEFAULT_SPEED * direction.y;
 
     // Sprite
-    load_sprite(&bullet.sprite, "assets/enemy_bullet.ase");
+    bullet.sprite                = get_sprite(SPRITE_ENEMY_BULLET);
     bullet.z_index               = Z_SPRITES;
 
     // Collider

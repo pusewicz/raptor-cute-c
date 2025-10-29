@@ -34,27 +34,25 @@ static inline bool has_extension(const char* filename, const char* extension) {
     return strcmp(dot + 1, extension) == 0;
 }
 
-bool load_sprite(CF_Sprite* sprite, const char* path) {
-    CF_ASSERT(sprite);
+CF_Sprite load_sprite(const char* path) {
     CF_ASSERT(path);
 
     if (has_extension(path, "png")) {
-        CF_Result result = {0};
-        *sprite          = cf_make_easy_sprite_from_png(path, &result);
+        CF_Result       result = {0};
+        const CF_Sprite sprite = cf_make_easy_sprite_from_png(path, &result);
 
         if (cf_is_error(result)) {
             APP_ERROR("Could not load sprite: %s", result.details != NULL ? result.details : "No details");
-            return false;
         }
 
-        return true;
+        return sprite;
     } else if (has_extension(path, "ase") || has_extension(path, "aseprite")) {
-        *sprite = cf_make_sprite(path);
-        return true;
+        const CF_Sprite sprite = cf_make_sprite(path);
+        return sprite;
     }
 
     APP_ERROR("Unsupported sprite format for %s", path);
-    return false;
+    return cf_make_demo_sprite();  // TODO: Abort?
 }
 
 void prefetch_sprites() {
@@ -62,9 +60,7 @@ void prefetch_sprites() {
 }
 
 bool load_sprites() {
-    for (size_t i = 0; i < SPRITE_COUNT; ++i) {
-        if (!load_sprite(&s_sprites[i], s_sprite_files[i])) return false;
-    }
+    for (size_t i = 0; i < SPRITE_COUNT; ++i) { s_sprites[i] = load_sprite(s_sprite_files[i]); }
 
     return true;
 }
