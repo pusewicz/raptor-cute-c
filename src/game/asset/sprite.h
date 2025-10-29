@@ -21,6 +21,6 @@ typedef enum Sprite {
 CF_Sprite  load_sprite(const char* path);
 CF_Sprite  get_sprite(const Sprite sprite);
 CF_Sprite* get_sprite_ptr(const Sprite sprite);
-bool       load_sprites();
+void       load_sprites();
 void       prefetch_sprites();
 void       render_sprite(CF_Sprite* sprite, const CF_V2 position, const ZIndex z_index);

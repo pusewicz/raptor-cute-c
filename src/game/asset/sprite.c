@@ -37,9 +37,11 @@ static inline bool has_extension(const char* filename, const char* extension) {
 CF_Sprite load_sprite(const char* path) {
     CF_ASSERT(path);
 
+    CF_Sprite sprite = {0};
+
     if (has_extension(path, "png")) {
-        CF_Result       result = {0};
-        const CF_Sprite sprite = cf_make_easy_sprite_from_png(path, &result);
+        CF_Result result = {0};
+        sprite           = cf_make_easy_sprite_from_png(path, &result);
 
         if (cf_is_error(result)) {
             APP_ERROR("Could not load sprite: %s", result.details != NULL ? result.details : "No details");
@@ -47,22 +49,20 @@ CF_Sprite load_sprite(const char* path) {
 
         return sprite;
     } else if (has_extension(path, "ase") || has_extension(path, "aseprite")) {
-        const CF_Sprite sprite = cf_make_sprite(path);
+        sprite = cf_make_sprite(path);
         return sprite;
     }
 
     APP_ERROR("Unsupported sprite format for %s", path);
-    return cf_make_demo_sprite();  // TODO: Abort?
+    return sprite;
 }
 
 void prefetch_sprites() {
     for (size_t i = 0; i < SPRITE_COUNT; ++i) { cf_draw_prefetch(&s_sprites[i]); }
 }
 
-bool load_sprites() {
+void load_sprites() {
     for (size_t i = 0; i < SPRITE_COUNT; ++i) { s_sprites[i] = load_sprite(s_sprite_files[i]); }
-
-    return true;
 }
 
 CF_Sprite  get_sprite(const Sprite sprite) { return s_sprites[sprite]; }

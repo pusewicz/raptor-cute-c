@@ -126,16 +126,7 @@ EXPORT void game_init(Platform* platform) {
 
     load_font("assets/tiny-and-chunky.ttf", "TinyAndChunky");
 
-    load_audio(&g_state->audio.music, "assets/music.ogg");
-    load_audio(&g_state->audio.reveal, "assets/reveal.ogg");
-    load_audio(&g_state->audio.game_over, "assets/game-over.ogg");
-    load_audio(&g_state->audio.death, "assets/death.ogg");
-    load_audio(&g_state->audio.laser_shoot, "assets/laser-shoot.ogg");
-    load_audio(&g_state->audio.explosion, "assets/explosion.ogg");
-    load_audio(&g_state->audio.hit_hurt, "assets/hit-hurt.ogg");
-
-    cf_play_sound(g_state->audio.reveal, cf_sound_params_defaults());
-
+    load_audios();
     // Prepare the storage for player bullets
     INIT_ENTITY_STORAGE(PlayerBullet, player_bullets, MAX_PLAYER_BULLETS);
     INIT_ENTITY_STORAGE(Enemy, enemies, MAX_ENEMIES);
@@ -155,7 +146,8 @@ EXPORT void game_init(Platform* platform) {
     // Initialize star particles
     init_star_particles();
 
-    cf_music_play(g_state->audio.music, 0.5f);
+    play_sound(SOUND_REVEAL);
+    play_music(MUSIC_BACKGROUND);
 }
 
 EXPORT bool game_update(void) {

@@ -1,15 +1,13 @@
 #include "enemy.h"
 
-#include <cute_audio.h>
 #include <cute_c_runtime.h>
-#include <cute_draw.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
-#include <cute_sprite.h>
 #include <cute_time.h>
 #include <stddef.h>
 
 #include "../engine/game_state.h"
+#include "asset/audio.h"
 #include "asset/sprite.h"
 #include "component.h"
 
@@ -125,7 +123,7 @@ void update_enemy(Enemy* enemy) {
             // Shoot downward (toward player)
             spawn_enemy_bullet(make_enemy_bullet(enemy->position.x, enemy->position.y, cf_v2(0, -1)));
 
-            cf_play_sound(g_state->audio.laser_shoot, cf_sound_params_defaults());
+            play_sound(SOUND_LASER);
         }
     }
 }

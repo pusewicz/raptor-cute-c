@@ -1,6 +1,5 @@
 #include "player.h"
 
-#include <cute_audio.h>
 #include <cute_c_runtime.h>
 #include <cute_draw.h>
 #include <cute_math.h>
@@ -10,6 +9,7 @@
 
 #include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
+#include "asset/audio.h"
 #include "asset/sprite.h"
 #include "component.h"
 #include "explosion.h"
@@ -67,8 +67,8 @@ void damage_player(void) {
 
     // Create explosion at player position
     spawn_explosion(make_explosion(player->position.x, player->position.y));
-    cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
-    cf_play_sound(g_state->audio.death, cf_sound_params_defaults());
+    play_sound(SOUND_EXPLOSION);
+    play_sound(SOUND_DEATH);
 
     // Mark player as dead
     player->is_alive      = false;
@@ -80,7 +80,7 @@ void damage_player(void) {
     } else {
         // Game over
         g_state->is_game_over = true;
-        cf_play_sound(g_state->audio.game_over, cf_sound_params_defaults());
+        play_sound(SOUND_GAME_OVER);
     }
 }
 
@@ -99,7 +99,7 @@ void update_player(Player* player) {
             player->position.x          = 0.0f;
             player->position.y          = -g_state->canvas_size.y / 3;
 
-            cf_play_sound(g_state->audio.reveal, cf_sound_params_defaults());
+            play_sound(SOUND_REVEAL);
         }
 
         return;
@@ -128,7 +128,7 @@ void update_player(Player* player) {
 
         spawn_player_bullet(make_player_bullet(player->position.x, player->position.y, cf_v2(0, 1)));
 
-        cf_play_sound(g_state->audio.laser_shoot, cf_sound_params_defaults());
+        play_sound(SOUND_LASER);
     }
 }
 

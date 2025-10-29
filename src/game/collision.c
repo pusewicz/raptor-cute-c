@@ -1,10 +1,10 @@
 #include "collision.h"
 
-#include <cute_audio.h>
 #include <cute_math.h>
 #include <stddef.h>
 
 #include "../engine/game_state.h"
+#include "asset/audio.h"
 #include "enemy.h"
 #include "explosion.h"
 #include "explosion_particle.h"
@@ -44,7 +44,7 @@ static void player_bullets_vs_enemies(
                 // If enemy survives, push it upwards and spawn particles
                 if (enemy->health.current > 0) {
                     enemy->position.y += 5.0f;  // Push upwards by 5 pixels
-                    cf_play_sound(g_state->audio.hit_hurt, cf_sound_params_defaults());
+                    play_sound(SOUND_HIT);
                 } else {
                     g_state->score += enemy->score;
                     // Destroy enemy
@@ -53,7 +53,7 @@ static void player_bullets_vs_enemies(
                     spawn_explosion(make_explosion(enemy->position.x, enemy->position.y));
                     spawn_explosion_particle_burst(enemy->position, enemy->type);
                     spawn_floating_score(make_floating_score(enemy->position.x, enemy->position.y, enemy->score));
-                    cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
+                    play_sound(SOUND_EXPLOSION);
                 }
 
                 // Get bullet direction from velocity and reverse it
