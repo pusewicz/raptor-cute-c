@@ -134,9 +134,6 @@ EXPORT void game_init(Platform* platform) {
     load_audio(&g_state->audio.explosion, "assets/explosion.ogg");
     load_audio(&g_state->audio.hit_hurt, "assets/hit-hurt.ogg");
 
-    g_state->sprites.life_icon = get_sprite(SPRITE_LIFE_ICON);
-    g_state->sprites.game_over = get_sprite(SPRITE_GAME_OVER);
-
     cf_play_sound(g_state->audio.reveal, cf_sound_params_defaults());
 
     // Prepare the storage for player bullets
@@ -342,10 +339,7 @@ EXPORT void game_render(void) {
     // Show game over screen
     if (g_state->is_game_over) {
         cf_draw() {
-            cf_draw_layer(Z_UI) {
-                // Draw game over sprite centered
-                cf_draw_sprite(&g_state->sprites.game_over);
-            }
+            cf_draw_layer(Z_UI) { cf_draw_sprite(get_sprite_ptr(SPRITE_GAME_OVER)); }
         }
 
         return;
@@ -396,19 +390,18 @@ EXPORT void game_render(void) {
         }
 
         // Render life icons
-        const int icon_margin_right  = 4;
-        const int icon_margin_bottom = 4;
-        float     icon_width         = (float)g_state->sprites.life_icon.w;
-        float     icon_height        = (float)g_state->sprites.life_icon.h;
-        float     canvas_half_width  = (float)cf_app_get_canvas_width() / 2 / g_state->scale;
-        float     canvas_half_height = (float)cf_app_get_canvas_height() / 2 / g_state->scale;
+        const int  icon_margin_right  = 4;
+        const int  icon_margin_bottom = 4;
+        CF_Sprite* icon               = get_sprite_ptr(SPRITE_LIFE_ICON);
+        float      canvas_half_width  = (float)cf_app_get_canvas_width() / 2 / g_state->scale;
+        float      canvas_half_height = (float)cf_app_get_canvas_height() / 2 / g_state->scale;
 
         for (int i = 0; i < g_state->lives; i++) {
-            float x = canvas_half_width - icon_margin_right - (i + 1) * (icon_width) + icon_width / 2;
-            float y = -canvas_half_height + icon_margin_bottom + icon_height / 4;
+            float x = canvas_half_width - icon_margin_right - (i + 1) * (icon->w) + icon->w / 2.0f;
+            float y = -canvas_half_height + icon_margin_bottom + icon->h / 4.0f;
             cf_draw() {
                 cf_draw_translate_v2(cf_v2(x, y));
-                cf_draw_sprite(&g_state->sprites.life_icon);
+                cf_draw_sprite(icon);
             }
         }
     }
