@@ -53,6 +53,7 @@ Want to modify the game while it's running? Use the watch mode:
 ```sh
 rake watch  # Auto-recompiles on file changes
 rake run    # Run the game in another terminal
+rake build  # Build the game in debug mode with hot-reload enabled
 ```
 
 Now edit `src/game/game.c` and watch your changes appear instantly in the running game!
