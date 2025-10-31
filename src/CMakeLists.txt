@@ -1,5 +1,6 @@
 set(NAME "Raptor")
 
+add_subdirectory(engine)
 add_subdirectory(game)
 
 include(${PROJECT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)

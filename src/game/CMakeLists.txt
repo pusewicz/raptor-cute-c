@@ -8,7 +8,6 @@ endif()
 
 add_library(
     ${NAME} ${LIBRARY_TYPE}
-    ../engine/game_state.c
     asset/audio.c
     asset/font.c
     asset/sprite.c
@@ -28,7 +27,7 @@ add_library(
 )
 target_link_libraries(${NAME}
   PRIVATE project_warnings
-  PUBLIC cute)
+  PUBLIC cute engine)
 target_compile_features(${NAME} PRIVATE c_std_23)
 target_compile_definitions(
     ${NAME} PRIVATE
