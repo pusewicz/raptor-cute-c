@@ -8,10 +8,9 @@
 #include <string.h>
 
 #include "../../engine/cute_macros.h"
+#include "../../engine/game_state.h"
 #include "../../engine/log.h"
 #include "../component.h"
-
-static CF_Sprite s_sprites[SPRITE_COUNT];
 
 static const char* const s_sprite_files[SPRITE_COUNT] = {
     [SPRITE_ALAN]         = "assets/alan.ase",
@@ -58,15 +57,15 @@ CF_Sprite load_sprite(const char* path) {
 }
 
 void prefetch_sprites() {
-    for (size_t i = 0; i < SPRITE_COUNT; ++i) { cf_draw_prefetch(&s_sprites[i]); }
+    for (size_t i = 0; i < SPRITE_COUNT; ++i) { cf_draw_prefetch(&g_state->sprite_assets[i]); }
 }
 
 void load_sprites() {
-    for (size_t i = 0; i < SPRITE_COUNT; ++i) { s_sprites[i] = load_sprite(s_sprite_files[i]); }
+    for (size_t i = 0; i < SPRITE_COUNT; ++i) { g_state->sprite_assets[i] = load_sprite(s_sprite_files[i]); }
 }
 
-CF_Sprite  get_sprite(const Sprite sprite) { return s_sprites[sprite]; }
-CF_Sprite* get_sprite_ptr(const Sprite sprite) { return &s_sprites[sprite]; }
+CF_Sprite  get_sprite(const Sprite sprite) { return g_state->sprite_assets[sprite]; }
+CF_Sprite* get_sprite_ptr(const Sprite sprite) { return &g_state->sprite_assets[sprite]; }
 
 void render_sprite(CF_Sprite* sprite, const CF_V2 position, const ZIndex z_index) {
     cf_sprite_update(sprite);

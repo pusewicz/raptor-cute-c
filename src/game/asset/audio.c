@@ -5,9 +5,9 @@
 #include <cute_result.h>
 #include <string.h>
 
+#include "../../engine/game_state.h"
 #include "../../engine/log.h"
 
-static CF_Audio          s_audios[AUDIO_COUNT];
 static const char* const s_audio_files[AUDIO_COUNT] = {
     [MUSIC_BACKGROUND] = "assets/music.ogg",
     [SOUND_REVEAL]     = "assets/reveal.ogg",
@@ -45,10 +45,10 @@ CF_Audio load_audio(const char* path) {
 }
 
 void load_audios() {
-    for (size_t i = 0; i < AUDIO_COUNT; ++i) { s_audios[i] = load_audio(s_audio_files[i]); }
+    for (size_t i = 0; i < AUDIO_COUNT; ++i) { g_state->audio_assets[i] = load_audio(s_audio_files[i]); }
 }
 
-CF_Audio get_audio(const Audio audio) { return s_audios[audio]; }
+CF_Audio get_audio(const Audio audio) { return g_state->audio_assets[audio]; }
 
 void play_sound(const Audio audio) { cf_play_sound(get_audio(audio), cf_sound_params_defaults()); }
 void play_music(const Audio audio) { cf_music_play(get_audio(audio), 0.5f); }

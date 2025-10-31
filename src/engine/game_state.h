@@ -2,6 +2,7 @@
 
 #include <cute_alloc.h>
 #include <cute_app.h>
+#include <cute_audio.h>
 #include <cute_color.h>
 #include <cute_coroutine.h>
 #include <cute_draw.h>
@@ -11,6 +12,8 @@
 #include <cute_sprite.h>
 #include <stddef.h>
 
+#include "../game/asset/audio.h"
+#include "../game/asset/sprite.h"
 #include "../game/background_scroll.h"
 #include "../game/enemy.h"
 #include "../game/explosion.h"
@@ -76,6 +79,9 @@ typedef struct GameState {
     FloatingScore* floating_scores;
     size_t         floating_scores_count;
     size_t         floating_scores_capacity;
+
+    CF_Audio  audio_assets[AUDIO_COUNT];
+    CF_Sprite sprite_assets[SPRITE_COUNT];
 
     struct {
         CF_Coroutine spawner;
