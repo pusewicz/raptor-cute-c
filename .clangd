@@ -8,4 +8,4 @@ Diagnostics:
 
 Style:
     QuotedHeaders: "src/.*"
-    AngledHeaders: ["include/.*"]
+    AngledHeaders: ["include/.*", "cute_*.h"]
