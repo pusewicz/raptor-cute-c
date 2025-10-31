@@ -1,15 +1,13 @@
 #include "enemy.h"
 
-#include <cute_audio.h>
 #include <cute_c_runtime.h>
-#include <cute_draw.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
-#include <cute_sprite.h>
 #include <cute_time.h>
 #include <stddef.h>
 
 #include "../engine/game_state.h"
+#include "asset/audio.h"
 #include "asset/sprite.h"
 #include "component.h"
 
@@ -17,28 +15,28 @@ constexpr float ENEMY_DEFAULT_SPEED = 0.5f;
 
 Enemy make_enemy_of_type(float x, float y, EnemyType type) {
     // Sprite
-    const char* sprite_path;
-    int         score_value;
-    int         health_value;
+    Sprite sprite;
+    int    score_value;
+    int    health_value;
 
     switch (type) {
         case ENEMY_TYPE_ALAN:
-            sprite_path  = "assets/alan.ase";
+            sprite       = SPRITE_ALAN;
             score_value  = 100;
             health_value = 1;
             break;
         case ENEMY_TYPE_BON_BON:
-            sprite_path  = "assets/bon_bon.ase";
+            sprite       = SPRITE_BON_BON;
             score_value  = 150;
             health_value = 2;
             break;
         case ENEMY_TYPE_LIPS:
-            sprite_path  = "assets/lips.ase";
+            sprite       = SPRITE_LIPS;
             score_value  = 200;
             health_value = 3;
             break;
         default:
-            sprite_path  = "assets/alan.ase";
+            sprite       = SPRITE_ALAN;
             score_value  = 100;
             health_value = 1;
             break;
@@ -54,7 +52,7 @@ Enemy make_enemy_of_type(float x, float y, EnemyType type) {
     };
 
     // Sprite
-    load_sprite(&enemy.sprite, sprite_path);
+    enemy.sprite                = get_sprite(sprite);
 
     // Collider
     enemy.collider.half_extents = cf_v2(enemy.sprite.w / 3.0f, enemy.sprite.h / 3.0f);
@@ -79,18 +77,18 @@ Enemy make_random_enemy(float x, float y) {
 constexpr float ENEMY_BULLET_DEFAULT_SPEED = 1.22f;
 
 EnemyBullet make_enemy_bullet(float x, float y, CF_V2 direction) {
-    EnemyBullet bullet = (EnemyBullet){.is_alive = true};
+    EnemyBullet bullet           = (EnemyBullet){.is_alive = true};
 
     // Position
-    bullet.position.x  = x;
-    bullet.position.y  = y;
+    bullet.position.x            = x;
+    bullet.position.y            = y;
 
     // Velocity
-    bullet.velocity.x  = ENEMY_BULLET_DEFAULT_SPEED * direction.x;
-    bullet.velocity.y  = ENEMY_BULLET_DEFAULT_SPEED * direction.y;
+    bullet.velocity.x            = ENEMY_BULLET_DEFAULT_SPEED * direction.x;
+    bullet.velocity.y            = ENEMY_BULLET_DEFAULT_SPEED * direction.y;
 
     // Sprite
-    load_sprite(&bullet.sprite, "assets/enemy_bullet.ase");
+    bullet.sprite                = get_sprite(SPRITE_ENEMY_BULLET);
     bullet.z_index               = Z_SPRITES;
 
     // Collider
@@ -125,7 +123,7 @@ void update_enemy(Enemy* enemy) {
             // Shoot downward (toward player)
             spawn_enemy_bullet(make_enemy_bullet(enemy->position.x, enemy->position.y, cf_v2(0, -1)));
 
-            cf_play_sound(g_state->audio.laser_shoot, cf_sound_params_defaults());
+            play_sound(SOUND_LASER);
         }
     }
 }

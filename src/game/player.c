@@ -1,6 +1,5 @@
 #include "player.h"
 
-#include <cute_audio.h>
 #include <cute_c_runtime.h>
 #include <cute_draw.h>
 #include <cute_math.h>
@@ -10,6 +9,7 @@
 
 #include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
+#include "asset/audio.h"
 #include "asset/sprite.h"
 #include "component.h"
 #include "explosion.h"
@@ -18,29 +18,29 @@
 constexpr float WEAPON_DEFAULT_COOLDOWN = 0.15f;  // Time needed to let the player shoot again
 
 Player make_player(float x, float y) {
-    Player player              = {0};
-    player.is_alive            = true;
-    player.is_invincible       = false;
-    player.invincibility_timer = 0.0f;
-    player.respawn_delay       = 0.0f;
+    Player player                  = {0};
+    player.is_alive                = true;
+    player.is_invincible           = false;
+    player.invincibility_timer     = 0.0f;
+    player.respawn_delay           = 0.0f;
 
     // Position
-    player.position.x          = x;
-    player.position.y          = y;
+    player.position.x              = x;
+    player.position.y              = y;
 
     // Velocity
-    player.velocity.x          = 0.0f;
-    player.velocity.y          = 0.0f;
+    player.velocity.x              = 0.0f;
+    player.velocity.y              = 0.0f;
 
     // Input
-    player.input.up            = false;
-    player.input.down          = false;
-    player.input.left          = false;
-    player.input.right         = false;
+    player.input.up                = false;
+    player.input.down              = false;
+    player.input.left              = false;
+    player.input.right             = false;
 
     // Sprites
-    load_sprite(&player.sprite, "assets/player.ase");
-    load_sprite(&player.booster_sprite, "assets/boosters.ase");
+    player.sprite                  = get_sprite(SPRITE_PLAYER);  // TODO: Should this not store sprites?
+    player.booster_sprite          = get_sprite(SPRITE_BOOSTERS);
     player.booster_sprite.offset.y = -player.sprite.h;
     player.z_index                 = Z_PLAYER_SPRITE;
     cf_sprite_play(&player.sprite, "default");
@@ -67,8 +67,8 @@ void damage_player(void) {
 
     // Create explosion at player position
     spawn_explosion(make_explosion(player->position.x, player->position.y));
-    cf_play_sound(g_state->audio.explosion, cf_sound_params_defaults());
-    cf_play_sound(g_state->audio.death, cf_sound_params_defaults());
+    play_sound(SOUND_EXPLOSION);
+    play_sound(SOUND_DEATH);
 
     // Mark player as dead
     player->is_alive      = false;
@@ -80,7 +80,7 @@ void damage_player(void) {
     } else {
         // Game over
         g_state->is_game_over = true;
-        cf_play_sound(g_state->audio.game_over, cf_sound_params_defaults());
+        play_sound(SOUND_GAME_OVER);
     }
 }
 
@@ -99,7 +99,7 @@ void update_player(Player* player) {
             player->position.x          = 0.0f;
             player->position.y          = -g_state->canvas_size.y / 3;
 
-            cf_play_sound(g_state->audio.reveal, cf_sound_params_defaults());
+            play_sound(SOUND_REVEAL);
         }
 
         return;
@@ -128,7 +128,7 @@ void update_player(Player* player) {
 
         spawn_player_bullet(make_player_bullet(player->position.x, player->position.y, cf_v2(0, 1)));
 
-        cf_play_sound(g_state->audio.laser_shoot, cf_sound_params_defaults());
+        play_sound(SOUND_LASER);
     }
 }
 

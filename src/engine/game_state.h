@@ -2,7 +2,6 @@
 
 #include <cute_alloc.h>
 #include <cute_app.h>
-#include <cute_audio.h>
 #include <cute_color.h>
 #include <cute_coroutine.h>
 #include <cute_draw.h>
@@ -83,19 +82,7 @@ typedef struct GameState {
     } coroutines;
 
     struct {
-        CF_Audio music;
-        CF_Audio laser_shoot;
-        CF_Audio explosion;
-        CF_Audio hit_hurt;
-        CF_Audio reveal;
-        CF_Audio game_over;
-        CF_Audio death;
-    } audio;
-
-    struct {
-        CF_Sprite life_icon;
         CF_Sprite particle;
-        CF_Sprite game_over;
     } sprites;
 
     bool is_game_over;

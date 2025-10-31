@@ -12,18 +12,18 @@
 constexpr float PLAYER_BULLET_DEFAULT_SPEED = 3.0f;
 
 PlayerBullet make_player_bullet(float x, float y, CF_V2 direction) {
-    PlayerBullet bullet = (PlayerBullet){.is_alive = true};
+    PlayerBullet bullet          = (PlayerBullet){.is_alive = true};
 
     // Position
-    bullet.position.x   = x;
-    bullet.position.y   = y;
+    bullet.position.x            = x;
+    bullet.position.y            = y;
 
     // Velocity
-    bullet.velocity.x   = 0.0f;
-    bullet.velocity.y   = PLAYER_BULLET_DEFAULT_SPEED * direction.y;
+    bullet.velocity.x            = 0.0f;
+    bullet.velocity.y            = PLAYER_BULLET_DEFAULT_SPEED * direction.y;
 
     // Sprite
-    load_sprite(&bullet.sprite, "assets/bullet.png");
+    bullet.sprite                = get_sprite(SPRITE_BULLET);
     bullet.z_index               = Z_SPRITES;
 
     // Collider

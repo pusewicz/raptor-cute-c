@@ -38,7 +38,6 @@
 #include "player.h"
 #include "player_bullet.h"
 #include "render.h"
-#include "sprite.h"
 #include "star_particle.h"
 
 #ifdef CF_RUNTIME_SHADER_COMPILATION
@@ -81,7 +80,10 @@ const int MAX_STAR_PARTICLES          = 4 * 4;  // 4 stars per 4 layers
 const int MAX_FLOATING_SCORES         = 16;
 
 EXPORT void game_init(Platform* platform) {
-    g_state                       = platform->allocate_memory(sizeof(GameState));
+    g_state = platform->allocate_memory(sizeof(GameState));
+
+    load_sprites();
+    prefetch_sprites();
 
     const int scale               = 3;
     g_state->display_id           = cf_default_display();
@@ -124,18 +126,7 @@ EXPORT void game_init(Platform* platform) {
 
     load_font("assets/tiny-and-chunky.ttf", "TinyAndChunky");
 
-    load_audio(&g_state->audio.music, "assets/music.ogg");
-    load_audio(&g_state->audio.reveal, "assets/reveal.ogg");
-    load_audio(&g_state->audio.game_over, "assets/game-over.ogg");
-    load_audio(&g_state->audio.death, "assets/death.ogg");
-    load_audio(&g_state->audio.laser_shoot, "assets/laser-shoot.ogg");
-    load_audio(&g_state->audio.explosion, "assets/explosion.ogg");
-    load_audio(&g_state->audio.hit_hurt, "assets/hit-hurt.ogg");
-    load_sprite(&g_state->sprites.life_icon, "assets/life_icon.png");
-    load_sprite(&g_state->sprites.game_over, "assets/gameover.png");
-
-    cf_play_sound(g_state->audio.reveal, cf_sound_params_defaults());
-
+    load_audios();
     // Prepare the storage for player bullets
     INIT_ENTITY_STORAGE(PlayerBullet, player_bullets, MAX_PLAYER_BULLETS);
     INIT_ENTITY_STORAGE(Enemy, enemies, MAX_ENEMIES);
@@ -155,7 +146,8 @@ EXPORT void game_init(Platform* platform) {
     // Initialize star particles
     init_star_particles();
 
-    cf_music_play(g_state->audio.music, 0.5f);
+    play_sound(SOUND_REVEAL);
+    play_music(MUSIC_BACKGROUND);
 }
 
 EXPORT bool game_update(void) {
@@ -339,10 +331,7 @@ EXPORT void game_render(void) {
     // Show game over screen
     if (g_state->is_game_over) {
         cf_draw() {
-            cf_draw_layer(Z_UI) {
-                // Draw game over sprite centered
-                cf_draw_sprite(&g_state->sprites.game_over);
-            }
+            cf_draw_layer(Z_UI) { cf_draw_sprite(get_sprite_ptr(SPRITE_GAME_OVER)); }
         }
 
         return;
@@ -377,12 +366,12 @@ EXPORT void game_render(void) {
         cf_font("TinyAndChunky") {
             cf_push_font_size(7);
             snprintf(score_text, 7, "%06d", g_state->score);
-            float     text_width   = cf_text_width(score_text, -1);
-            float     text_height  = cf_text_height(score_text, -1);
-            float     offset_x     = (float)cf_app_get_canvas_width() / 2 / g_state->scale - text_width;
-            float     offset_y     = (float)cf_app_get_canvas_height() / 2 / g_state->scale + text_height / 2;
-            const int margin_top   = 4;
-            const int margin_right = 4;
+            const float text_width   = cf_text_width(score_text, -1);
+            const float text_height  = cf_text_height(score_text, -1);
+            const float offset_x     = cf_app_get_canvas_width() / 2.0f / g_state->scale - text_width;
+            const float offset_y     = cf_app_get_canvas_height() / 2.0f / g_state->scale + text_height / 2;
+            const int   margin_top   = 4;
+            const int   margin_right = 4;
 
             cf_draw_color(cf_make_color_rgb(20, 91, 132)) {
                 cf_draw_text(score_text, cf_v2(offset_x + 1 - margin_right, offset_y - 1 - margin_top), -1);
@@ -393,19 +382,18 @@ EXPORT void game_render(void) {
         }
 
         // Render life icons
-        const int icon_margin_right  = 4;
-        const int icon_margin_bottom = 4;
-        float     icon_width         = (float)g_state->sprites.life_icon.w;
-        float     icon_height        = (float)g_state->sprites.life_icon.h;
-        float     canvas_half_width  = (float)cf_app_get_canvas_width() / 2 / g_state->scale;
-        float     canvas_half_height = (float)cf_app_get_canvas_height() / 2 / g_state->scale;
+        const int        icon_margin_right  = 4;
+        const int        icon_margin_bottom = 4;
+        const CF_Sprite* icon               = get_sprite_ptr(SPRITE_LIFE_ICON);
+        const float      canvas_half_width  = cf_app_get_canvas_width() / 2.0f / g_state->scale;
+        const float      canvas_half_height = cf_app_get_canvas_height() / 2.0f / g_state->scale;
 
         for (int i = 0; i < g_state->lives; i++) {
-            float x = canvas_half_width - icon_margin_right - (i + 1) * (icon_width) + icon_width / 2;
-            float y = -canvas_half_height + icon_margin_bottom + icon_height / 4;
+            float x = canvas_half_width - icon_margin_right - (i + 1) * (icon->w) + icon->w / 2.0f;
+            float y = -canvas_half_height + icon_margin_bottom + icon->h / 4.0f;
             cf_draw() {
                 cf_draw_translate_v2(cf_v2(x, y));
-                cf_draw_sprite(&g_state->sprites.life_icon);
+                cf_draw_sprite(icon);
             }
         }
     }

@@ -23,7 +23,6 @@ add_library(
     floating_score.c
     hit_particle.c
     star_particle.c
-    sprite.c
     background_scroll.c
     game.c
 )

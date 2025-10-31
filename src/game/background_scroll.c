@@ -15,7 +15,7 @@ BackgroundScroll make_background_scroll(void) {
     };
 
     for (int i = 0; i < BACKGROUND_SCROLL_SPRITE_COUNT; ++i) {
-        load_sprite(&background_scroll.sprites[i], "assets/background.ase");
+        background_scroll.sprites[i] = get_sprite(SPRITE_BACKGROUND);
 
         // Set the initial frame to 0 or 1 based on the index to create a
         // checkerboard pattern
