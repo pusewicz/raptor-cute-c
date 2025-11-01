@@ -13,7 +13,6 @@
 #include "../engine/common.h"
 #include "../engine/cute_macros.h"
 #include "../engine/game_state.h"
-#include "../engine/log.h"
 #include "component.h"
 #include "enemy.h"
 #include "movement.h"
