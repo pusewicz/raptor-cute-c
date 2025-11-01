@@ -2,6 +2,7 @@ RELOADABLE = ENV.fetch('RELOADABLE', "ON").upcase
 BUILD_TYPE = ENV.fetch('BUILD_TYPE', 'Debug')
 BUILD_DIR = File.join(__dir__, '.build', "#{BUILD_TYPE}-#{RELOADABLE == "ON" ? "reloadable" : "static"}")
 WEB_BUILD_DIR = File.join(__dir__, '.build', 'emscripten-static')
+XCODE_BUILD_DIR = File.join(__dir__, '.build', 'xcode-static')
 PWD = File.expand_path(__dir__)
 PID_FILE = File.join(BUILD_DIR, 'raptor.pid')
 EXE_FILE = File.join(BUILD_DIR, 'Raptor')
@@ -45,6 +46,17 @@ directory WEB_BUILD_DIR do
   sh "emcmake cmake #{flags.join(' ')}"
 end
 
+directory XCODE_BUILD_DIR do
+  flags = %W[
+    -S#{PWD}
+    -B#{XCODE_BUILD_DIR}
+    -GXcode
+    -DCMAKE_BUILD_TYPE=Release
+    -DRELOADABLE=OFF
+  ]
+  sh "cmake #{flags.join(' ')}"
+end
+
 desc 'Build the project'
 task build: [BUILD_DIR, *SHADER_HEADERS] do
   sh "ninja -C #{BUILD_DIR}"
@@ -53,6 +65,11 @@ end
 desc 'Build for web'
 task web: WEB_BUILD_DIR do
   sh "cmake --build #{WEB_BUILD_DIR} --parallel"
+end
+
+desc 'Build Xcode release'
+task xcode: XCODE_BUILD_DIR do
+  sh "cmake --build #{XCODE_BUILD_DIR} --parallel"
 end
 
 def run(cmd)
