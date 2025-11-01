@@ -3,10 +3,11 @@
 #include <cute_audio.h>
 #include <cute_c_runtime.h>
 #include <cute_result.h>
-#include <string.h>
+#include <stddef.h>
 
 #include "../../engine/game_state.h"
 #include "../../engine/log.h"
+#include "utils.h"
 
 static const char* const s_audio_files[AUDIO_COUNT] = {
     [MUSIC_BACKGROUND] = "assets/music.ogg",
@@ -17,13 +18,6 @@ static const char* const s_audio_files[AUDIO_COUNT] = {
     [SOUND_EXPLOSION]  = "assets/explosion.ogg",
     [SOUND_HIT]        = "assets/hit-hurt.ogg",
 };
-
-static inline bool has_extension(const char* filename, const char* extension) {
-    const char* dot = strrchr(filename, '.');
-    if (dot == NULL || dot == filename) { return false; }
-
-    return strcmp(dot + 1, extension) == 0;
-}
 
 CF_Audio load_audio(const char* path) {
     CF_ASSERT(path);

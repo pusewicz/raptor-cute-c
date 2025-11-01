@@ -5,12 +5,13 @@
 #include <cute_math.h>
 #include <cute_result.h>
 #include <cute_sprite.h>
-#include <string.h>
+#include <stddef.h>
 
 #include "../../engine/cute_macros.h"
 #include "../../engine/game_state.h"
 #include "../../engine/log.h"
 #include "../component.h"
+#include "utils.h"
 
 static const char* const s_sprite_files[SPRITE_COUNT] = {
     [SPRITE_ALAN]         = "assets/alan.ase",
@@ -25,13 +26,6 @@ static const char* const s_sprite_files[SPRITE_COUNT] = {
     [SPRITE_LIPS]         = "assets/lips.ase",
     [SPRITE_PLAYER]       = "assets/player.ase",
 };
-
-static inline bool has_extension(const char* filename, const char* extension) {
-    const char* dot = strrchr(filename, '.');
-    if (dot == NULL || dot == filename) { return false; }
-
-    return strcmp(dot + 1, extension) == 0;
-}
 
 CF_Sprite load_sprite(const char* path) {
     CF_ASSERT(path);
