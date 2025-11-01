@@ -13,6 +13,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 option(RELOADABLE "Is the program reloadable" ON)
+option(BUILD_TESTS "Build test suite" ON)
 
 include(cmake/StandardProjectSettings.cmake)
 include(GNUInstallDirs)
@@ -23,3 +24,8 @@ set_project_warnings(project_warnings)
 
 add_subdirectory(vendor)
 add_subdirectory(src)
+
+# Build tests if enabled
+if(BUILD_TESTS)
+  add_subdirectory(tests)
+endif()

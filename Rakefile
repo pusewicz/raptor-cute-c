@@ -50,6 +50,9 @@ task build: [BUILD_DIR, *SHADER_HEADERS] do
   sh "ninja -C #{BUILD_DIR}"
 end
 
+# Alias for build
+task compile: :build
+
 desc 'Build for web'
 task web: WEB_BUILD_DIR do
   sh "cmake --build #{WEB_BUILD_DIR} --parallel"
@@ -195,6 +198,12 @@ end
 desc "Formats the source code using clang-format"
 task :format do
   sh %(fd --full-path src/ -e "c" -e "h" | xargs clang-format -i)
+end
+
+desc "Build and run tests"
+task test: :build do
+  test_exe = File.join(BUILD_DIR, 'hot_reload_tests')
+  sh "#{test_exe}"
 end
 
 task default: :build

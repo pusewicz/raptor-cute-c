@@ -58,6 +58,32 @@ rake build  # Build the game in debug mode with hot-reload enabled
 
 Now edit `src/game/game.c` and watch your changes appear instantly in the running game!
 
+### 🧪 Testing
+
+The project includes a comprehensive test suite for the hot reload functionality:
+
+```sh
+# Run all tests
+rake test
+
+# Or use the test runner script
+./tests/run_tests.sh
+
+# Build with tests enabled manually
+cmake -B build -DBUILD_TESTS=ON
+cmake --build build
+./build/hot_reload_tests
+```
+
+The test suite verifies:
+- Platform layer memory management
+- Library loading/unloading cycles
+- State preservation across reloads
+- Crash resistance during hot reload
+- Memory integrity and leak prevention
+
+See [tests/README.md](tests/README.md) for detailed documentation.
+
 ## 🙏 Credits
 
 This project wouldn't be possible without the amazing work of:
