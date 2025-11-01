@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Building the project
 ```bash
-rake compile
+rake build
 ```
 This creates a debug build in `build/debug/` using CMake with Ninja generator.
 
@@ -31,6 +31,7 @@ This is a C23 game called "Raptor" built on top of the Cute Framework (https://g
 The project uses a **hot-reloadable game library architecture**:
 
 - **Main executable** (`src/main.c`): Entry point that loads the game library and runs the main loop
+- **Engine library** (`src/engine/game_state.c`): Contains the game state and engine stuff, compiled as a static library (`engine`)
 - **Game library** (`src/game/game.c`): Contains the actual game logic, compiled as a shared library (`gamelib`)
 - **Platform layer** (`src/platform/`): Abstracts platform-specific functionality
 - **Engine layer** (`src/engine/`): Core engine utilities and data structures
@@ -78,5 +79,5 @@ The project uses a **hot-reloadable game library architecture**:
 
 ### Instructions
 
-- Always format and compile after changes: `rake format compile`.
+- Always format and build after changes: `rake format build`.
 - When using `cf_draw()` macro, ensure to include `engine/cute_macros.h`.
