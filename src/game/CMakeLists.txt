@@ -11,19 +11,20 @@ add_library(
     asset/audio.c
     asset/font.c
     asset/sprite.c
+    background_scroll.c
+    collision.c
     coroutine.c
-    input.c
-    player.c
-    player_bullet.c
     enemy.c
     explosion.c
     explosion_particle.c
-    collision.c
     floating_score.c
-    hit_particle.c
-    star_particle.c
-    background_scroll.c
+    formation.c
     game.c
+    hit_particle.c
+    input.c
+    player.c
+    player_bullet.c
+    star_particle.c
 )
 target_link_libraries(${NAME}
   PRIVATE project_warnings
