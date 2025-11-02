@@ -61,7 +61,7 @@ Enemy make_enemy_of_type(float x, float y, EnemyType type) {
     enemy.health.current = enemy.health.maximum = health_value;
 
     // Weapon
-    enemy.cooldown                              = cf_rnd_range_float(&g_state->rnd, 1.5f, 3.5f);
+    enemy.cooldown                              = cf_rnd_range_float(&g_state->rnd, 2.5f, 6.5f);
     enemy.time_since_shot                       = cf_rnd_range_float(&g_state->rnd, 0.0f, enemy.cooldown);
     enemy.shoot_chance                          = 0.3f;  // 30% chance to shoot when cooldown ready
 
