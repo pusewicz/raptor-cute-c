@@ -3,10 +3,12 @@
 #include <cute_alloc.h>
 #include <cute_coroutine.h>
 #include <cute_defines.h>
+#include <cute_math.h>
 #include <cute_time.h>
 
 #include "../engine/game_state.h"
 #include "enemy.h"
+#include "formation.h"
 
 static void wait_for(float seconds) {
     auto   coro     = cf_coroutine_currently_running();
@@ -17,14 +19,40 @@ static void wait_for(float seconds) {
 
 static void enemy_spawner(CF_Coroutine co [[maybe_unused]]) {
     while (1) {
-        float canvas_top = g_state->canvas_size.y / 2.0f;
+        float canvas_top      = g_state->canvas_size.y / 2.0f;
 
-        spawn_enemy(make_random_enemy(0, canvas_top));
-        wait_for(2.0f);
+        const CF_V2 spawn_pos = cf_v2(0, canvas_top);
+        formation_spawner_init(
+            &g_state->formation_spawners[g_state->formation_spawners_count++],
+            &FORMATION_DIAMOND,
+            spawn_pos,
+            ENEMY_TYPE_ALAN
+        );
+        wait_for(3.0f);
 
-        spawn_enemy(make_random_enemy(-10, canvas_top));
-        spawn_enemy(make_random_enemy(10, canvas_top));
-        wait_for(1.0f);
+        formation_spawner_init(
+            &g_state->formation_spawners[g_state->formation_spawners_count++],
+            &FORMATION_LINE_HORIZONTAL,
+            spawn_pos,
+            ENEMY_TYPE_BON_BON
+        );
+        wait_for(3.0f);
+
+        formation_spawner_init(
+            &g_state->formation_spawners[g_state->formation_spawners_count++],
+            &FORMATION_WAVE,
+            spawn_pos,
+            ENEMY_TYPE_LIPS
+        );
+        wait_for(3.0f);
+
+        formation_spawner_init(
+            &g_state->formation_spawners[g_state->formation_spawners_count++],
+            &FORMATION_ARROW_DOWN,
+            spawn_pos,
+            ENEMY_TYPE_BON_BON
+        );
+        wait_for(3.0f);
     }
 }
 

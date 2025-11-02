@@ -32,6 +32,7 @@
 #include "explosion.h"
 #include "explosion_particle.h"
 #include "floating_score.h"
+#include "formation.h"
 #include "hit_particle.h"
 #include "input.h"
 #include "movement.h"
@@ -71,13 +72,14 @@ constexpr int CANVAS_WIDTH            = 180;
 constexpr int CANVAS_HEIGHT           = 320;
 
 const int MAX_PLAYER_BULLETS          = 32;
-const int MAX_ENEMIES                 = 32;
-const int MAX_ENEMY_BULLETS           = 32;
+const int MAX_ENEMIES                 = 64;
+const int MAX_ENEMY_BULLETS           = 64;
 const int MAX_HIT_PARTICLES           = 240;
 const int MAX_EXPLOSION_PARTICLES     = 320;    // More particles for colorful explosions
 const int MAX_EXPLOSIONS              = 32;
 const int MAX_STAR_PARTICLES          = 4 * 4;  // 4 stars per 4 layers
 const int MAX_FLOATING_SCORES         = 16;
+const int MAX_FORMATION_SPAWNERS      = 16;
 
 EXPORT void game_init(Platform* platform) {
     g_state = platform->allocate_memory(sizeof(GameState));
@@ -126,16 +128,18 @@ EXPORT void game_init(Platform* platform) {
 
     load_font("assets/tiny-and-chunky.ttf", "TinyAndChunky");
 
-    load_audios();
+    load_audios();  // TODO: Rename the _audios to something better... sounding?
+
     // Prepare the storage for player bullets
-    INIT_ENTITY_STORAGE(PlayerBullet, player_bullets, MAX_PLAYER_BULLETS);
     INIT_ENTITY_STORAGE(Enemy, enemies, MAX_ENEMIES);
     INIT_ENTITY_STORAGE(EnemyBullet, enemy_bullets, MAX_ENEMY_BULLETS);
-    INIT_ENTITY_STORAGE(HitParticle, hit_particles, MAX_HIT_PARTICLES);
-    INIT_ENTITY_STORAGE(ExplosionParticle, explosion_particles, MAX_EXPLOSION_PARTICLES);
     INIT_ENTITY_STORAGE(Explosion, explosions, MAX_EXPLOSIONS);
-    INIT_ENTITY_STORAGE(StarParticle, star_particles, MAX_STAR_PARTICLES);
+    INIT_ENTITY_STORAGE(ExplosionParticle, explosion_particles, MAX_EXPLOSION_PARTICLES);
     INIT_ENTITY_STORAGE(FloatingScore, floating_scores, MAX_FLOATING_SCORES);
+    INIT_ENTITY_STORAGE(FormationSpawner, formation_spawners, MAX_FORMATION_SPAWNERS);
+    INIT_ENTITY_STORAGE(HitParticle, hit_particles, MAX_HIT_PARTICLES);
+    INIT_ENTITY_STORAGE(PlayerBullet, player_bullets, MAX_PLAYER_BULLETS);
+    INIT_ENTITY_STORAGE(StarParticle, star_particles, MAX_STAR_PARTICLES);
 
     // Initialize shared particle sprite (1x1 white pixel)
     CF_Pixel particle_pixel = {
@@ -196,6 +200,11 @@ EXPORT bool game_update(void) {
     // Update player movement
     update_movement(&g_state->player.position, &g_state->player.velocity);
 
+    // Update active formation spawners
+    for (size_t i = 0; i < g_state->formation_spawners_count; i++) {
+        formation_spawner_update(&g_state->formation_spawners[i]);
+    }
+
     // Update player bullets
     for (size_t i = 0; i < g_state->player_bullets_count; i++) {
         update_movement(&g_state->player_bullets[i].position, &g_state->player_bullets[i].velocity);
@@ -211,9 +220,7 @@ EXPORT bool game_update(void) {
         update_enemy(&g_state->enemies[i]);  // TODO: Rename to update_enemy_weapon
 
         // Mark enemy as destroyed when out of screen bounds
-        auto enemy_aabb =
-            cf_make_aabb_center_half_extents(g_state->enemies[i].position, g_state->enemies[i].collider.half_extents);
-        if (!cf_aabb_to_aabb(canvas_aabb, enemy_aabb)) { g_state->enemies[i].is_alive = false; }
+        if (g_state->enemies[i].position.y < canvas_aabb.min.y) { g_state->enemies[i].is_alive = false; }
     }
     // Update enemy bullets
     for (size_t i = 0; i < g_state->enemy_bullets_count; i++) {
@@ -248,6 +255,8 @@ EXPORT bool game_update(void) {
     cleanup_explosion_particles();
     cleanup_player_bullets();
     cleanup_floating_scores();
+    g_state->formation_spawners_count =
+        formation_spawner_cleanup(g_state->formation_spawners_count, g_state->formation_spawners);
 
     return true;
 }
