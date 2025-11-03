@@ -36,8 +36,17 @@ static void enemy_spawner(CF_Coroutine co [[maybe_unused]]) {
     }
 }
 
-void init_coroutines(void) { g_state->coroutines.spawner = cf_make_coroutine(enemy_spawner, CF_MB, nullptr); }
-void cleanup_coroutines(void) { cf_destroy_coroutine(g_state->coroutines.spawner); }
+void init_coroutines(void) {
+    g_state->coroutines.spawner     = cf_make_coroutine(enemy_spawner, CF_MB, nullptr);
+    g_state->coroutines.initialized = true;
+}
+
+void cleanup_coroutines(void) {
+    if (g_state->coroutines.initialized) {
+        cf_destroy_coroutine(g_state->coroutines.spawner);
+        g_state->coroutines.initialized = false;
+    }
+}
 void update_coroutine(void) {
     if (cf_coroutine_state(g_state->coroutines.spawner) != CF_COROUTINE_STATE_DEAD) {
         cf_coroutine_resume(g_state->coroutines.spawner);

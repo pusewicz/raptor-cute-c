@@ -89,6 +89,7 @@ typedef struct GameState {
 
     struct {
         CF_Coroutine spawner;
+        bool         initialized;
     } coroutines;
 
     struct {

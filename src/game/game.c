@@ -82,27 +82,52 @@ const int MAX_EXPLOSIONS              = 32;
 const int MAX_STAR_PARTICLES          = 4 * 4;  // 4 stars per 4 layers
 const int MAX_FLOATING_SCORES         = 16;
 
+static void reset_game(void) {
+    // Reset game state
+    g_state->is_game_over              = false;
+    g_state->lives                     = 3;
+    g_state->score                     = 0;
+
+    // Reset player
+    g_state->player                    = make_player(0.0f, -g_state->canvas_size.y / 3);
+
+    // Clear all entities
+    g_state->player_bullets_count      = 0;
+    g_state->enemies_count             = 0;
+    g_state->enemy_bullets_count       = 0;
+    g_state->explosions_count          = 0;
+    g_state->hit_particles_count       = 0;
+    g_state->explosion_particles_count = 0;
+    g_state->star_particles_count      = 0;
+    g_state->floating_scores_count     = 0;
+
+    // Re-initialize star particles
+    init_star_particles();
+
+    // Restart coroutines
+    cleanup_coroutines();
+    init_coroutines();
+}
+
 EXPORT void game_init(Platform* platform) {
     g_state = platform->allocate_memory(sizeof(GameState));
 
     load_sprites();
     prefetch_sprites();
 
-    const int scale               = 3;
-    g_state->display_id           = cf_default_display();
-    g_state->platform             = platform;
-    g_state->canvas_size          = cf_v2(CANVAS_WIDTH, CANVAS_HEIGHT);
-    g_state->scale                = scale;
-    g_state->permanent_arena      = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, PERMANENT_ARENA_SIZE);
-    g_state->stage_arena          = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, STAGE_ARENA_SIZE);
-    g_state->scratch_arena        = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
-    g_state->rnd                  = cf_rnd_seed((uint32_t)time(nullptr));
-    g_state->debug_bounding_boxes = false;
-    g_state->is_game_over         = false;
-    g_state->lives                = 3;
+    const int scale                 = 3;
+    g_state->display_id             = cf_default_display();
+    g_state->platform               = platform;
+    g_state->canvas_size            = cf_v2(CANVAS_WIDTH, CANVAS_HEIGHT);
+    g_state->scale                  = scale;
+    g_state->permanent_arena        = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, PERMANENT_ARENA_SIZE);
+    g_state->stage_arena            = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, STAGE_ARENA_SIZE);
+    g_state->scratch_arena          = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
+    g_state->rnd                    = cf_rnd_seed((uint32_t)time(nullptr));
+    g_state->debug_bounding_boxes   = false;
+    g_state->coroutines.initialized = false;
 
-    g_state->background_scroll    = make_background_scroll();
-    g_state->player               = make_player(0.0f, -g_state->canvas_size.y / 3);
+    g_state->background_scroll      = make_background_scroll();
 
     /**
      * Shaders
@@ -113,7 +138,6 @@ EXPORT void game_init(Platform* platform) {
     g_state->recolor = cf_make_draw_shader_from_bytecode(s_recolor_bytecode);
 #endif
 
-    init_coroutines();
     screenshake_init(&g_state->screenshake, 6.0f);
 
     if (!validate_game_state()) {
@@ -151,8 +175,8 @@ EXPORT void game_init(Platform* platform) {
     };
     g_state->sprites.particle = cf_make_easy_sprite_from_pixels(&particle_pixel, 1, 1);
 
-    // Initialize star particles
-    init_star_particles();
+    // Initialize game state (player, entities, coroutines, etc.)
+    reset_game();
 
     play_sound(SOUND_REVEAL);
     play_music(MUSIC_BACKGROUND);
@@ -173,31 +197,7 @@ EXPORT bool game_update(void) {
     // Handle game over state
     if (g_state->is_game_over) {
         // Check for restart input (shoot button)
-        if (g_state->player.input.shoot) {
-            // TODO: Extract a generic init/reset function
-            // Reset game state
-            g_state->is_game_over              = false;
-            g_state->lives                     = 3;
-            g_state->score                     = 0;
-
-            // Reset player
-            g_state->player                    = make_player(0.0f, -g_state->canvas_size.y / 3);
-            g_state->player_bullets_count      = 0;
-            g_state->enemies_count             = 0;
-            g_state->enemy_bullets_count       = 0;
-            g_state->explosions_count          = 0;
-            g_state->hit_particles_count       = 0;
-            g_state->explosion_particles_count = 0;
-            g_state->star_particles_count      = 0;
-            g_state->floating_scores_count     = 0;
-
-            // Re-initialize star particles
-            init_star_particles();
-
-            // Restart coroutines
-            cleanup_coroutines();
-            init_coroutines();
-        }
+        if (g_state->player.input.shoot) { reset_game(); }
         return true;
     }
     update_player(&g_state->player);
