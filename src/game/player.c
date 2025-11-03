@@ -13,6 +13,7 @@
 #include "asset/sprite.h"
 #include "component.h"
 #include "explosion.h"
+#include "explosion_particle.h"
 #include "player_bullet.h"
 
 constexpr float WEAPON_DEFAULT_COOLDOWN = 0.15f;  // Time needed to let the player shoot again
@@ -67,6 +68,7 @@ void damage_player(void) {
 
     // Create explosion at player position
     spawn_explosion(make_explosion(player->position));
+    spawn_explosion_particle_burst(player->position, COLOR_SOURCE_PLAYER());
     play_sound(SOUND_EXPLOSION);
     play_sound(SOUND_DEATH);
 

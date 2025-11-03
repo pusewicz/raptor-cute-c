@@ -18,6 +18,7 @@
 #include "movement.h"
 
 static CF_Color sample_sprite_color(const EnemyType enemy_type) {
+    // TODO: Precompute these and store in static
     CF_Color colors[ENEMY_TYPE_COUNT][3] = {
         [ENEMY_TYPE_ALAN] =
             {
@@ -42,6 +43,28 @@ static CF_Color sample_sprite_color(const EnemyType enemy_type) {
     CF_Color color = colors[enemy_type][index];
 
     return color;
+}
+
+static CF_Color sample_player_sprite_color(void) {
+    CF_Color colors[] = {
+        cf_make_color_hex(0x9e1328),
+        cf_make_color_hex(0xff4646),
+        cf_make_color_hex(0x20a3f8),
+        cf_make_color_hex(0xf2f1f0),
+    };
+
+    int      index = cf_rnd_range_int(&g_state->rnd, 0, lengthof(colors));
+    CF_Color color = colors[index];
+
+    return color;
+}
+
+static CF_Color sample_color_from_source(ColorSource source) {
+    if (source.type == COLOR_SOURCE_TYPE_PLAYER) {
+        return sample_player_sprite_color();
+    } else {
+        return sample_sprite_color(source.data.enemy_type);
+    }
 }
 
 ExplosionParticle make_explosion_particle(CF_V2 position, CF_Color color, float angle) {
@@ -76,18 +99,15 @@ void spawn_explosion_particles(size_t count, const ExplosionParticle particles[s
     g_state->explosion_particles_count += count;
 }
 
-void spawn_explosion_particle_burst(CF_V2 pos, const EnemyType enemy_type) {
+void spawn_explosion_particle_burst(CF_V2 pos, const ColorSource color_source) {
     // Create radial burst of particles
-    constexpr size_t  particle_count = 10;  // Number of particles in explosion
+    constexpr size_t  particle_count = 10;
     ExplosionParticle burst[particle_count];
 
     for (size_t i = 0; i < particle_count; ++i) {
+        CF_Color color = sample_color_from_source(color_source);
         // Calculate angle for radial dispersion (360 degrees)
         float angle    = (float)i / (float)particle_count * CF_PI * 2.0f;
-
-        // Sample color from sprite
-        CF_Color color = sample_sprite_color(enemy_type);
-
         burst[i]       = make_explosion_particle(pos, color, angle);
     }
 
