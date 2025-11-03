@@ -15,9 +15,8 @@ void screenshake_add(ScreenShake* shake, float amount) {
     // Add to existing magnitude (allows multiple explosions to stack)
     shake->magnitude += amount;
 
-    // Optional: Cap the maximum shake to prevent excessive shaking
-    const float MAX_SHAKE = 10.0f;
-    if (shake->magnitude > MAX_SHAKE) { shake->magnitude = MAX_SHAKE; }
+    // Cap the maximum shake to prevent excessive shaking
+    if (shake->magnitude > SCREENSHAKE_MAX_MAGNITUDE) { shake->magnitude = SCREENSHAKE_MAX_MAGNITUDE; }
 }
 
 void screenshake_update(ScreenShake* shake) {
@@ -28,27 +27,26 @@ void screenshake_update(ScreenShake* shake) {
     }
 
     // Update time for variation
-    shake->time += CF_DELTA_TIME * 30.0f;  // Multiply by frequency for faster shake
+    shake->time += CF_DELTA_TIME * SCREENSHAKE_FREQ_TIME_SCALE;
 
     // Use Perlin-noise-like variation with sine waves at different frequencies
     // This creates smooth but chaotic motion
-    float x_offset = CF_SINF(shake->time * 1.3f) * shake->magnitude;
-    float y_offset = CF_COSF(shake->time * 1.7f) * shake->magnitude;
+    float x_offset = CF_SINF(shake->time * SCREENSHAKE_FREQ_OFFSET_X1) * shake->magnitude;
+    float y_offset = CF_COSF(shake->time * SCREENSHAKE_FREQ_OFFSET_Y1) * shake->magnitude;
 
     // Add higher frequency component for more "jittery" feel
-    x_offset += CF_SINF(shake->time * 3.1f) * shake->magnitude * 0.5f;
-    y_offset += CF_COSF(shake->time * 2.9f) * shake->magnitude * 0.5f;
+    x_offset += CF_SINF(shake->time * SCREENSHAKE_FREQ_OFFSET_X2) * shake->magnitude * SCREENSHAKE_OFFSET_JITTER_SCALE;
+    y_offset += CF_COSF(shake->time * SCREENSHAKE_FREQ_OFFSET_Y2) * shake->magnitude * SCREENSHAKE_OFFSET_JITTER_SCALE;
 
-    shake->offset        = cf_v2(x_offset, y_offset);
+    shake->offset = cf_v2(x_offset, y_offset);
 
     // Calculate rotation - use different frequency for independence from position
-    // Scale rotation by magnitude but keep it subtle (convert to degrees conceptually)
-    // Max rotation at max magnitude should be around 2-3 degrees (0.035 - 0.052 radians)
-    float rotation_scale = 0.005f;  // Adjust this to control max rotation intensity
-    shake->rotation      = CF_SINF(shake->time * 2.3f) * shake->magnitude * rotation_scale;
+    shake->rotation =
+        CF_SINF(shake->time * SCREENSHAKE_FREQ_ROTATION_1) * shake->magnitude * SCREENSHAKE_ROTATION_SCALE;
 
     // Add a counter-oscillation for more dynamic rotation
-    shake->rotation += CF_COSF(shake->time * 1.9f) * shake->magnitude * rotation_scale * 0.6f;
+    shake->rotation += CF_COSF(shake->time * SCREENSHAKE_FREQ_ROTATION_2) * shake->magnitude *
+                       SCREENSHAKE_ROTATION_SCALE * SCREENSHAKE_ROTATION_COUNTER_SCALE;
 
     // Decay the magnitude over time
     shake->magnitude -= shake->decay_rate * CF_DELTA_TIME;
