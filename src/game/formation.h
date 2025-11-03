@@ -37,4 +37,4 @@ extern const Formation FORMATION_WAVE;
 void formation_spawner_init(FormationSpawner* spawner, const Formation* formation, CF_V2 origin, EnemyType enemy_type);
 void formation_spawner_update(FormationSpawner* spawner);
 bool formation_spawner_is_complete(const FormationSpawner* spawner);
-size_t formation_spawner_cleanup(size_t count, FormationSpawner spawner[static restrict count]);
+void formation_spawner_cleanup(void);

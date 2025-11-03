@@ -255,8 +255,7 @@ EXPORT bool game_update(void) {
     cleanup_explosion_particles();
     cleanup_player_bullets();
     cleanup_floating_scores();
-    g_state->formation_spawners_count =
-        formation_spawner_cleanup(g_state->formation_spawners_count, g_state->formation_spawners);
+    formation_spawner_cleanup();
 
     return true;
 }

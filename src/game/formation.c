@@ -5,6 +5,7 @@
 #include <stddef.h>
 
 #include "../engine/common.h"
+#include "../engine/game_state.h"
 #include "enemy.h"
 
 // Define the actual formations
@@ -127,10 +128,12 @@ void formation_spawner_update(FormationSpawner* spawner) {
     spawner->active = false;
 }
 
-size_t formation_spawner_cleanup(size_t count, FormationSpawner spawner[static restrict count]) {
-    size_t write_idx = 0;
-    for (size_t i = 0; i < count; i++) {
-        if (spawner[i].active) { spawner[write_idx++] = spawner[i]; }
+void formation_spawner_cleanup() {
+    int write_idx = 0;
+    for (size_t i = 0; i < g_state->formation_spawners_count; i++) {
+        if (g_state->formation_spawners[i].active) {
+            g_state->formation_spawners[write_idx++] = g_state->formation_spawners[i];
+        }
     }
-    return write_idx;
+    g_state->floating_scores_count = write_idx;
 }
