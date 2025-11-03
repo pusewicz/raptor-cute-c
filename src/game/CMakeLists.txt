@@ -24,6 +24,7 @@ add_library(
     input.c
     player.c
     player_bullet.c
+    screenshake.c
     star_particle.c
 )
 target_link_libraries(${NAME}

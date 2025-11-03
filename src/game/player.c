@@ -15,6 +15,7 @@
 #include "explosion.h"
 #include "explosion_particle.h"
 #include "player_bullet.h"
+#include "screenshake.h"
 
 constexpr float WEAPON_DEFAULT_COOLDOWN = 0.15f;  // Time needed to let the player shoot again
 
@@ -69,6 +70,7 @@ void damage_player(void) {
     // Create explosion at player position
     spawn_explosion(make_explosion(player->position));
     spawn_explosion_particle_burst(player->position, COLOR_SOURCE_PLAYER());
+    screenshake_add(&g_state->screenshake, 4.0f);
     play_sound(SOUND_EXPLOSION);
     play_sound(SOUND_DEATH);
 

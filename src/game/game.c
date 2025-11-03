@@ -7,6 +7,7 @@
 #include <cute_color.h>
 #include <cute_defines.h>
 #include <cute_draw.h>
+#include <cute_graphics.h>
 #include <cute_input.h>
 #include <cute_math.h>
 #include <cute_rnd.h>
@@ -39,6 +40,7 @@
 #include "player.h"
 #include "player_bullet.h"
 #include "render.h"
+#include "screenshake.h"
 #include "star_particle.h"
 
 #ifdef CF_RUNTIME_SHADER_COMPILATION
@@ -72,8 +74,8 @@ constexpr int CANVAS_WIDTH            = 180;
 constexpr int CANVAS_HEIGHT           = 320;
 
 const int MAX_PLAYER_BULLETS          = 32;
-const int MAX_ENEMIES                 = 64;
-const int MAX_ENEMY_BULLETS           = 64;
+const int MAX_ENEMIES                 = 128;
+const int MAX_ENEMY_BULLETS           = 128;
 const int MAX_HIT_PARTICLES           = 240;
 const int MAX_EXPLOSION_PARTICLES     = 320;    // More particles for colorful explosions
 const int MAX_EXPLOSIONS              = 32;
@@ -113,13 +115,17 @@ EXPORT void game_init(Platform* platform) {
 #endif
 
     init_coroutines();
+    screenshake_init(&g_state->screenshake, 6.0f);
 
     if (!validate_game_state()) {
         APP_FATAL("GameState validation failed in game_init");
         CF_ASSERT(false);
     }
 
-    cf_app_set_canvas_size((int)g_state->canvas_size.x * g_state->scale, (int)g_state->canvas_size.y * g_state->scale);
+    int canvas_w    = (int)g_state->canvas_size.x * g_state->scale;
+    int canvas_h    = (int)g_state->canvas_size.y * g_state->scale;
+    g_state->canvas = cf_make_canvas(cf_canvas_defaults(canvas_w, canvas_h));
+    cf_app_set_canvas_size(canvas_w, canvas_h);
     cf_app_set_size((int)g_state->canvas_size.x * g_state->scale, (int)g_state->canvas_size.y * g_state->scale);
     cf_app_center_window();
 #ifdef DEBUG
@@ -247,6 +253,7 @@ EXPORT bool game_update(void) {
     update_background_scroll();
     update_collision();
     update_coroutine();
+    screenshake_update(&g_state->screenshake);
 
     cleanup_enemies();
     cleanup_enemy_bullets();
@@ -404,6 +411,19 @@ EXPORT void game_render(void) {
                 cf_draw_sprite(icon);
             }
         }
+    }
+
+    cf_render_to(g_state->canvas, true);
+
+    cf_draw() {
+        cf_draw_translate_v2(screenshake_get_offset(&g_state->screenshake));
+        cf_draw_rotate(screenshake_get_rotation(&g_state->screenshake));  // TODO: Move param inside the screenshake
+                                                                          // function
+        cf_draw_canvas(
+            g_state->canvas,
+            cf_v2(0, 0),
+            cf_v2(cf_app_get_canvas_width() / g_state->scale, cf_app_get_canvas_height() / g_state->scale)
+        );
     }
 }
 

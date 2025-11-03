@@ -23,6 +23,7 @@
 #include "../game/hit_particle.h"
 #include "../game/player.h"
 #include "../game/player_bullet.h"
+#include "../game/screenshake.h"
 #include "../game/star_particle.h"
 
 typedef struct Platform Platform;
@@ -44,6 +45,7 @@ typedef struct GameState {
     int          score;
     int          lives;
 
+    CF_Canvas canvas;
     CF_Shader recolor;
 
     BackgroundScroll background_scroll;
@@ -85,8 +87,9 @@ typedef struct GameState {
     size_t            formation_spawners_count;
     size_t            formation_spawners_capacity;
 
-    CF_Audio  audio_assets[AUDIO_COUNT];
-    CF_Sprite sprite_assets[SPRITE_COUNT];
+    ScreenShake screenshake;
+    CF_Audio    audio_assets[AUDIO_COUNT];
+    CF_Sprite   sprite_assets[SPRITE_COUNT];
 
     struct {
         CF_Coroutine spawner;

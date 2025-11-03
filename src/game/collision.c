@@ -12,6 +12,7 @@
 #include "hit_particle.h"
 #include "player.h"
 #include "player_bullet.h"
+#include "screenshake.h"
 
 static void player_bullets_vs_enemies(
     const size_t player_bullets_count,
@@ -44,6 +45,7 @@ static void player_bullets_vs_enemies(
                 // If enemy survives, push it upwards and spawn particles
                 if (enemy->health.current > 0) {
                     enemy->position.y += 5.0f;  // Push upwards by 5 pixels
+                    screenshake_add(&g_state->screenshake, 0.5f);
                     play_sound(SOUND_HIT);
                 } else {
                     g_state->score += enemy->score;
@@ -53,6 +55,7 @@ static void player_bullets_vs_enemies(
                     spawn_explosion(make_explosion(enemy->position));
                     spawn_explosion_particle_burst(enemy->position, COLOR_SOURCE_ENEMY(enemy->type));
                     spawn_floating_score(make_floating_score(enemy->position, enemy->score));
+                    screenshake_add(&g_state->screenshake, 1.0f);
                     play_sound(SOUND_EXPLOSION);
                 }
 
