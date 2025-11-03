@@ -14,6 +14,6 @@ typedef struct Explosion {
     ZIndex    z_index;  // Rendering order
 } Explosion;
 
-Explosion make_explosion(float x, float y);
+Explosion make_explosion(CF_V2 position);
 void      spawn_explosion(Explosion explosion);
 void      cleanup_explosions(void);

@@ -50,9 +50,9 @@ static void player_bullets_vs_enemies(
                     // Destroy enemy
                     enemy->is_alive = false;
 
-                    spawn_explosion(make_explosion(enemy->position.x, enemy->position.y));
+                    spawn_explosion(make_explosion(enemy->position));
                     spawn_explosion_particle_burst(enemy->position, enemy->type);
-                    spawn_floating_score(make_floating_score(enemy->position.x, enemy->position.y, enemy->score));
+                    spawn_floating_score(make_floating_score(enemy->position, enemy->score));
                     play_sound(SOUND_EXPLOSION);
                 }
 

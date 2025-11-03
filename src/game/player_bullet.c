@@ -11,12 +11,11 @@
 
 constexpr float PLAYER_BULLET_DEFAULT_SPEED = 3.0f;
 
-PlayerBullet make_player_bullet(float x, float y, CF_V2 direction) {
-    PlayerBullet bullet          = (PlayerBullet){.is_alive = true};
-
-    // Position
-    bullet.position.x            = x;
-    bullet.position.y            = y;
+PlayerBullet make_player_bullet(CF_V2 position, CF_V2 direction) {
+    PlayerBullet bullet = (PlayerBullet){
+        .is_alive = true,
+        .position = position,
+    };
 
     // Velocity
     bullet.velocity.x            = 0.0f;

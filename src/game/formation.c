@@ -120,7 +120,7 @@ void formation_spawner_update(FormationSpawner* spawner) {
     for (size_t i = 0; i < spawner->formation->points_count; ++i) {
         const FormationPoint* point = &spawner->formation->points[i];
         CF_V2 world_pos = {spawner->spawn_origin.x + point->x_offset, spawner->spawn_origin.y + point->y_offset};
-        auto  enemy     = make_enemy_of_type(world_pos.x, world_pos.y, spawner->enemy_type);
+        auto  enemy     = make_enemy_of_type(world_pos, spawner->enemy_type);
 
         spawn_enemy(enemy);
     }

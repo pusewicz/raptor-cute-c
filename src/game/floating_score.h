@@ -2,6 +2,7 @@
 
 #include <cute_math.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef struct FloatingScore {
     CF_V2 position;
@@ -12,7 +13,7 @@ typedef struct FloatingScore {
     bool  is_alive;
 } FloatingScore;
 
-FloatingScore make_floating_score(float x, float y, int score);
+FloatingScore make_floating_score(CF_V2 position, int score);
 void          spawn_floating_score(FloatingScore floating_score);
 void          update_floating_scores(void);
 void          render_floating_scores(void);

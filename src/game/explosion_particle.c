@@ -44,12 +44,12 @@ static CF_Color sample_sprite_color(const EnemyType enemy_type) {
     return color;
 }
 
-ExplosionParticle make_explosion_particle(float x, float y, CF_Color color, float angle) {
+ExplosionParticle make_explosion_particle(CF_V2 position, CF_Color color, float angle) {
     float speed                = cf_rnd_range_float(&g_state->rnd, 0.5f, 1.0f);
 
     ExplosionParticle particle = (ExplosionParticle){
         .is_alive   = true,
-        .position   = cf_v2(x, y),
+        .position   = position,
         .velocity   = cf_v2(CF_COSF(angle) * speed, CF_SINF(angle) * speed),
         .lifetime   = cf_rnd_range_float(&g_state->rnd, 0.5f, 0.8f),
         .time_alive = 0.0f,
@@ -88,7 +88,7 @@ void spawn_explosion_particle_burst(CF_V2 pos, const EnemyType enemy_type) {
         // Sample color from sprite
         CF_Color color = sample_sprite_color(enemy_type);
 
-        burst[i]       = make_explosion_particle(pos.x, pos.y, color, angle);
+        burst[i]       = make_explosion_particle(pos, color, angle);
     }
 
     spawn_explosion_particles(particle_count, burst);

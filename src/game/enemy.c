@@ -13,7 +13,7 @@
 
 constexpr float ENEMY_DEFAULT_SPEED = 0.5f;
 
-Enemy make_enemy_of_type(float x, float y, EnemyType type) {
+Enemy make_enemy_of_type(CF_V2 position, EnemyType type) {
     // Sprite
     Sprite sprite;
     int    score_value;
@@ -43,7 +43,7 @@ Enemy make_enemy_of_type(float x, float y, EnemyType type) {
     }
 
     Enemy enemy = (Enemy){
-        .position = cf_v2(x, y),
+        .position = position,
         .velocity = cf_v2(0, -ENEMY_DEFAULT_SPEED),
         .z_index  = Z_SPRITES,
         .score    = score_value,
@@ -68,20 +68,19 @@ Enemy make_enemy_of_type(float x, float y, EnemyType type) {
     return enemy;
 }
 
-Enemy make_random_enemy(float x, float y) {
+Enemy make_random_enemy(CF_V2 position) {
     EnemyType types[] = {ENEMY_TYPE_ALAN, ENEMY_TYPE_BON_BON, ENEMY_TYPE_LIPS};
     int       type    = cf_rnd_range_int(&g_state->rnd, 0, 2);
-    return make_enemy_of_type(x, y, types[type]);
+    return make_enemy_of_type(position, types[type]);
 }
 
 constexpr float ENEMY_BULLET_DEFAULT_SPEED = 1.22f;
 
-EnemyBullet make_enemy_bullet(float x, float y, CF_V2 direction) {
-    EnemyBullet bullet           = (EnemyBullet){.is_alive = true};
-
-    // Position
-    bullet.position.x            = x;
-    bullet.position.y            = y;
+EnemyBullet make_enemy_bullet(CF_V2 position, CF_V2 direction) {
+    EnemyBullet bullet = (EnemyBullet){
+        .is_alive = true,
+        .position = position,
+    };
 
     // Velocity
     bullet.velocity.x            = ENEMY_BULLET_DEFAULT_SPEED * direction.x;
@@ -100,12 +99,14 @@ EnemyBullet make_enemy_bullet(float x, float y, CF_V2 direction) {
 void spawn_enemy_bullet(EnemyBullet bullet) {
     CF_ASSERT(g_state->enemy_bullets);
     CF_ASSERT(g_state->enemy_bullets_count < g_state->enemy_bullets_capacity);
+
     g_state->enemy_bullets[g_state->enemy_bullets_count++] = bullet;
 }
 
 void spawn_enemy(Enemy enemy) {
     CF_ASSERT(g_state->enemies);
     CF_ASSERT(g_state->enemies_count < g_state->enemies_capacity - 1);
+
     g_state->enemies[g_state->enemies_count++] = enemy;
 }
 
@@ -121,7 +122,7 @@ void update_enemy(Enemy* enemy) {
             enemy->time_since_shot = 0.0f;
 
             // Shoot downward (toward player)
-            spawn_enemy_bullet(make_enemy_bullet(enemy->position.x, enemy->position.y, cf_v2(0, -1)));
+            spawn_enemy_bullet(make_enemy_bullet(enemy->position, cf_v2(0, -1)));
 
             play_sound(SOUND_LASER);
         }

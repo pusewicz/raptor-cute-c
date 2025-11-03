@@ -41,9 +41,9 @@ typedef struct EnemyBullet {
     ZIndex    z_index;  // Rendering order
 } EnemyBullet;
 
-Enemy       make_enemy_of_type(float x, float y, EnemyType type);
-Enemy       make_random_enemy(float x, float y);
-EnemyBullet make_enemy_bullet(float x, float y, CF_V2 direction);
+Enemy       make_enemy_of_type(CF_V2 position, EnemyType type);
+Enemy       make_random_enemy(CF_V2 position);
+EnemyBullet make_enemy_bullet(CF_V2 position, CF_V2 direction);
 void        spawn_enemy_bullet(EnemyBullet bullet);
 void        spawn_enemy(Enemy enemy);
 void        update_enemy(Enemy* enemy);

@@ -14,7 +14,7 @@ typedef struct HitParticle {
     bool      is_alive;
 } HitParticle;
 
-HitParticle make_hit_particle(float x, float y, CF_V2 direction);
+HitParticle make_hit_particle(CF_V2 position, CF_V2 direction);
 void        spawn_hit_particle(HitParticle hit_particle);
 void        spawn_hit_particles(size_t count, const HitParticle particles[static restrict count]);
 void        spawn_hit_particle_burst(size_t count, CF_V2 pos, CF_V2 dir);

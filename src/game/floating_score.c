@@ -15,9 +15,9 @@
 constexpr float FLOATING_SCORE_SPEED    = 0.85f;
 constexpr float FLOATING_SCORE_LIFETIME = 1.0f;
 
-FloatingScore make_floating_score(float x, float y, int score) {
+FloatingScore make_floating_score(CF_V2 position, int score) {
     return (FloatingScore){
-        .position = cf_v2(x, y),
+        .position = position,
         .velocity = cf_v2(0, FLOATING_SCORE_SPEED),
         .score    = score,
         .lifetime = FLOATING_SCORE_LIFETIME,

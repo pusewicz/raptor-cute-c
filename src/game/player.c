@@ -66,7 +66,7 @@ void damage_player(void) {
     g_state->lives--;
 
     // Create explosion at player position
-    spawn_explosion(make_explosion(player->position.x, player->position.y));
+    spawn_explosion(make_explosion(player->position));
     play_sound(SOUND_EXPLOSION);
     play_sound(SOUND_DEATH);
 
@@ -126,7 +126,7 @@ void update_player(Player* player) {
     } else if (player->input.shoot) {
         player->weapon.time_since_shot = 0.0f;
 
-        spawn_player_bullet(make_player_bullet(player->position.x, player->position.y, cf_v2(0, 1)));
+        spawn_player_bullet(make_player_bullet(player->position, cf_v2(0, 1)));
 
         play_sound(SOUND_LASER);
     }

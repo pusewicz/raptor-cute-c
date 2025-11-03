@@ -9,11 +9,15 @@
 #include "asset/sprite.h"
 #include "component.h"
 
-Explosion make_explosion(float x, float y) {
-    Explosion explosion = (Explosion){.position = cf_v2(x, y), .z_index = Z_SPRITES, .is_alive = true};
+Explosion make_explosion(CF_V2 position) {
+    Explosion explosion = (Explosion){
+        .position = position,
+        .z_index  = Z_SPRITES,
+        .is_alive = true,
+    };
 
     // Sprite
-    explosion.sprite    = get_sprite(SPRITE_EXPLOSION);
+    explosion.sprite = get_sprite(SPRITE_EXPLOSION);
     cf_sprite_set_loop(&explosion.sprite, false);
 
     return explosion;

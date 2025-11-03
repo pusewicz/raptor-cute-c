@@ -14,6 +14,6 @@ typedef struct PlayerBullet {
     ZIndex    z_index;  // Rendering order
 } PlayerBullet;
 
-PlayerBullet make_player_bullet(float x, float y, CF_V2 direction);
+PlayerBullet make_player_bullet(CF_V2 position, CF_V2 direction);
 void         spawn_player_bullet(PlayerBullet player_bullet);
 void         cleanup_player_bullets(void);

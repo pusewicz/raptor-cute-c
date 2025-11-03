@@ -12,7 +12,7 @@
 #include "../engine/game_state.h"
 #include "movement.h"
 
-HitParticle make_hit_particle(float x, float y, CF_V2 direction) {
+HitParticle make_hit_particle(CF_V2 position, CF_V2 direction) {
     // Calculate the base angle from the direction vector
     float base_angle     = CF_ATAN2F(direction.y, direction.x);
     float spread         = cf_rnd_range_float(&g_state->rnd, -0.5f, 0.5f);  // ±0.5 radians spread
@@ -21,7 +21,7 @@ HitParticle make_hit_particle(float x, float y, CF_V2 direction) {
 
     HitParticle particle = (HitParticle){
         .is_alive   = true,
-        .position   = cf_v2(x, y),
+        .position   = position,
         .velocity   = cf_v2(CF_COSF(angle) * speed, CF_SINF(angle) * speed),
         .lifetime   = cf_rnd_range_float(&g_state->rnd, 0.5f, 0.85f),
         .time_alive = 0.0f,
@@ -42,7 +42,6 @@ void spawn_hit_particle(HitParticle particle) {
 
 void spawn_hit_particles(size_t count, const HitParticle particles[static restrict count]) {
     CF_ASSERT(g_state->hit_particles_count + count <= g_state->hit_particles_capacity);
-
     CF_MEMCPY(&g_state->hit_particles[g_state->hit_particles_count], particles, count * sizeof(*particles));
 
     g_state->hit_particles_count += count;
@@ -51,7 +50,7 @@ void spawn_hit_particles(size_t count, const HitParticle particles[static restri
 void spawn_hit_particle_burst(size_t count, CF_V2 pos, CF_V2 dir) {
     HitParticle burst[count];
 
-    for (size_t i = 0; i < count; ++i) { burst[i] = make_hit_particle(pos.x, pos.y, dir); }
+    for (size_t i = 0; i < count; ++i) { burst[i] = make_hit_particle(pos, dir); }
 
     spawn_hit_particles(count, burst);
 }

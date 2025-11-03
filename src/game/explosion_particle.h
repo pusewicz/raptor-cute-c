@@ -18,7 +18,7 @@ typedef struct ExplosionParticle {
     bool      is_alive;
 } ExplosionParticle;
 
-ExplosionParticle make_explosion_particle(float x, float y, CF_Color color, float angle);
+ExplosionParticle make_explosion_particle(CF_V2 position, CF_Color color, float angle);
 void              spawn_explosion_particle(ExplosionParticle particle);
 void              spawn_explosion_particles(size_t count, const ExplosionParticle particles[static restrict count]);
 void              spawn_explosion_particle_burst(CF_V2 pos, const EnemyType enemy_type);
