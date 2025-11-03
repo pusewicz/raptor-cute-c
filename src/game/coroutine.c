@@ -22,36 +22,16 @@ static void enemy_spawner(CF_Coroutine co [[maybe_unused]]) {
         float canvas_top      = g_state->canvas_size.y / 2.0f;
 
         const CF_V2 spawn_pos = cf_v2(0, canvas_top);
-        formation_spawner_init(
-            &g_state->formation_spawners[g_state->formation_spawners_count++],
-            &FORMATION_DIAMOND,
-            spawn_pos,
-            ENEMY_TYPE_ALAN
-        );
+        formation_spawn(&FORMATION_DIAMOND, spawn_pos, ENEMY_TYPE_ALAN);
         wait_for(3.0f);
 
-        formation_spawner_init(
-            &g_state->formation_spawners[g_state->formation_spawners_count++],
-            &FORMATION_LINE_HORIZONTAL,
-            spawn_pos,
-            ENEMY_TYPE_BON_BON
-        );
+        formation_spawn(&FORMATION_LINE_HORIZONTAL, spawn_pos, ENEMY_TYPE_BON_BON);
         wait_for(3.0f);
 
-        formation_spawner_init(
-            &g_state->formation_spawners[g_state->formation_spawners_count++],
-            &FORMATION_WAVE,
-            spawn_pos,
-            ENEMY_TYPE_LIPS
-        );
+        formation_spawn(&FORMATION_WAVE, spawn_pos, ENEMY_TYPE_LIPS);
         wait_for(3.0f);
 
-        formation_spawner_init(
-            &g_state->formation_spawners[g_state->formation_spawners_count++],
-            &FORMATION_ARROW_DOWN,
-            spawn_pos,
-            ENEMY_TYPE_BON_BON
-        );
+        formation_spawn(&FORMATION_ARROW_DOWN, spawn_pos, ENEMY_TYPE_BON_BON);
         wait_for(3.0f);
     }
 }

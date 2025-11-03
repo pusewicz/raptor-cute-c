@@ -108,32 +108,12 @@ const Formation FORMATION_WAVE = {
 };
 
 // Spawner implementation
-void formation_spawner_init(FormationSpawner* spawner, const Formation* formation, CF_V2 origin, EnemyType enemy_type) {
-    spawner->formation    = formation;
-    spawner->spawn_origin = origin;
-    spawner->enemy_type   = enemy_type;
-    spawner->active       = true;
-}
-
-void formation_spawner_update(FormationSpawner* spawner) {
-    if (!spawner->active) { return; }
-
-    for (size_t i = 0; i < spawner->formation->points_count; ++i) {
-        const FormationPoint* point = &spawner->formation->points[i];
-        CF_V2 world_pos = {spawner->spawn_origin.x + point->x_offset, spawner->spawn_origin.y + point->y_offset};
-        auto  enemy     = make_enemy_of_type(world_pos, spawner->enemy_type);
+void formation_spawn(const Formation* formation, CF_V2 origin, EnemyType enemy_type) {
+    for (size_t i = 0; i < formation->points_count; ++i) {
+        const FormationPoint* point     = &formation->points[i];
+        CF_V2                 world_pos = {origin.x + point->x_offset, origin.y + point->y_offset};
+        auto                  enemy     = make_enemy_of_type(world_pos, enemy_type);
 
         spawn_enemy(enemy);
     }
-    spawner->active = false;
-}
-
-void formation_spawner_cleanup() {
-    int write_idx = 0;
-    for (size_t i = 0; i < g_state->formation_spawners_count; i++) {
-        if (g_state->formation_spawners[i].active) {
-            g_state->formation_spawners[write_idx++] = g_state->formation_spawners[i];
-        }
-    }
-    g_state->floating_scores_count = write_idx;
 }

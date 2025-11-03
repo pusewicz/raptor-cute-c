@@ -83,10 +83,6 @@ typedef struct GameState {
     size_t         floating_scores_count;
     size_t         floating_scores_capacity;
 
-    FormationSpawner* formation_spawners;
-    size_t            formation_spawners_count;
-    size_t            formation_spawners_capacity;
-
     ScreenShake screenshake;
     CF_Audio    audio_assets[AUDIO_COUNT];
     CF_Sprite   sprite_assets[SPRITE_COUNT];

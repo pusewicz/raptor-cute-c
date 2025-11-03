@@ -81,7 +81,6 @@ const int MAX_EXPLOSION_PARTICLES     = 320;    // More particles for colorful e
 const int MAX_EXPLOSIONS              = 32;
 const int MAX_STAR_PARTICLES          = 4 * 4;  // 4 stars per 4 layers
 const int MAX_FLOATING_SCORES         = 16;
-const int MAX_FORMATION_SPAWNERS      = 16;
 
 EXPORT void game_init(Platform* platform) {
     g_state = platform->allocate_memory(sizeof(GameState));
@@ -142,7 +141,6 @@ EXPORT void game_init(Platform* platform) {
     INIT_ENTITY_STORAGE(Explosion, explosions, MAX_EXPLOSIONS);
     INIT_ENTITY_STORAGE(ExplosionParticle, explosion_particles, MAX_EXPLOSION_PARTICLES);
     INIT_ENTITY_STORAGE(FloatingScore, floating_scores, MAX_FLOATING_SCORES);
-    INIT_ENTITY_STORAGE(FormationSpawner, formation_spawners, MAX_FORMATION_SPAWNERS);
     INIT_ENTITY_STORAGE(HitParticle, hit_particles, MAX_HIT_PARTICLES);
     INIT_ENTITY_STORAGE(PlayerBullet, player_bullets, MAX_PLAYER_BULLETS);
     INIT_ENTITY_STORAGE(StarParticle, star_particles, MAX_STAR_PARTICLES);
@@ -206,11 +204,6 @@ EXPORT bool game_update(void) {
     // Update player movement
     update_movement(&g_state->player.position, &g_state->player.velocity);
 
-    // Update active formation spawners
-    for (size_t i = 0; i < g_state->formation_spawners_count; i++) {
-        formation_spawner_update(&g_state->formation_spawners[i]);
-    }
-
     // Update player bullets
     for (size_t i = 0; i < g_state->player_bullets_count; i++) {
         update_movement(&g_state->player_bullets[i].position, &g_state->player_bullets[i].velocity);
@@ -262,7 +255,6 @@ EXPORT bool game_update(void) {
     cleanup_explosion_particles();
     cleanup_player_bullets();
     cleanup_floating_scores();
-    formation_spawner_cleanup();
 
     return true;
 }
