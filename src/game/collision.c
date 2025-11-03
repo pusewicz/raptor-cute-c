@@ -14,9 +14,9 @@
 #include "player_bullet.h"
 
 static void player_bullets_vs_enemies(
-    size_t       player_bullets_count,
+    const size_t player_bullets_count,
     PlayerBullet player_bullets[static restrict player_bullets_count],
-    size_t       enemies_count,
+    const size_t enemies_count,
     Enemy        enemies[static restrict enemies_count]
 ) {
     if (player_bullets_count == 0 || enemies_count == 0) { return; }
@@ -71,10 +71,10 @@ static void player_bullets_vs_enemies(
 
 static void player_vs_threats(
     const Player* restrict player,
-    size_t      enemies_count,
-    Enemy       enemies[static restrict enemies_count],
-    size_t      enemy_bullets_count,
-    EnemyBullet enemy_bullets[static restrict enemy_bullets_count]
+    const size_t enemies_count,
+    Enemy        enemies[static restrict enemies_count],
+    const size_t enemy_bullets_count,
+    EnemyBullet  enemy_bullets[static restrict enemy_bullets_count]
 ) {
     if (enemies_count == 0 && enemy_bullets_count == 0) { return; }
     if (!player->is_alive || player->is_invincible) { return; }
