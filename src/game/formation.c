@@ -5,7 +5,6 @@
 #include <stddef.h>
 
 #include "../engine/common.h"
-#include "../engine/game_state.h"
 #include "enemy.h"
 
 // Define the actual formations
@@ -119,10 +118,7 @@ void formation_spawn(const Formation* formation, CF_V2 origin, EnemyType enemy_t
 }
 
 void formation_spawn_with_shoot_chance(
-    const Formation* formation,
-    CF_V2            origin,
-    EnemyType        enemy_type,
-    float            shoot_chance
+    const Formation* formation, CF_V2 origin, EnemyType enemy_type, float shoot_chance
 ) {
     for (size_t i = 0; i < formation->points_count; ++i) {
         const FormationPoint* point     = &formation->points[i];

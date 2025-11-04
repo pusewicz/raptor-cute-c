@@ -29,8 +29,5 @@ extern const Formation FORMATION_WAVE;
 // Spawner functions
 void formation_spawn(const Formation* formation, CF_V2 origin, EnemyType enemy_type);
 void formation_spawn_with_shoot_chance(
-    const Formation* formation,
-    CF_V2            origin,
-    EnemyType        enemy_type,
-    float            shoot_chance
+    const Formation* formation, CF_V2 origin, EnemyType enemy_type, float shoot_chance
 );
