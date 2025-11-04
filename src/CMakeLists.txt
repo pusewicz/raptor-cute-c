@@ -64,8 +64,8 @@ if(APPLE AND ${RELOADABLE})
     set(destination "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/assets")
     add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND "${CMAKE_COMMAND}" -E create_symlink ${source} ${destination}
         COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/"
+        COMMAND "${CMAKE_COMMAND}" -E create_symlink ${source} ${destination}
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:game>" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/"
         VERBATIM
         COMMENT "Copying game library to app bundle Resources folder"
