@@ -27,13 +27,13 @@ target_link_libraries(${NAME}
   PRIVATE project_warnings
   PUBLIC cute)
 if(NOT ${RELOADABLE})
-    target_link_libraries(${NAME} PRIVATE gamelib)
+    target_link_libraries(${NAME} PRIVATE game)
 endif()
 target_compile_definitions(
     ${NAME} PRIVATE
     $<$<CONFIG:Debug>:DEBUG>
     $<$<CONFIG:Release>:RELEASE>
-    GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:gamelib>"
+    GAME_LIBRARY_NAME="$<TARGET_FILE_NAME:game>"
     ENGINE_ENABLE_HOT_RELOAD=$<IF:$<BOOL:${RELOADABLE}>,1,0>
 )
 

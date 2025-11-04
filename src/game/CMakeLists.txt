@@ -1,4 +1,4 @@
-set(NAME "gamelib")
+set(NAME "game")
 
 if (${RELOADABLE})
     set(LIBRARY_TYPE SHARED)

@@ -20,7 +20,7 @@ Runs the built executable from the build directory. Will fail if build hasn't be
 ```bash
 rake watch
 ```
-Watches source files for changes and automatically recompiles the project causing the running game process to reload the gamelib.
+Watches source files for changes and automatically recompiles the project causing the running game process to reload the game library.
 
 ## Architecture
 
@@ -32,7 +32,7 @@ The project uses a **hot-reloadable game library architecture**:
 
 - **Main executable** (`src/main.c`): Entry point that loads the game library and runs the main loop
 - **Engine library** (`src/engine/game_state.c`): Contains the game state and engine stuff, compiled as a static library (`engine`)
-- **Game library** (`src/game/game.c`): Contains the actual game logic, compiled as a shared library (`gamelib`)
+- **Game library** (`src/game/game.c`): Contains the actual game logic, compiled as a shared library (`game`)
 - **Platform layer** (`src/platform/`): Abstracts platform-specific functionality
 - **Engine layer** (`src/engine/`): Core engine utilities and data structures
 
