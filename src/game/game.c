@@ -357,7 +357,7 @@ EXPORT void game_render(void) {
 
         cf_draw() {
             cf_font("TinyAndChunky") {
-                cf_push_font_size(12);
+                cf_push_font_size(7);
                 const float text_width  = cf_text_width(wave_text, -1);
                 const float text_height = cf_text_height(wave_text, -1);
 
