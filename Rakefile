@@ -69,7 +69,7 @@ end
 
 desc 'Build Xcode release'
 task xcode: XCODE_BUILD_DIR do
-  sh "cmake --build #{XCODE_BUILD_DIR} --parallel"
+  sh "cmake --build #{XCODE_BUILD_DIR} --config Release --parallel"
 end
 
 def run(cmd)
