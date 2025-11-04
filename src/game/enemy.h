@@ -5,6 +5,9 @@
 
 #include "component.h"
 
+constexpr float ENEMY_BULLET_DEFAULT_SPEED = 1.22f;
+constexpr float ENEMY_DEFAULT_SPEED        = 0.5f;
+
 typedef enum EnemyType {
     ENEMY_TYPE_ALAN,
     ENEMY_TYPE_BON_BON,
