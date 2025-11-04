@@ -78,7 +78,7 @@ def run(cmd)
   File.write(PID_FILE, pid)
   puts "Started process #{pid} with PID file at #{PID_FILE}"
 ensure
-  Process.wait(pid)
+  Process.wait(pid) if pid
   File.delete(PID_FILE) if File.exist?(PID_FILE)
 end
 
