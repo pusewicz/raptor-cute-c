@@ -25,11 +25,11 @@ static void spawn_single_enemy(CF_V2 position, EnemyType type, float shoot_chanc
 
 static void enemy_spawner(CF_Coroutine co [[maybe_unused]]) {
     while (1) {
-        float   canvas_top = g_state->canvas_size.y / 2.0f;
-        CF_V2   spawn_pos  = cf_v2(0, canvas_top);
-        int     wave       = g_state->wave.current_wave;
-        float   shoot_chance;
-        CF_V2   left_pos, right_pos;
+        float canvas_top = g_state->canvas_size.y / 2.0f;
+        CF_V2 spawn_pos  = cf_v2(0, canvas_top);
+        int   wave       = g_state->wave.current_wave;
+        float shoot_chance;
+        CF_V2 left_pos, right_pos;
 
         // Wait for wave announcement to finish
         while (g_state->wave.is_announcing) { cf_coroutine_yield(co); }
@@ -60,7 +60,9 @@ static void enemy_spawner(CF_Coroutine co [[maybe_unused]]) {
             case 2:
                 // Wave 2: BON_BON line formation, 10% shoot chance
                 shoot_chance = 0.1f;
-                formation_spawn_with_shoot_chance(&FORMATION_LINE_HORIZONTAL, spawn_pos, ENEMY_TYPE_BON_BON, shoot_chance);
+                formation_spawn_with_shoot_chance(
+                    &FORMATION_LINE_HORIZONTAL, spawn_pos, ENEMY_TYPE_BON_BON, shoot_chance
+                );
                 wait_for(3.0f);
                 break;
 
@@ -71,7 +73,9 @@ static void enemy_spawner(CF_Coroutine co [[maybe_unused]]) {
                 right_pos    = cf_v2(30, canvas_top);
                 formation_spawn_with_shoot_chance(&FORMATION_LINE_VERTICAL, left_pos, ENEMY_TYPE_ALAN, shoot_chance);
                 wait_for(1.0f);
-                formation_spawn_with_shoot_chance(&FORMATION_LINE_VERTICAL, right_pos, ENEMY_TYPE_BON_BON, shoot_chance);
+                formation_spawn_with_shoot_chance(
+                    &FORMATION_LINE_VERTICAL, right_pos, ENEMY_TYPE_BON_BON, shoot_chance
+                );
                 wait_for(2.5f);
                 break;
 
@@ -119,7 +123,7 @@ static void enemy_spawner(CF_Coroutine co [[maybe_unused]]) {
         g_state->wave.is_announcing      = true;
 
         // Small delay before announcing next wave
-        wait_for(1.0f);
+        wait_for(3.0f);
     }
 }
 
