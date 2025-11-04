@@ -28,7 +28,7 @@ char         game_library_path[MAX_PATH_LENGTH] = {0};
 SDL_PathInfo path_info;
 
 static void mount_content_directory_as(const char* dir) {
-    const char* path = cf_fs_get_base_directory();
+    const char* path = SDL_GetBasePath();
     cf_path_normalize(path);
     char full_path[MAX_PATH_LENGTH];
     SDL_snprintf(full_path, MAX_PATH_LENGTH, "%s%s", path, "assets");

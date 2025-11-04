@@ -7,7 +7,7 @@ include(${PROJECT_SOURCE_DIR}/cmake/StaticAnalyzers.cmake)
 
 add_executable(
   ${NAME}
-  # WIN32 MACOSX_BUNDLE
+  WIN32 MACOSX_BUNDLE
   main.c
   platform/platform_cute.c
 )
@@ -46,21 +46,28 @@ if(NOT CMAKE_C_LINK_PIE_SUPPORTED)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(source "${CMAKE_SOURCE_DIR}/assets")
-    set(destination "${CMAKE_BINARY_DIR}/assets")
-    add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
-        COMMENT "Creating symbolic link for the assets folder in ${destination}"
-    )
 endif()
 
-# Copy the generated DLL for SDL to the built binary’s folder
+# Copy the generated DLL for SDL to the built binary's folder
 if(WIN32)
   add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$" "$"
         VERBATIM
         COMMENT "Copying SDL3 DLL file to build folder"
+    )
+endif()
+
+# Copy game library to the app bundle on macOS
+if(APPLE AND ${RELOADABLE})
+    set(source "${CMAKE_SOURCE_DIR}/assets")
+    set(destination "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/assets")
+    add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E create_symlink ${source} ${destination}
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/"
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:game>" "$<TARGET_FILE_DIR:${PROJECT_NAME}>/../Resources/"
+        VERBATIM
+        COMMENT "Copying game library to app bundle Resources folder"
     )
 endif()

@@ -5,7 +5,7 @@ WEB_BUILD_DIR = File.join(__dir__, '.build', 'emscripten-static')
 XCODE_BUILD_DIR = File.join(__dir__, '.build', 'xcode-static')
 PWD = File.expand_path(__dir__)
 PID_FILE = File.join(BUILD_DIR, 'raptor.pid')
-EXE_FILE = File.join(BUILD_DIR, 'Raptor')
+EXE_FILE = File.join(BUILD_DIR, 'Raptor.app/Contents/MacOS/Raptor') # TODO: Handle other operating systems
 SHELL_STATIC_FILES = [
   'shell/logo.png',
   'shell/shell.css',
