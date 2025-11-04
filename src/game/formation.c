@@ -117,3 +117,19 @@ void formation_spawn(const Formation* formation, CF_V2 origin, EnemyType enemy_t
         spawn_enemy(enemy);
     }
 }
+
+void formation_spawn_with_shoot_chance(
+    const Formation* formation,
+    CF_V2            origin,
+    EnemyType        enemy_type,
+    float            shoot_chance
+) {
+    for (size_t i = 0; i < formation->points_count; ++i) {
+        const FormationPoint* point     = &formation->points[i];
+        CF_V2                 world_pos = {origin.x + point->x_offset, origin.y + point->y_offset};
+        auto                  enemy     = make_enemy_of_type(world_pos, enemy_type);
+
+        set_enemy_shoot_chance(&enemy, shoot_chance);
+        spawn_enemy(enemy);
+    }
+}

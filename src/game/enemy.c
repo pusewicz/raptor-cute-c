@@ -74,6 +74,8 @@ Enemy make_random_enemy(CF_V2 position) {
     return make_enemy_of_type(position, types[type]);
 }
 
+void set_enemy_shoot_chance(Enemy* enemy, float shoot_chance) { enemy->shoot_chance = shoot_chance; }
+
 constexpr float ENEMY_BULLET_DEFAULT_SPEED = 1.22f;
 
 EnemyBullet make_enemy_bullet(CF_V2 position, CF_V2 direction) {

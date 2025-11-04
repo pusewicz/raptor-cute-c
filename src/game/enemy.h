@@ -43,6 +43,7 @@ typedef struct EnemyBullet {
 
 Enemy       make_enemy_of_type(CF_V2 position, EnemyType type);
 Enemy       make_random_enemy(CF_V2 position);
+void        set_enemy_shoot_chance(Enemy* enemy, float shoot_chance);
 EnemyBullet make_enemy_bullet(CF_V2 position, CF_V2 direction);
 void        spawn_enemy_bullet(EnemyBullet bullet);
 void        spawn_enemy(Enemy enemy);

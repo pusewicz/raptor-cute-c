@@ -96,6 +96,13 @@ typedef struct GameState {
         CF_Sprite particle;
     } sprites;
 
+    // Wave system
+    struct {
+        int   current_wave;
+        float announcement_timer;
+        bool  is_announcing;
+    } wave;
+
     bool is_game_over;
     bool debug;  // Enable ImGUI debug pane
     bool debug_bounding_boxes;

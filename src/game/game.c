@@ -88,6 +88,11 @@ static void reset_game(void) {
     g_state->lives                     = 3;
     g_state->score                     = 0;
 
+    // Reset wave system
+    g_state->wave.current_wave         = 0;
+    g_state->wave.announcement_timer   = 0.0f;
+    g_state->wave.is_announcing        = true;
+
     // Reset player
     g_state->player                    = make_player(0.0f, -g_state->canvas_size.y / 3);
 
@@ -200,6 +205,16 @@ EXPORT bool game_update(void) {
         if (g_state->player.input.shoot) { reset_game(); }
         return true;
     }
+
+    // Update wave announcement
+    constexpr float WAVE_ANNOUNCEMENT_DURATION = 2.0f;
+    if (g_state->wave.is_announcing) {
+        g_state->wave.announcement_timer += CF_DELTA_TIME;
+        if (g_state->wave.announcement_timer >= WAVE_ANNOUNCEMENT_DURATION) {
+            g_state->wave.is_announcing = false;
+        }
+    }
+
     update_player(&g_state->player);
     // Update player movement
     update_movement(&g_state->player.position, &g_state->player.velocity);
@@ -334,6 +349,31 @@ EXPORT void game_render(void) {
 
     render_background_scroll();
     render_star_particles();
+
+    // Show wave announcement
+    if (g_state->wave.is_announcing) {
+        char wave_text[32];
+        snprintf(wave_text, sizeof(wave_text), "Wave %d", g_state->wave.current_wave);
+
+        cf_draw() {
+            cf_font("TinyAndChunky") {
+                cf_push_font_size(12);
+                const float text_width  = cf_text_width(wave_text, -1);
+                const float text_height = cf_text_height(wave_text, -1);
+
+                cf_draw_layer(Z_UI) {
+                    // Draw shadow
+                    cf_draw_color(cf_make_color_rgb(20, 91, 132)) {
+                        cf_draw_text(wave_text, cf_v2(-text_width / 2.0f + 2, -text_height / 2.0f - 2), -1);
+                    }
+                    // Draw main text
+                    cf_draw_color(cf_color_white()) {
+                        cf_draw_text(wave_text, cf_v2(-text_width / 2.0f, -text_height / 2.0f), -1);
+                    }
+                }
+            }
+        }
+    }
 
     // Show game over screen
     if (g_state->is_game_over) {
