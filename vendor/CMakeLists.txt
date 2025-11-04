@@ -3,7 +3,7 @@ include(FetchContent)
 FetchContent_Declare(
   cute
   GIT_REPOSITORY https://github.com/RandyGaul/cute_framework
-  GIT_TAG fb85bc0e9f3b6504a0bfa107bfc35be63a8daf8b
+  GIT_TAG 5485791078f6f21b8d7d38676e40dbdf2a96eeb4
 )
 
 # Settings
