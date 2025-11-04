@@ -5,7 +5,6 @@
 #include <cute_audio.h>
 #include <cute_c_runtime.h>
 #include <cute_color.h>
-#include <cute_defines.h>
 #include <cute_draw.h>
 #include <cute_graphics.h>
 #include <cute_input.h>
@@ -33,7 +32,6 @@
 #include "explosion.h"
 #include "explosion_particle.h"
 #include "floating_score.h"
-#include "formation.h"
 #include "hit_particle.h"
 #include "input.h"
 #include "movement.h"
@@ -53,34 +51,6 @@ const char s_recolor[] = {
 #endif
 
 GameState* g_state = nullptr;
-
-#ifdef _WIN32
-    #define EXPORT __declspec(dllexport)
-#else
-    #define EXPORT
-#endif
-
-#define INIT_ENTITY_STORAGE(type, field, max)                                                \
-    g_state->field            = cf_arena_alloc(&g_state->stage_arena, (max) * sizeof(type)); \
-    g_state->field##_count    = 0;                                                           \
-    g_state->field##_capacity = (max)
-
-constexpr int PERMANENT_ARENA_SIZE    = CF_MB * 64;
-constexpr int STAGE_ARENA_SIZE        = CF_MB * 64;
-constexpr int SCRATCH_ARENA_SIZE      = CF_MB * 64;
-constexpr int DEFAULT_ARENA_ALIGNMENT = 16;
-
-constexpr int CANVAS_WIDTH            = 180;
-constexpr int CANVAS_HEIGHT           = 320;
-
-const int MAX_PLAYER_BULLETS          = 32;
-const int MAX_ENEMIES                 = 128;
-const int MAX_ENEMY_BULLETS           = 128;
-const int MAX_HIT_PARTICLES           = 240;
-const int MAX_EXPLOSION_PARTICLES     = 320;    // More particles for colorful explosions
-const int MAX_EXPLOSIONS              = 32;
-const int MAX_STAR_PARTICLES          = 4 * 4;  // 4 stars per 4 layers
-const int MAX_FLOATING_SCORES         = 16;
 
 static void reset_game(void) {
     // Reset game state
@@ -120,11 +90,10 @@ EXPORT void game_init(Platform* platform) {
     load_sprites();
     prefetch_sprites();
 
-    const int scale                 = 3;
     g_state->display_id             = cf_default_display();
     g_state->platform               = platform;
     g_state->canvas_size            = cf_v2(CANVAS_WIDTH, CANVAS_HEIGHT);
-    g_state->scale                  = scale;
+    g_state->scale                  = CANVAS_SCALE;
     g_state->permanent_arena        = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, PERMANENT_ARENA_SIZE);
     g_state->stage_arena            = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, STAGE_ARENA_SIZE);
     g_state->scratch_arena          = cf_make_arena(DEFAULT_ARENA_ALIGNMENT, SCRATCH_ARENA_SIZE);
@@ -207,16 +176,12 @@ EXPORT bool game_update(void) {
     }
 
     // Update wave announcement
-    constexpr float WAVE_ANNOUNCEMENT_DURATION = 2.0f;
     if (g_state->wave.is_announcing) {
         g_state->wave.announcement_timer += CF_DELTA_TIME;
-        if (g_state->wave.announcement_timer >= WAVE_ANNOUNCEMENT_DURATION) {
-            g_state->wave.is_announcing = false;
-        }
+        if (g_state->wave.announcement_timer >= WAVE_ANNOUNCEMENT_DURATION) { g_state->wave.is_announcing = false; }
     }
 
     update_player(&g_state->player);
-    // Update player movement
     update_movement(&g_state->player.position, &g_state->player.velocity);
 
     // Update player bullets
@@ -228,6 +193,7 @@ EXPORT bool game_update(void) {
             g_state->player_bullets[i].is_alive = false;
         }
     }
+
     // Update enemies
     for (size_t i = 0; i < g_state->enemies_count; i++) {
         update_movement(&g_state->enemies[i].position, &g_state->enemies[i].velocity);
@@ -236,6 +202,7 @@ EXPORT bool game_update(void) {
         // Mark enemy as destroyed when out of screen bounds
         if (g_state->enemies[i].position.y < canvas_aabb.min.y) { g_state->enemies[i].is_alive = false; }
     }
+
     // Update enemy bullets
     for (size_t i = 0; i < g_state->enemy_bullets_count; i++) {
         update_movement(&g_state->enemy_bullets[i].position, &g_state->enemy_bullets[i].velocity);
@@ -246,6 +213,7 @@ EXPORT bool game_update(void) {
         );
         if (!cf_aabb_to_aabb(canvas_aabb, bullet_aabb)) { g_state->enemy_bullets[i].is_alive = false; }
     }
+
     update_hit_particles();
     update_explosion_particles();
     update_star_particles();
